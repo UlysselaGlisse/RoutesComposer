@@ -10,14 +10,30 @@ Les sections sont dans le plugin des segments, et la départementale correspond 
 
 Tout le travail géographique s'effectue sur les segments. Les compositions ne possèdent que des attributs et une liste avec les identifiants des segments.
 
+## Division 
+
 La première fonction de ce plugin est d'aider au moment de la division d'un segment.
 Si le segment fait partie d'une ou plusieurs compositions, il est pénible d'aller chercher dans lesquelles et à quel endroit.
 Le plugin s'occupe de cela à votre place.
 
+https://github.com/user-attachments/assets/82e68484-61c9-49c2-8f8e-dd5668f01f40
 
-https://github.com/user-attachments/assets/847a345d-a748-43bd-8e1c-c4cfd3f3e9d2
+Dans la vidéo ci-dessus, vous pouvez voir un ensemble de segments sur la carte et une liste de segments en bas de l'écran. Lorsque le segment 2516 est divisé, un nouveau segment est créé et les listes de segments sont automatiquement mises-à-jour.
 
-Dans la vidéo ci-dessus, vous pouvez voir un ensemble de segments sur la carte et une liste de segments en bas de l'écran. Lorsque le segment 6705 est divisé (pour en ajouter un nouveau, par exemple ici pour aller vers le Mont-Blanc de Courmayeur), un nouveau segment est créé et on peut voir que les listes de segments sont automatiquement mis-à-jour.
+## Création de géométries et erreurs:
+
+Vous pourrez directement depuis l'interface du plugin crée les géométries des compositions, les mettre à jour si votre couche en possède déjà et les mettre à jour à chaque modification de la géométrie des segments.
+
+## Sélection
+
+Ce plugin est accompagné d'un autre outil, permettant de sélectionner les ids des segments directement sur la carte. Un petit algorithme permet de boucher les trous si l'on ne sélectionne pas deux segments contigus.
+
+https://github.com/user-attachments/assets/e7506320-665e-49fe-bef8-5ba32d06b17d
+
+
+
+
+
 
 
 # Installation
