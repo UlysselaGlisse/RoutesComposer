@@ -1,0 +1,23 @@
+[general]
+name=RoutesComposer
+description=Outil de gestion de réseaux de vecteurs.
+version=0.2
+qgisMinimumVersion=3.0
+author=Ulysse Descamps
+email=ulysse38250@gmail.com
+about=Ce plugin Qgis sera utile à ceux qui souhaitent créer des routes entre deux points à partir d'un réseau de vecteurs (de lignes).
+    L'exemple le plus évident de réseau est celui des routes :
+    la départementale 42 est à la fois une seule route et est composée de dizaines de sections différentes.
+
+    Les sections sont dans le plugin des segments, et la départementale correspond à une composition.
+
+    Tout le travail géographique s'effectue sur les segments. Les compositions ne possèdent que des attributs et une liste avec les identifiants des segments.
+
+    La première fonction de ce plugin est d'aider au moment de la division d'un segment.
+    Si le segment fait partie d'une ou plusieurs compositions, il est pénible d'aller chercher dans lesquelles et à quel endroit.
+    Le plugin s'occupe de cela à votre place.
+repository=https://github.com/UlysselaGlisse/RoutesComposer
+category=Vector
+icon=ui/icons/icon.png
+experimental=True
+deprecated=False
