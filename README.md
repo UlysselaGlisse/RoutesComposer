@@ -76,7 +76,7 @@ Taper RoutesComposer - s'il n'apparaît pas, redémarrer Qgis - > Cocher la chec
 * La seule chose nécessaire est que le champ contenant la liste de segments soit de type string et que la couche des segments ait un champ nommé "id" - celui avec lequel vous construisez vos compositions.
 
 ### Usages:
-#### Compositeur de routes:
+#### Compositeur de routes
 * Cliquer sur l'icone ![icône](ui/icons/icon.png)
 * Entrer le nom des deux couches puis du champ de la couche des compositions où se trouve la liste des segments.
 * Démarrer
