@@ -100,7 +100,7 @@ def create_merged_geometry(segment_ids: List[int], segments_layer: QgsVectorLaye
 
     if result_points:
         line_string = QgsLineString([QgsPoint(p.x(), p.y()) for p in result_points])
-        return QgsGeometry.fromPolyline(line_string), not_connected_segments
+        return QgsGeometry(line_string), not_connected_segments
     else:
         log("Aucun point trouvé après le traitement des segments.", level='WARNING')
         return QgsGeometry(), []
