@@ -101,47 +101,17 @@ def update_compositions_segments(segments_layer: QgsVectorLayer, compositions_la
 def check_segment_orientation(segments_layer: QgsVectorLayer, segment_geom: QgsGeometry, is_new_geom: bool,
     segments_list: list, old_index: int) -> bool:
     """Vérifie si un segment est orienté correctement par rapport aux segments adjacents."""
-    segment_points = segment_geom.asPolyline()
+    if is_new_geom:
+        adjacent_id = segments_list[old_index - 1]
+    else:
+        adjacent_id = segments_list[old_index + 1]
 
-    if is_new_geom is False:
-        # Chercher la géométrie de l'ancien segment'
-        next_id = segments_list[old_index + 1] if old_index < len(segments_list) - 1 else None
+    adjacent_feature = next(segments_layer.getFeatures(f"id = {adjacent_id}"), None)
 
-        expression = f"\"id\" = '{next_id}'"
-        request = QgsFeatureRequest().setFilterExpression(expression)
-        next_feature = next(segments_layer.getFeatures(request), None)
-
-        if next_feature:
-            next_geom = next_feature.geometry()
-        else:
-            next_geom = None
-
-        # Vérifier avec le segment suivant
-        if next_geom and not next_geom.isEmpty():
-            next_points = next_geom.asPolyline()
-            # Si le segment original touche le segment suivant: à l'envers.'
-            if (segment_points[0].distance(next_points[0]) < 0.01 or
-                segment_points[0].distance(next_points[-1]) < 0.01):
-                return False
-
-    if is_new_geom is True:
-        # Chercher la géométrie du nouveau segment
-        prev_id = segments_list[old_index - 1]
-
-        expression = f"\"id\" = '{prev_id}'"
-        request = QgsFeatureRequest().setFilterExpression(expression)
-        prev_feature = next(segments_layer.getFeatures(request), None)
-
-        if prev_feature:
-            prev_geom = prev_feature.geometry()
-        else:
-            prev_geom = None
-        # Vérifier avec le segment précédent
-        if prev_geom and not prev_geom.isEmpty():
-            prev_points = prev_geom.asPolyline()
-            # Si le nouveau segment touche le segment précédent: à l'envers.'
-            if (segment_points[-1].distance(prev_points[0]) < 0.01 or
-                segment_points[-1].distance(prev_points[-1]) < 0.01):
+    if adjacent_feature:
+        adjacent_geom = adjacent_feature.geometry()
+        if not adjacent_geom.isEmpty():
+            if adjacent_geom.touches(segment_geom):
                 return False
 
     return True
