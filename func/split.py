@@ -101,7 +101,7 @@ def update_compositions_segments(segments_layer: QgsVectorLayer, compositions_la
                     ','.join(map(str, new_segments_list))
             )
         except Exception as e:
-            raise Exception("La composition .. n'a pa pu être mis-à-jour")
+            raise Exception(f"Erreur lors de la mise-à-jour automatique de la liste des segments.")
 
 
 def check_segment_orientation(segments_layer: QgsVectorLayer, segment_geom: QgsGeometry, original_geometry: bool,
