@@ -27,7 +27,7 @@ def get_compositions_list_segments(segment_id: int, compositions_layer: QgsVecto
     if not segment_id:
         return []
 
-    all_segments_lists = []
+    segments_lists = []
 
     request = QgsFeatureRequest()
     expression = (
@@ -38,10 +38,10 @@ def get_compositions_list_segments(segment_id: int, compositions_layer: QgsVecto
     )
     request.setFilterExpression(expression)
 
-    features = utils.get_features_list(compositions_layer, request)
+    compositions = utils.get_features_list(compositions_layer, request)
 
-    for feature in features:
-        segments_str = feature[segments_column_name]
+    for composition in compositions:
+        segments_str = composition[segments_column_name]
 
         if not segments_str:
             continue
@@ -49,13 +49,13 @@ def get_compositions_list_segments(segment_id: int, compositions_layer: QgsVecto
         try:
             segments_ids = [int(id.strip()) for id in str(segments_str).split(',')]
             if int(segment_id) in segments_ids:
-                log(f"Segment find in composition: {feature.id()}")
-                all_segments_lists.append(segments_ids)
+                log(f"Segment find in composition: {composition.id()}")
+                segments_lists.append(segments_ids)
 
         except Exception as e:
-            log(f"Erreur lors du traitement de la composition {feature.id()}: {str(e)}", level='WARNING')
+            log(f"Erreur lors du traitement de la composition {composition.id()}: {str(e)}", level='WARNING')
 
-    return all_segments_lists
+    return segments_lists
 
 
 def update_compositions_segments(segments_layer: QgsVectorLayer, compositions_layer: QgsVectorLayer,
