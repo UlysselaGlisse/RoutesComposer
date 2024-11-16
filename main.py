@@ -66,10 +66,10 @@ def feature_added(fid):
         if not original_feature:
             return
         # Récupérer toutes les compositions contenant ce segment
-        segments_lists = split.get_compositions_list_segments(segment_id, compositions_layer, segments_column_name)
-        log(f"Segment find into {len(segments_lists)} compositions.", level='INFO')
+        segments_lists_ids = split.get_compositions_list_segments(segment_id, compositions_layer, segments_column_name)
+        log(f"Segment find into {len(segments_lists_ids)} compositions.", level='INFO')
 
-        if not segments_lists:
+        if not segments_lists_ids:
             return
 
         next_id = split.get_next_id(segments_layer, id_column_index)
@@ -79,8 +79,8 @@ def feature_added(fid):
 
         segment_unique = False
 
-        for segment_list in segments_lists:
-            if len(segment_list) == 1:
+        for segment_list_ids in segments_lists_ids:
+            if len(segment_list_ids) == 1:
                 segment_unique = True
                 iface.mapCanvas().refresh()
 
@@ -92,7 +92,7 @@ def feature_added(fid):
                 pass
         else:
             split.update_compositions_segments(segments_layer, compositions_layer, segments_column_name,
-                segments_column_index, segment_id, next_id, original_feature, source_feature, segments_lists)
+                segments_column_index, segment_id, next_id, original_feature, source_feature, segments_lists_ids)
 
     compositions_layer.triggerRepaint()
 
