@@ -105,7 +105,7 @@ def create_merged_geometry(segment_ids: List[int], segments_layer: QgsVectorLaye
         log("Aucun point trouvé après le traitement des segments.", level='WARNING')
         return QgsGeometry(), []
 
-def create_compositions_geometries(compositions_layer: QgsVectorLayer, segments_layer: QgsVectorLayer, segments_list_field: str, progress_bar):
+def create_compositions_geometries(compositions_layer: QgsVectorLayer, segments_layer: QgsVectorLayer, segments_column_name: str, progress_bar):
 
     new_layer = QgsVectorLayer("LineString?crs=" + segments_layer.crs().authid(), "Merged Geometries", "memory")
     provider = new_layer.dataProvider()
@@ -132,7 +132,7 @@ def create_compositions_geometries(compositions_layer: QgsVectorLayer, segments_
             log("Création des géométries annulée...", level='INFO')
             break
 
-        segments_str = composition[segments_list_field]
+        segments_str = composition[segments_column_name]
 
         if isinstance(segments_str, str):
             segment_ids = [int(id_str) for id_str in segments_str.split(',') if id_str.strip().isdigit()]
@@ -187,7 +187,7 @@ def create_compositions_geometries(compositions_layer: QgsVectorLayer, segments_
 
     return errors_messages
 
-def update_compositions_geometries(compositions_layer, segments_layer, segments_list_field, progress_bar):
+def update_compositions_geometries(compositions_layer, segments_layer, segments_column_name, progress_bar):
 
     total_compositions = sum(1 for _ in get_features_list(compositions_layer))
     processed_count = 0
@@ -201,7 +201,7 @@ def update_compositions_geometries(compositions_layer, segments_layer, segments_
         if config.cancel_request:
             log("Mise à jour des géométries annulée...", level='INFO')
             break
-        segments_str = composition[segments_list_field]
+        segments_str = composition[segments_column_name]
 
         if isinstance(segments_str, str):
             segment_ids = [int(id_str) for id_str in segments_str.split(',') if id_str.strip().isdigit()]
