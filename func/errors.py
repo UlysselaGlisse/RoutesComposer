@@ -35,13 +35,6 @@ def verify_segments(segments_layer, compositions_layer, segments_column_name):
             continue
         segments_list = [seg.strip() for seg in str(segments_str).split(',')]
         log(f"Composition {composition.id()} début de traitement pour la liste: {segments_list}")
-        hallucinated_segments = [seg for seg in segments_list if seg not in valid_segments_ids and seg]
-        if hallucinated_segments:
-            errors.append({
-                'composition_id': composition.id(),
-                'error_type': 'missing_segments',
-                'segment_ids': hallucinated_segments
-            })
 
         for i, current_segment_id in enumerate(segments_list):
             # Pour tous les segments sauf le dernier de la liste (dont la coninuité est vérifié par celle du précédent).
