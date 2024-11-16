@@ -22,7 +22,7 @@ Dans la vidéo ci-dessus, vous pouvez voir un ensemble de segments sur la carte 
 
 ## Création de géométries et erreurs:
 
-Vous pourrez directement depuis l'interface du plugin crée les géométries des compositions, les mettre à jour si votre couche en possède déjà et les mettre à jour à chaque modification de la géométrie des segments.
+Vous pourrez directement depuis l'interface du plugin créer les géométries des compositions, les mettre à jour si votre couche en possède déjà et les mettre à jour à chaque modification de la géométrie des segments.
 
 ![RoutesComposer](https://github.com/user-attachments/assets/33897f19-8f54-49e9-b7ea-8a9dd685000d)
 
