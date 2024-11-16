@@ -75,14 +75,14 @@ def update_compositions_segments(segments_layer: QgsVectorLayer, compositions_la
             # car une logique différente s'applique dans ce cas.
             if old_index < len(segments_list) - 1:
                 segment_geom = original_geom
-                original_geometry = True
+                last_segment = False
             else:
                 segment_geom = new_geom
-                original_geometry = False
+                last_segment = True
 
             # Vérifier l'orientation
             is_correctly_oriented = check_segment_orientation(segments_layer, segment_geom,
-                original_geometry, segments_list, old_index)
+                last_segment, segments_list, old_index)
 
             # On ajuste la nouvelle liste en fonction de l'orientation du segment.'
             new_segments_list = segments_list.copy()
@@ -104,12 +104,12 @@ def update_compositions_segments(segments_layer: QgsVectorLayer, compositions_la
             raise Exception(f"Erreur lors de la mise-à-jour automatique de la liste des segments.")
 
 
-def check_segment_orientation(segments_layer: QgsVectorLayer, segment_geom: QgsGeometry, original_geometry: bool,
+def check_segment_orientation(segments_layer: QgsVectorLayer, segment_geom: QgsGeometry, last_segment: bool,
     segments_list: list, old_index: int) -> bool:
     """Vérifie si un segment est orienté correctement par rapport aux segments adjacents."""
     segment_points = segment_geom.asPolyline()
 
-    if original_geometry is True:
+    if last_segment is False:
         # Chercher la géométrie de l'ancien segment'
         next_id = segments_list[old_index + 1] if old_index < len(segments_list) - 1 else None
 
@@ -126,10 +126,11 @@ def check_segment_orientation(segments_layer: QgsVectorLayer, segment_geom: QgsG
         if next_geom and not next_geom.isEmpty():
             next_points = next_geom.asPolyline()
             # Si le segment original touche le segment suivant: à l'envers.'
-            if segment_points[0].distance(next_points[0]) < 0.01 or segment_points[0].distance(next_points[-1]) < 0.01:
+            if (segment_points[0].distance(next_points[0]) < 0.01 or
+                segment_points[0].distance(next_points[-1]) < 0.01):
                 return False
 
-    if original_geometry is False:
+    if last_segment is True:
         # Chercher la géométrie du nouveau segment
         prev_id = segments_list[old_index - 1]
 
@@ -145,7 +146,8 @@ def check_segment_orientation(segments_layer: QgsVectorLayer, segment_geom: QgsG
         if prev_geom and not prev_geom.isEmpty():
             prev_points = prev_geom.asPolyline()
             # Si le nouveau segment touche le segment précédent: à l'envers.'
-            if segment_points[-1].distance(prev_points[0]) < 0.01 or segment_points[-1].distance(prev_points[-1]) < 0.01:
+            if (segment_points[-1].distance(prev_points[0]) < 0.01 or
+                segment_points[-1].distance(prev_points[-1]) < 0.01):
                 return False
 
     return True
@@ -191,7 +193,6 @@ def process_single_segment_composition(segments_layer: QgsVectorLayer, compositi
     else:
         return None
 
-@timer_decorator
 def clean_invalid_segments(segments_layer: QgsVectorLayer, compositions_layer: QgsVectorLayer,
     segments_column_name: str, segments_column_index: int) -> None:
     """Supprime les références aux segments qui n'existent plus dans la table segments."""
@@ -234,7 +235,7 @@ def update_segment_id(segments_layer: QgsVectorLayer, fid: int, next_id: int, id
     segments_layer.startEditing()
     segments_layer.changeAttributeValue(fid,
         id_column_index,
-        str(next_id))
+        int(next_id))
 
 
 def get_next_id(segments_layer: QgsVectorLayer, id_column_index:int) -> int:
