@@ -96,4 +96,4 @@ Taper RoutesComposer - s'il n'apparaît pas, redémarrer Qgis - > Cocher la chec
 
 # Essai
 Si vous souhaitez simplement essayer ce plugin, vous trouverez dans le dossier etc/ un Géopackage d'exemple.
-Ouvrez-le et essayer.
+Ouvrez-le et essayez.
