@@ -74,7 +74,6 @@ def update_compositions_segments(segments_layer: QgsVectorLayer, compositions_la
             last_segment = old_index == len(segments_list) - 1
             segment_geom, is_new_geom = new_geom if last_segment else original_geom, True if last_segment else False
 
-            # Vérifier l'orientation
             is_correctly_oriented = check_segment_orientation(segments_layer, segment_geom,
                 is_new_geom, segments_list, old_index)
 
@@ -111,6 +110,7 @@ def check_segment_orientation(segments_layer: QgsVectorLayer, segment_geom: QgsG
     if adjacent_feature:
         adjacent_geom = adjacent_feature.geometry()
         if not adjacent_geom.isEmpty():
+            # Si la géométrie touche le segment précédant (si dernier) ou suivant: à l'envers.'
             if adjacent_geom.touches(segment_geom):
                 return False
 
