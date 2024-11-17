@@ -82,7 +82,7 @@ class RoutesComposerTool:
             auto_start, _ = project.readBoolEntry("routes_composer", "auto_start", False)
             geom_on_fly, _ = project.readBoolEntry("routes_composer", "geom_on_fly", False)
 
-            if auto_start and self.check_required_layers():
+            if auto_start:
                 start_script()
                 config.script_running = True
             if geom_on_fly:
@@ -90,28 +90,6 @@ class RoutesComposerTool:
                 if success:
                     config.geom_on_fly_running = True
             self.update_icon()
-
-    def check_required_layers(self):
-        if not self.project_loaded:
-            return
-
-        project = QgsProject.instance()
-        if not project:
-            return
-        settings = QSettings()
-        segments_layer_id = settings.value("routes_composer/segments_layer_id", "")
-        compositions_layer_id = settings.value("routes_composer/compositions_layer_id", "")
-        segments_column_name = settings.value("routes_composer/segments_column_name", "")
-
-        segments_layer = cast(QgsVectorLayer, project.mapLayer(segments_layer_id))
-        compositions_layer = cast(QgsVectorLayer, project.mapLayer(compositions_layer_id))
-
-        if segments_layer is None or compositions_layer is None:
-            return False
-        if segments_column_name not in compositions_layer.fields().names():
-            return False
-
-        return True
 
     def activate_ids_basket(self):
         project = QgsProject.instance()
