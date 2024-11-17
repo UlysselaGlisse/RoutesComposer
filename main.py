@@ -111,6 +111,7 @@ def geometry_changed(fid):
     """Crée la géométrie des compositions lors du changement de la géométrie d'un segment"""
     # Initialisation
     log(f"Geometry has changed for fid: '{fid}'", level='INFO')
+    global segments_layer, compositions_layer
 
     segments_column_name = config.segments_column_name
     segments_column_index = config.segments_column_index
@@ -133,7 +134,8 @@ def geometry_changed(fid):
             # Obtenir la liste des segments pour cette composition
             segment_ids = [int(id_str) for id_str in segments_str.split(',') if id_str.strip().isdigit()]
 
-            new_geometry = geom_compo.create_merged_geometry(segment_ids, segments_layer)
+            a = geom_compo.GeomCompo(segments_layer, compositions_layer, segments_column_name)
+            new_geometry = a.create_merged_geometry(segment_ids)
 
             if new_geometry:
                 # Mettre à jour la géométrie de la composition
