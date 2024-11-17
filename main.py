@@ -213,7 +213,6 @@ def stop_script():
         iface.messageBar().pushMessage(QCoreApplication.translate("RoutesComposer","Erreur"), str(e), level=Qgis.MessageLevel.Critical)
         return False
 
-
 def start_geom_on_fly():
     """Démarre la création en continue des géométries de compositions."""
     try:
