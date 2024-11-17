@@ -54,8 +54,8 @@ class RoutesComposerDialog(QDialog):
         self.setMinimumWidth(400)
         self.initial_size = self.size()
 
-        self.script_running = config.script_running
-        self.cancel_request = config.cancel_request
+        # self.script_running = config.script_running
+        # self.cancel_request = config.cancel_request
 
         self.init_ui()
         self.load_settings()
@@ -248,6 +248,7 @@ class RoutesComposerDialog(QDialog):
                 main.stop_script()
                 config.script_running = False
                 main.stop_geom_on_fly()
+                config.geom_on_fly_running = False
                 self.geom_checkbox.setChecked(False)
                 if self.tool:
                     self.tool.update_icon()
