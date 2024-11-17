@@ -75,7 +75,6 @@ class RoutesComposerTool:
             if auto_start:
                 QTimer.singleShot(1000, self.auto_start_script)
 
-
     def auto_start_script(self):
         project = QgsProject.instance()
         if project:
