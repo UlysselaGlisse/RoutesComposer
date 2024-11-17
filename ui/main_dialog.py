@@ -35,7 +35,7 @@ from .. import config
 from ..func import split
 from ..func.utils import get_features_list, log
 from ..func.errors import verify_segments, highlight_errors
-from ..func.geom_compo import create_compositions_geometries, update_compositions_geometries
+from ..func.geom_compo import GeomCompo
 from .. import main
 from .sub_dialog import InfoDialog, ErrorDialog
 from ..func import errors
@@ -53,9 +53,6 @@ class RoutesComposerDialog(QDialog):
         self.setWindowTitle(self.tr("Compositeur de Routes"))
         self.setMinimumWidth(400)
         self.initial_size = self.size()
-
-        # self.script_running = config.script_running
-        # self.cancel_request = config.cancel_request
 
         self.init_ui()
         self.load_settings()
@@ -245,11 +242,15 @@ class RoutesComposerDialog(QDialog):
                     if self.tool:
                         self.tool.update_icon()
             else:
-                main.stop_script()
-                config.script_running = False
-                main.stop_geom_on_fly()
-                config.geom_on_fly_running = False
-                self.geom_checkbox.setChecked(False)
+                success = main.stop_script()
+                if success:
+                    config.script_running = False
+
+                success = main.stop_geom_on_fly()
+                if success:
+                    config.geom_on_fly_running = False
+                    self.geom_checkbox.setChecked(False)
+
                 if self.tool:
                     self.tool.update_icon()
 
@@ -446,7 +447,9 @@ class RoutesComposerDialog(QDialog):
         self.cancel_button.setVisible(True)
         self.cancel_button.setEnabled(True)
 
-        errors_messages = create_compositions_geometries(compositions_layer, segments_layer, segments_column_name, self.progress_bar)
+
+        a = GeomCompo(segments_layer, compositions_layer, segments_column_name)
+        errors_messages = a.create_compositions_geometries(self.progress_bar)
 
         self.progress_bar.setVisible(False)
         self.cancel_button.setVisible(False)
@@ -484,7 +487,8 @@ class RoutesComposerDialog(QDialog):
         self.cancel_button.setVisible(True)
         self.cancel_button.setEnabled(True)
 
-        errors_messages = update_compositions_geometries(compositions_layer, segments_layer, segments_column_name, self.progress_bar)
+        a = GeomCompo(segments_layer, compositions_layer, segments_column_name)
+        errors_messages = a.update_compositions_geometries(self.progress_bar)
 
         self.progress_bar.setVisible(False)
         self.cancel_button.setVisible(False)
@@ -536,6 +540,10 @@ class RoutesComposerDialog(QDialog):
             geom_on_fly = bool(state)
             log(f"config state of geom_on_fly = {geom_on_fly}")
             if geom_on_fly:
-                main.start_geom_on_fly()
+                success = main.start_geom_on_fly()
+                if success:
+                    config.geom_on_fly_running = True
             if not geom_on_fly:
-                main.stop_geom_on_fly()
+                success = main.stop_geom_on_fly()
+                if success:
+                    config.geom_on_fly_running = False

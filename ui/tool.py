@@ -86,7 +86,9 @@ class RoutesComposerTool:
                 start_script()
                 config.script_running = True
             if geom_on_fly:
-                start_geom_on_fly()
+                success = start_geom_on_fly()
+                if success:
+                    config.geom_on_fly_running = True
             self.update_icon()
 
     def check_required_layers(self):
