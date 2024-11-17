@@ -32,12 +32,13 @@ def feature_added(fid):
         return
 
     global last_fid, segments_column_name, segments_column_index, id_column_index
-
     log(f"New feature added with fid: '{fid}'", level='INFO')
     # Initialisation
     segments_column_name = config.segments_column_name
     segments_column_index = config.segments_column_index
     id_column_index = config.id_column_index
+
+    a = split.SplitManager(segments_layer, compositions_layer, segments_column_name, segments_column_index, id_column_index)
 
     source_feature = segments_layer.getFeature(fid)
     if not source_feature.isValid() and source_feature.fields().names():
@@ -51,8 +52,8 @@ def feature_added(fid):
     log(f"With corresponding segment id: '{segment_id}'", level='INFO')
 
     # Le segment a-t-il était divisé ?
-    if split.has_duplicate_segment_id(segments_layer, segment_id):
-        log(f"Segment '{segment_id}' has been split")
+    if a.has_duplicate_segment_id(segment_id):
+        log(f"Segment '{segment_id}' has been split.")
         new_geometry = source_feature.geometry()
         if not new_geometry or new_geometry.isEmpty():
             return
@@ -66,16 +67,16 @@ def feature_added(fid):
         if not original_feature:
             return
         # Récupérer toutes les compositions contenant ce segment
-        segments_lists_ids = split.get_compositions_list_segments(segment_id, compositions_layer, segments_column_name)
+        segments_lists_ids = a.get_compositions_list_segments(segment_id)
         log(f"Segment find into {len(segments_lists_ids)} compositions.", level='INFO')
 
         if not segments_lists_ids:
             return
 
-        next_id = split.get_next_id(segments_layer, id_column_index)
+        next_id = a.get_next_id()
         log(f"New segment id to attribute: '{next_id}'", level='INFO')
 
-        split.update_segment_id(segments_layer, fid, next_id, id_column_index)
+        a.update_segment_id(fid, next_id)
 
         segment_unique = False
 
@@ -86,13 +87,11 @@ def feature_added(fid):
 
         if segment_unique == True:
             log(f"Single segment found, open dialog.")
-            new_segments = split.process_single_segment_composition(segments_layer, compositions_layer,
-                segments_column_name, segments_column_index, fid, segment_id, next_id)
+            new_segments = a.process_single_segment_composition(fid, segment_id, next_id)
             if new_segments is None:
                 pass
         else:
-            split.update_compositions_segments(segments_layer, compositions_layer, segments_column_name,
-                segments_column_index, segment_id, next_id, original_feature, source_feature, segments_lists_ids)
+            a.update_compositions_segments(segment_id, next_id, original_feature, source_feature, segments_lists_ids)
 
     compositions_layer.triggerRepaint()
 
@@ -102,8 +101,9 @@ def features_deleted(fids):
     global segments_column_name, segments_column_index
     segments_column_name = config.segments_column_name
     segments_column_index = config.segments_column_index
+    a = split.SplitManager(segments_layer, compositions_layer, segments_column_name, segments_column_index, id_column_index)
 
-    split.clean_invalid_segments(segments_layer, compositions_layer, segments_column_name, segments_column_index)
+    a.clean_invalid_segments()
     log(f"Compositions has been updated.")
 
 
