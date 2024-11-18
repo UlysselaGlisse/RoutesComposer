@@ -236,20 +236,11 @@ class RoutesComposerDialog(QDialog):
                     QMessageBox.warning(self, self.tr("Attention"), self.tr("Veuillez sélectionner la colonne segments"))
                     return
 
-                success = main.start_script()
-                if success:
-                    config.script_running = True
-                    if self.tool:
-                        self.tool.update_icon()
-            else:
-                success = main.stop_script()
-                if success:
-                    config.script_running = False
-
-                success = main.stop_geom_on_fly()
-                if success:
-                    config.geom_on_fly_running = False
-                    self.geom_checkbox.setChecked(False)
+                routes_composer = main.RoutesComposer()
+                try:
+                    routes_composer.connect()
+                finally:
+                    routes_composer.disconnect()
 
                 if self.tool:
                     self.tool.update_icon()
@@ -539,11 +530,11 @@ class RoutesComposerDialog(QDialog):
             project.setDirty(True)
             geom_on_fly = bool(state)
             log(f"config state of geom_on_fly = {geom_on_fly}")
-            if geom_on_fly:
-                success = main.start_geom_on_fly()
-                if success:
-                    config.geom_on_fly_running = True
-            if not geom_on_fly:
-                success = main.stop_geom_on_fly()
-                if success:
-                    config.geom_on_fly_running = False
+            # if geom_on_fly:
+            #     success = main.start_geom_on_fly()
+            #     if success:
+            #         config.geom_on_fly_running = True
+            # if not geom_on_fly:
+            #     success = main.stop_geom_on_fly()
+            #     if success:
+            #         config.geom_on_fly_running = False

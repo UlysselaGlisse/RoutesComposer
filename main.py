@@ -12,7 +12,6 @@ from qgis.PyQt.QtCore import (
     QSettings,
     QCoreApplication,
 )
-from .ui.main_dialog import RoutesComposerDialog
 from . import config
 from .func import(
     split,
@@ -25,75 +24,8 @@ from .func.utils import log
 segments_layer: QgsVectorLayer
 compositions_layer: QgsVectorLayer
 
-def feature_added(fid):
-    """Fonction prinicpale. Traite l'ajout d'une nouvelle entité dans la couche segments."""
-    # Lorsque Qgis enregistre les couches: fid >= 0, comme le script ne doit pas s'exécuter à ce moment, on le vérifie.'
-    if fid >= 0:
-        return
-
-    global last_fid, segments_column_name, segments_column_index, id_column_index
-    log(f"New feature added with fid: '{fid}'", level='INFO')
-    # Initialisation
-    segments_column_name = config.segments_column_name
-    segments_column_index = config.segments_column_index
-    id_column_index = config.id_column_index
-
-    a = split.SplitManager(segments_layer, compositions_layer, segments_column_name, segments_column_index, id_column_index)
-
-    source_feature = segments_layer.getFeature(fid)
-    if not source_feature.isValid() and source_feature.fields().names():
-          return
-
-    segment_id = source_feature.attributes()[id_column_index]
-    if segment_id is None:
-        log("No segment id, return.")
-        return
-
-    log(f"With corresponding segment id: '{segment_id}'", level='INFO')
-
-    # Le segment a-t-il était divisé ?
-    if a.has_duplicate_segment_id(segment_id):
-        log(f"Segment '{segment_id}' has been split.")
-        new_geometry = source_feature.geometry()
-        if not new_geometry or new_geometry.isEmpty():
-            return
-
-        # Récupérer le segment original.
-        expression = f"\"id\" = '{segment_id}' AND $id != {fid}"
-        request = QgsFeatureRequest().setFilterExpression(expression)
-        original_feature = next(segments_layer.getFeatures(request), None)
-        print(original_feature)
-
-        if not original_feature:
-            return
-        # Récupérer toutes les compositions contenant ce segment
-        segments_lists_ids = a.get_compositions_list_segments(segment_id)
-        log(f"Segment find into {len(segments_lists_ids)} compositions.", level='INFO')
-
-        if not segments_lists_ids:
-            return
-
-        next_id = a.get_next_id()
-        log(f"New segment id to attribute: '{next_id}'", level='INFO')
-
-        a.update_segment_id(fid, next_id)
-
-        segment_unique = False
-
-        for segment_list_ids in segments_lists_ids:
-            if len(segment_list_ids) == 1:
-                segment_unique = True
-                iface.mapCanvas().refresh()
-
-        if segment_unique == True:
-            log(f"Single segment found, open dialog.")
-            new_segments = a.process_single_segment_composition(fid, segment_id, next_id)
-            if new_segments is None:
-                pass
-        else:
-            a.update_compositions_segments(segment_id, next_id, original_feature, source_feature, segments_lists_ids)
-
-    compositions_layer.triggerRepaint()
+def start_script():
+    routes_composer = RoutesComposer()
 
 
 def features_deleted(fids):
@@ -147,71 +79,149 @@ def geometry_changed(fid):
 
     compositions_layer.triggerRepaint()
 
-
-def start_script():
-    """Démarre le script."""
-    global segments_layer, compositions_layer, id_column_index
-    try:
-        settings = QSettings()
-        segments_layer_id = settings.value("routes_composer/segments_layer_id", "")
-        compositions_layer_id = settings.value("routes_composer/compositions_layer_id", "")
-        segments_column_name = settings.value("routes_composer/segments_column_name", "segments")
-
-        project = QgsProject.instance()
-        if not project:
+class RoutesComposer:
+    def __init__(self):
+        self.project = QgsProject.instance()
+        if not self.project:
             raise Exception(QCoreApplication.translate("RoutesComposer","Aucun projet QGIS n'est ouvert"))
+        self.settings = QSettings()
+        self.segments_layer = self.get_segments_layer()
+        self.compositions_layer = self.get_compositions_layer()
+        self.segments_column_name, self.segments_column_index = self.get_segments_column_name()
+        self.id_column_index = self.get_id_column_index()
+        self.split_manager = split.SplitManager(self.segments_layer, self.compositions_layer,
+            self.segments_column_name, self.segments_column_index, self.id_column_index)
 
-        segments_layer = cast(QgsVectorLayer, project.mapLayer(segments_layer_id))
-        compositions_layer = cast(QgsVectorLayer, project.mapLayer(compositions_layer_id))
 
-        if not segments_layer.isValid():
+    def connect(self):
+        try:
+            segments_layer.featureAdded.connect(self.feature_added)
+            # segments_layer.featuresDeleted.connect(features_deleted)
+
+            log("Script has started", level='INFO')
+            iface.messageBar().pushMessage("Info", QCoreApplication.translate("RoutesComposer","Le suivi par RoutesComposer a démarré"), level=Qgis.MessageLevel.Info)
+            return True
+
+        except Exception as e:
+            iface.messageBar().pushMessage(QCoreApplication.translate("RoutesComposer","Erreur"), str(e), level=Qgis.MessageLevel.Critical)
+            return False
+
+    def disconnect(self):
+        try :
+            segments_layer.featureAdded.disconnect(self.feature_added)
+            # segments_layer.featuresDeleted.disconnect(features_deleted)
+
+            log("Script has been stopped.", level='INFO')
+            iface.messageBar().pushMessage("Info", QCoreApplication.translate("RoutesComposer","Le suivi par RoutesComposer est arrêté"), level=Qgis.MessageLevel.Info)
+
+        except Exception as e:
+            iface.messageBar().pushMessage(QCoreApplication.translate("RoutesComposer","Erreur"), str(e), level=Qgis.MessageLevel.Critical)
+            return False
+
+    def feature_added(self, fid):
+        """Fonction prinicpale. Traite l'ajout d'une nouvelle entité dans la couche segments."""
+        # Lorsque Qgis enregistre les couches: fid >= 0, comme le script ne doit pas s'exécuter à ce moment, on le vérifie.'
+        if fid >= 0:
+            return
+
+        source_feature = self.segments_layer.getFeature(fid)
+        if not source_feature.isValid() and source_feature.fields().names():
+            return
+
+        segment_id = source_feature.attributes()[self.id_column_index]
+        if segment_id is None:
+            log("No segment id, return.")
+            return
+
+        log(f"With corresponding segment id: '{segment_id}'", level='INFO')
+
+        # Le segment a-t-il était divisé ?
+        if self.split_manager.has_duplicate_segment_id(segment_id):
+            log(f"Segment '{segment_id}' has been split.")
+            new_geometry = source_feature.geometry()
+            if not new_geometry or new_geometry.isEmpty():
+                return
+
+            # Récupérer le segment original.
+            expression = f"\"id\" = '{segment_id}' AND $id != {fid}"
+            request = QgsFeatureRequest().setFilterExpression(expression)
+            original_feature = next(self.segments_layer.getFeatures(request), None)
+            print(original_feature)
+
+            if not original_feature:
+                return
+            # Récupérer toutes les compositions contenant ce segment
+            segments_lists_ids = self.split_manager.get_compositions_list_segments(segment_id)
+            log(f"Segment find into {len(segments_lists_ids)} compositions.", level='INFO')
+
+            if not segments_lists_ids:
+                return
+
+            next_id = self.split_manager.get_next_id()
+            log(f"New segment id to attribute: '{next_id}'", level='INFO')
+
+            self.split_manager.update_segment_id(fid, next_id)
+
+            segment_unique = False
+
+            for segment_list_ids in segments_lists_ids:
+                if len(segment_list_ids) == 1:
+                    segment_unique = True
+                    iface.mapCanvas().refresh()
+
+            if segment_unique == True:
+                log(f"Single segment found, open dialog.")
+                new_segments = self.split_manager.process_single_segment_composition(fid, segment_id, next_id)
+                if new_segments is None:
+                    pass
+            else:
+                self.split_manager.update_compositions_segments(segment_id, next_id, original_feature, source_feature, segments_lists_ids)
+
+        self.compositions_layer.triggerRepaint()
+
+    def get_segments_layer(self):
+
+        segments_layer_id = self.settings.value("routes_composer/segments_layer_id", "")
+        if not segments_layer_id:
+            return
+        self.segments_layer = cast(QgsVectorLayer, self.project.mapLayer(segments_layer_id))
+        if not self.segments_layer.isValid():
             raise Exception(QCoreApplication.translate("RoutesComposer","Veuillez sélectionner une couche de segments valide"))
-        if not compositions_layer.isValid():
-            raise Exception(QCoreApplication.translate("RoutesComposer","Veuillez sélectionner une couche de compositions valide"))
-
-        if not isinstance(segments_layer, QgsVectorLayer):
+        if not isinstance(self.segments_layer, QgsVectorLayer):
             raise Exception(QCoreApplication.translate("RoutesComposer","La couche de segments n'est pas une couche vectorielle valide"))
-        if not isinstance(compositions_layer, QgsVectorLayer):
+
+        return self.segments_layer
+
+    def get_compositions_layer(self):
+
+        compositions_layer_id = self.settings.value("routes_composer/compositions_layer_id", "")
+        self.compositions_layer = cast(QgsVectorLayer, self.project.mapLayer(compositions_layer_id))
+        if not self.compositions_layer.isValid():
+            raise Exception(QCoreApplication.translate("RoutesComposer","Veuillez sélectionner une couche de compositions valide"))
+        if not isinstance(self.compositions_layer, QgsVectorLayer):
             raise Exception(QCoreApplication.translate("RoutesComposer","La couche de compositions n'est pas une couche vectorielle valide"))
 
-        config.segments_column_name = segments_column_name
+        return self.compositions_layer
 
-        segments_column_index = compositions_layer.fields().indexOf(segments_column_name)
-        if segments_column_index == -1:
+    def get_segments_column_name(self):
+        self.segments_column_name = self.settings.value("routes_composer/segments_column_name", "segments")
+        config.segments_column_name = self.segments_column_name
+
+        self.segments_column_index = self.compositions_layer.fields().indexOf(self.segments_column_name)
+        if self.segments_column_index == -1:
             raise Exception(QCoreApplication.translate("RoutesComposer", "Le champ '{segments_column_name}' n'existe pas dans la couche compositions".format(segments_column_name=segments_column_name)))
 
-        config.segments_column_index = segments_column_index
+        config.segments_column_index = self.segments_column_index
 
-        id_column_index = segments_layer.fields().indexOf('id')
-        if id_column_index == -1:
+        return self.segments_column_name, self.segments_column_index
+
+    def get_id_column_index(self):
+        self.id_column_index = self.segments_layer.fields().indexOf('id')
+        if self.id_column_index == -1:
             raise Exception(QCoreApplication.translate("RoutesComposer","Le champ 'id' n'a pas été trouvé dans la couche segments"))
 
-        config.id_column_index = id_column_index
-
-        segments_layer.featureAdded.connect(feature_added)
-        segments_layer.featuresDeleted.connect(features_deleted)
-
-        log("Script has started", level='INFO')
-        iface.messageBar().pushMessage("Info", QCoreApplication.translate("RoutesComposer","Le suivi par RoutesComposer a démarré"), level=Qgis.MessageLevel.Info)
-        return True
-
-    except Exception as e:
-        iface.messageBar().pushMessage(QCoreApplication.translate("RoutesComposer","Erreur"), str(e), level=Qgis.MessageLevel.Critical)
-        return False
-
-
-def stop_script():
-    """Arrête l'exécution du script."""
-    try :
-        segments_layer.featureAdded.disconnect(feature_added)
-        segments_layer.featuresDeleted.disconnect(features_deleted)
-
-        log("Script has been stopped.", level='INFO')
-        iface.messageBar().pushMessage("Info", QCoreApplication.translate("RoutesComposer","Le suivi par RoutesComposer est arrêté"), level=Qgis.MessageLevel.Info)
-
-    except Exception as e:
-        iface.messageBar().pushMessage(QCoreApplication.translate("RoutesComposer","Erreur"), str(e), level=Qgis.MessageLevel.Critical)
-        return False
+        config.id_column_index = self.id_column_index
+        return self.id_column_index
 
 def start_geom_on_fly():
     """Démarre la création en continue des géométries de compositions."""
@@ -228,7 +238,6 @@ def start_geom_on_fly():
             segments_layer.geometryChanged.connect(geometry_changed)
     except TypeError:
         log("La fonction geometry_changed n'a pas pu être connectée.", level='WARNING')
-
 
 def stop_geom_on_fly():
     try:
