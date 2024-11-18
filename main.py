@@ -22,6 +22,7 @@ from .func import(
 )
 from .func.utils import log
 
+
 def start_routes_composer():
     global routes_composer
 
@@ -30,9 +31,11 @@ def start_routes_composer():
 
     return routes_composer
 
+
 def stop_routes_composer():
     global routes_composer
     routes_composer.disconnect()
+
 
 class RoutesComposer:
     def __init__(self):
@@ -202,6 +205,7 @@ class RoutesComposer:
         config.id_column_index = self.id_column_index
         return self.id_column_index
 
+
 def start_geom_on_fly():
     global geom_on_fly
     geom_on_fly = GeomOnFly()
@@ -209,11 +213,13 @@ def start_geom_on_fly():
 
     return geom_on_fly
 
+
 def stop_geom_on_fly():
     global geom_on_fly
     if not config.geom_on_fly_running:
         return
     geom_on_fly.disconnect()
+
 
 class GeomOnFly(RoutesComposer):
     def __init__(self):
