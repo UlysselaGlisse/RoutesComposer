@@ -245,6 +245,7 @@ class RoutesComposerDialog(QDialog):
             else:
                 main.stop_routes_composer()
                 config.script_running = False
+                self.geom_checkbox.setChecked(False)
                 if self.tool:
                     self.tool.update_icon()
 
