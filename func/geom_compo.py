@@ -230,7 +230,7 @@ class GeomCompo:
             processed_count += 1
             progress_bar.setValue(processed_count)
 
-            if processed_count % 10 == 0:
+            if processed_count % 5 == 0:
                 QgsApplication.processEvents()
 
         self.compositions_layer.updateFields()
