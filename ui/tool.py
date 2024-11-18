@@ -43,11 +43,12 @@ class RoutesComposerTool:
             QCoreApplication.installTranslator(self.translator)
 
 
+
     def initGui(self):
         icon_path = os.path.join(os.path.dirname(__file__), 'icons', 'icon.png')
         show_action = QAction(
             QIcon(icon_path),
-            'Ouvrir Routes Composer',
+            ('Ouvrir Routes Composer'),
             self.iface.mainWindow()
         )
         show_action.triggered.connect(self.show_dialog)
