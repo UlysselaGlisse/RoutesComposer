@@ -47,6 +47,7 @@ https://github.com/user-attachments/assets/e7506320-665e-49fe-bef8-5ba32d06b17d
 * Installer le Plugin.
 
 _Si jamais le plugin n'apparaît pas, se rendre dans Extensions > Installées > Cocher l'icone du plugin._
+
 ---
 
 
