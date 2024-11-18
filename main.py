@@ -1,3 +1,4 @@
+import gc
 from typing import cast
 from qgis.core import (
     Qgis,
@@ -21,63 +22,17 @@ from .func import(
 )
 from .func.utils import log
 
-segments_layer: QgsVectorLayer
-compositions_layer: QgsVectorLayer
+def start_routes_composer():
+    global routes_composer
 
-def start_script():
     routes_composer = RoutesComposer()
+    routes_composer.connect()
 
+    return routes_composer
 
-def features_deleted(fids):
-    """Nettoie les compositions des segments supprimés."""
-    global segments_column_name, segments_column_index
-    segments_column_name = config.segments_column_name
-    segments_column_index = config.segments_column_index
-    a = split.SplitManager(segments_layer, compositions_layer, segments_column_name, segments_column_index, id_column_index)
-
-    a.clean_invalid_segments()
-    log(f"Compositions has been updated.")
-
-
-def geometry_changed(fid):
-    """Crée la géométrie des compositions lors du changement de la géométrie d'un segment"""
-    # Initialisation
-    log(f"Geometry has changed for fid: '{fid}'", level='INFO')
-    global segments_layer, compositions_layer
-
-    segments_column_name = config.segments_column_name
-    segments_column_index = config.segments_column_index
-    id_column_index = config.id_column_index
-
-    source_feature = segments_layer.getFeature(fid)
-    if not source_feature.isValid() and source_feature.fields().names():
-          return
-
-    segment_id = source_feature.attributes()[id_column_index]
-    if segment_id is None:
-        log("No segment id, return.")
-        return
-
-    log(f"With corresponding segment id: '{segment_id}'", level='INFO')
-
-    for composition in utils.get_features_list(compositions_layer):
-        segments_str = composition[segments_column_name]
-        if str(segment_id) in segments_str.split(','):
-            # Obtenir la liste des segments pour cette composition
-            segment_ids = [int(id_str) for id_str in segments_str.split(',') if id_str.strip().isdigit()]
-
-            a = geom_compo.GeomCompo(segments_layer, compositions_layer, segments_column_name)
-            new_geometry = a.create_merged_geometry(segment_ids)
-
-            if new_geometry:
-                # Mettre à jour la géométrie de la composition
-                compositions_layer.startEditing()
-                compositions_layer.changeGeometry(composition.id(), new_geometry[0])
-                log(f"Updated geometry for composition {composition.id()}", level='INFO')
-            else:
-                log(f"Failed to create geometry for composition {composition.id()}", level='WARNING')
-
-    compositions_layer.triggerRepaint()
+def stop_routes_composer():
+    global routes_composer
+    routes_composer.disconnect()
 
 class RoutesComposer:
     def __init__(self):
@@ -85,38 +40,56 @@ class RoutesComposer:
         if not self.project:
             raise Exception(QCoreApplication.translate("RoutesComposer","Aucun projet QGIS n'est ouvert"))
         self.settings = QSettings()
+
         self.segments_layer = self.get_segments_layer()
         self.compositions_layer = self.get_compositions_layer()
         self.segments_column_name, self.segments_column_index = self.get_segments_column_name()
         self.id_column_index = self.get_id_column_index()
+
         self.split_manager = split.SplitManager(self.segments_layer, self.compositions_layer,
             self.segments_column_name, self.segments_column_index, self.id_column_index)
 
+        self.is_connected = False
 
     def connect(self):
         try:
-            segments_layer.featureAdded.connect(self.feature_added)
-            # segments_layer.featuresDeleted.connect(features_deleted)
+            if self.segments_layer is not None and not self.is_connected:
+                self.segments_layer.featureAdded.connect(self.feature_added)
+                self.segments_layer.featuresDeleted.connect(self.features_deleted)
+                self.is_connected = True
 
-            log("Script has started", level='INFO')
-            iface.messageBar().pushMessage("Info", QCoreApplication.translate("RoutesComposer","Le suivi par RoutesComposer a démarré"), level=Qgis.MessageLevel.Info)
-            return True
+                log("Script has started", level='INFO')
+                iface.messageBar().pushMessage("Info", QCoreApplication.translate("RoutesComposer","Le suivi par RoutesComposer a démarré"), level=Qgis.MessageLevel.Info)
+                return True
 
         except Exception as e:
             iface.messageBar().pushMessage(QCoreApplication.translate("RoutesComposer","Erreur"), str(e), level=Qgis.MessageLevel.Critical)
             return False
 
     def disconnect(self):
-        try :
-            segments_layer.featureAdded.disconnect(self.feature_added)
-            # segments_layer.featuresDeleted.disconnect(features_deleted)
+        try:
+            if self.segments_layer is not None and self.is_connected:
+                self.segments_layer.featureAdded.disconnect(self.feature_added)
+                self.segments_layer.featuresDeleted.disconnect(self.features_deleted)
+                self.is_connected = False
 
-            log("Script has been stopped.", level='INFO')
-            iface.messageBar().pushMessage("Info", QCoreApplication.translate("RoutesComposer","Le suivi par RoutesComposer est arrêté"), level=Qgis.MessageLevel.Info)
+                self.segments_layer = None
+                self.compositions_layer = None
+                self.segments_column_name = None
+                self.segments_column_index = None
+                self.id_column_index = None
+                routes_composer = None
 
+                log("Script has been stopped.", level='INFO')
+                iface.messageBar().pushMessage(
+                    "Info",
+                    QCoreApplication.translate("RoutesComposer", "Le suivi par RoutesComposer est arrêté"),
+                    level=Qgis.MessageLevel.Info
+                )
+            else:
+                print("Segments layer is None or is_connect is false.")
         except Exception as e:
             iface.messageBar().pushMessage(QCoreApplication.translate("RoutesComposer","Erreur"), str(e), level=Qgis.MessageLevel.Critical)
-            return False
 
     def feature_added(self, fid):
         """Fonction prinicpale. Traite l'ajout d'une nouvelle entité dans la couche segments."""
@@ -179,6 +152,12 @@ class RoutesComposer:
 
         self.compositions_layer.triggerRepaint()
 
+    def features_deleted(self, fids):
+        """Nettoie les compositions des segments supprimés."""
+
+        self.split_manager.clean_invalid_segments()
+        log(f"Compositions has been cleaned.")
+
     def get_segments_layer(self):
 
         segments_layer_id = self.settings.value("routes_composer/segments_layer_id", "")
@@ -224,32 +203,73 @@ class RoutesComposer:
         return self.id_column_index
 
 def start_geom_on_fly():
-    """Démarre la création en continue des géométries de compositions."""
-    try:
-        project = QgsProject.instance()
-        if not project:
-            raise Exception(QCoreApplication.translate("RoutesComposer", "Aucun projet QGIS n'est ouvert"))
-        settings = QgsSettings()
-        segments_layer_id = settings.value("routes_composer/segments_layer_id", "")
-        segments_layer = cast(QgsVectorLayer, project.mapLayer(segments_layer_id))
+    global geom_on_fly
+    geom_on_fly = GeomOnFly()
+    geom_on_fly.connect()
 
-        geom_on_fly, _ = project.readBoolEntry("routes_composer", "geom_on_fly", False)
-        if geom_on_fly:
-            segments_layer.geometryChanged.connect(geometry_changed)
-    except TypeError:
-        log("La fonction geometry_changed n'a pas pu être connectée.", level='WARNING')
+    return geom_on_fly
 
 def stop_geom_on_fly():
-    try:
-        project = QgsProject.instance()
-        if not project:
-            raise Exception(QCoreApplication.translate("RoutesComposer","Aucun projet QGIS n'est ouvert"))
-        settings = QgsSettings()
-        segments_layer_id = settings.value("routes_composer/segments_layer_id", "")
-        segments_layer = cast(QgsVectorLayer, project.mapLayer(segments_layer_id))
+    global geom_on_fly
+    if not config.geom_on_fly_running:
+        return
+    geom_on_fly.disconnect()
 
-        geom_on_fly, _ = project.readBoolEntry("routes_composer", "geom_on_fly", False)
-        if geom_on_fly is False:
-            segments_layer.geometryChanged.disconnect(geometry_changed)
-    except TypeError:
-        log("La fonction geometry_changed n'était pas connectée.", level='WARNING')
+class GeomOnFly(RoutesComposer):
+    def __init__(self):
+        super().__init__()
+        self.segments_layer = self.get_segments_layer()
+        self.compositions_layer = self.get_compositions_layer()
+        self.segments_column_name, self.segments_column_index = self.get_segments_column_name()
+        self.id_column_index = self.get_id_column_index()
+
+
+    def connect(self):
+        """Démarre la création en continue des géométries de compositions."""
+        try:
+            geom_on_fly, _ = self.project.readBoolEntry("routes_composer", "geom_on_fly", False)
+            if geom_on_fly:
+                self.segments_layer.geometryChanged.connect(self.geometry_changed)
+        except TypeError:
+            log("La fonction geometry_changed n'a pas pu être connectée.", level='WARNING')
+
+    def disconnect(self):
+        try:
+            self.segments_layer.geometryChanged.disconnect(self.geometry_changed)
+        except TypeError:
+            log("La fonction geometry_changed n'était pas connectée.", level='WARNING')
+
+    def geometry_changed(self, fid):
+        """Crée la géométrie des compositions lors du changement de la géométrie d'un segment"""
+        # Initialisation
+        log(f"Geometry has changed for fid: '{fid}'", level='INFO')
+
+        source_feature = self.segments_layer.getFeature(fid)
+        if not source_feature.isValid() and source_feature.fields().names():
+            return
+
+        segment_id = source_feature.attributes()[self.id_column_index]
+        if segment_id is None:
+            log("No segment id, return.")
+            return
+
+        log(f"With corresponding segment id: '{segment_id}'", level='INFO')
+
+        for composition in utils.get_features_list(self.compositions_layer):
+            segments_str = composition[self.segments_column_name]
+            if str(segment_id) in segments_str.split(','):
+                # Obtenir la liste des segments pour cette composition
+                segment_ids = [int(id_str) for id_str in segments_str.split(',') if id_str.strip().isdigit()]
+
+                a = geom_compo.GeomCompo(self.segments_layer, self.compositions_layer, self.segments_column_name)
+                new_geometry = a.create_merged_geometry(segment_ids)
+
+                if new_geometry:
+                    # Mettre à jour la géométrie de la composition
+                    self.compositions_layer.startEditing()
+                    self.compositions_layer.changeGeometry(composition.id(), new_geometry[0])
+                    log(f"Updated geometry for composition {composition.id()}", level='INFO')
+                else:
+                    log(f"Failed to create geometry for composition {composition.id()}", level='WARNING')
+
+        self.compositions_layer.triggerRepaint()

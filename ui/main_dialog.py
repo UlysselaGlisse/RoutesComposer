@@ -1,5 +1,5 @@
 """Main dialog class. Dialog that's open when cliking on the icon."""
-import os
+import os, gc
 from posix import error
 from typing import cast
 from qgis.core import (
@@ -58,6 +58,7 @@ class RoutesComposerDialog(QDialog):
         self.load_settings()
         self.update_ui_state()
         self.translator = QTranslator()
+
 
     def load_styles(self):
         """Charge les styles à partir du fichier CSS."""
@@ -226,6 +227,7 @@ class RoutesComposerDialog(QDialog):
     def toggle_script(self):
         """Démarre ou arrête le script."""
         try:
+            print(f"is script_running: {config.script_running}")
             if not config.script_running:
                 # Vérifier que les couches sont sélectionnées
                 if not self.segments_combo.currentData() or not self.compositions_combo.currentData():
@@ -236,12 +238,13 @@ class RoutesComposerDialog(QDialog):
                     QMessageBox.warning(self, self.tr("Attention"), self.tr("Veuillez sélectionner la colonne segments"))
                     return
 
-                routes_composer = main.RoutesComposer()
-                try:
-                    routes_composer.connect()
-                finally:
-                    routes_composer.disconnect()
-
+                main.start_routes_composer()
+                config.script_running = True
+                if self.tool:
+                    self.tool.update_icon()
+            else:
+                main.stop_routes_composer()
+                config.script_running = False
                 if self.tool:
                     self.tool.update_icon()
 
@@ -530,11 +533,11 @@ class RoutesComposerDialog(QDialog):
             project.setDirty(True)
             geom_on_fly = bool(state)
             log(f"config state of geom_on_fly = {geom_on_fly}")
-            # if geom_on_fly:
-            #     success = main.start_geom_on_fly()
-            #     if success:
-            #         config.geom_on_fly_running = True
-            # if not geom_on_fly:
-            #     success = main.stop_geom_on_fly()
-            #     if success:
-            #         config.geom_on_fly_running = False
+            if geom_on_fly:
+                success = main.start_geom_on_fly()
+                if success:
+                    config.geom_on_fly_running = True
+            if not geom_on_fly:
+                success = main.stop_geom_on_fly()
+                if success:
+                    config.geom_on_fly_running = False

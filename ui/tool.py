@@ -12,7 +12,7 @@ from qgis.PyQt.QtCore import (
     QTranslator
 )
 from .. import config
-from ..main import start_script, start_geom_on_fly
+from .. import main
 from .main_dialog import show_dialog, RoutesComposerDialog
 from ..ids_basket import IDsBasket
 
@@ -82,10 +82,10 @@ class RoutesComposerTool:
             geom_on_fly, _ = project.readBoolEntry("routes_composer", "geom_on_fly", False)
 
             if auto_start:
-                start_script()
+                main.start_routes_composer()
                 config.script_running = True
             if geom_on_fly:
-                success = start_geom_on_fly()
+                success = main.start_geom_on_fly()
                 if success:
                     config.geom_on_fly_running = True
             self.update_icon()
