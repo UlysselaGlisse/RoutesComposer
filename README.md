@@ -1,4 +1,4 @@
-THis README is also available in [:gb: English](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-en.md) and [:de: German](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-de.md)
+This README is also available in [:gb: English](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-en.md) and [:de: German](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-de.md)
 
 
 
@@ -49,11 +49,6 @@ https://github.com/user-attachments/assets/e7506320-665e-49fe-bef8-5ba32d06b17d
 _Si jamais le plugin n'apparaît pas, se rendre dans Extensions > Installées > Cocher l'icone du plugin._
 
 ---
-
-
-Dans Qgis, Extensions >  Installer/Gérer les extensions
-
-Taper RoutesComposer - s'il n'apparaît pas, redémarrer Qgis - > Cocher la checkbox.
 
 # Utilisation
 ### Prérequis:
