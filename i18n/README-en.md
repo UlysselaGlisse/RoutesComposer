@@ -1,7 +1,7 @@
 This README is also available in [:gb: English](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-en.md) and [:de: German](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-de.md)
 
-This QGIS plugin will be useful for those who want to create routes between two points from a vector network. The most obvious example of a network is that of roads: the D42 road is both a single road and is made up of dozens of different sections.
-The sections are in the plugin the segments, and the road corresponds to a composition.
+This QGIS plugin will be useful for those who want to create routes between two points from a vector (line) network. The most obvious example of a network is that of roads: the D42 road is both a single road and is made up of dozens of different segments.
+The segments are the plugin's building blocks, and the road corresponds to a composition.
 All geographical work is done on the segments. The compositions only have attributes and a list containing the identifiers of the segments.
 
 ## Division
