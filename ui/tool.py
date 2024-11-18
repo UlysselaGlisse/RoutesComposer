@@ -27,7 +27,7 @@ class RoutesComposerTool:
         self.project_loaded = False
         self.script_running = config.script_running
         self.iface = iface
-        self.plugin_dir = os.path.dirname(__file__)
+        self.plugin_dir = os.path.dirname(os.path.dirname(__file__))
         project = QgsProject.instance()
         if project:
             project.readProject.connect(self.on_project_load)
@@ -36,13 +36,11 @@ class RoutesComposerTool:
             self.plugin_dir,
             'i18n',
             'RoutesComposer_{}.qm'.format(locale))
-
+        self.locale_path = locale_path
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
             QCoreApplication.installTranslator(self.translator)
-
-
 
     def initGui(self):
         icon_path = os.path.join(os.path.dirname(__file__), 'icons', 'icon.png')

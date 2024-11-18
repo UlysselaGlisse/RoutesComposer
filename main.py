@@ -67,7 +67,7 @@ class RoutesComposer:
                 self.is_connected = True
 
                 log("Script has started", level='INFO')
-                iface.messageBar().pushMessage("Info", QCoreApplication.translate("RoutesComposer","Le suivi par RoutesComposer a démarré"), level=Qgis.MessageLevel.Info)
+                iface.messageBar().pushMessage("Info",QCoreApplication.translate("RoutesComposer","Le suivi par RoutesComposer a démarré"), level=Qgis.MessageLevel.Info)
                 return True
 
         except Exception as e:

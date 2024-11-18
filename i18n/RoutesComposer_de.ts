@@ -4,32 +4,32 @@
 <context>
     <name>ErrorDialog</name>
     <message>
-        <location filename="../ui/sub_dialog.py" line="131"/>
+        <location filename="../ui/sub_dialog.py" line="100"/>
         <source>Erreurs détectées</source>
         <translation>Erkannte Fehler</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="140"/>
+        <location filename="../ui/sub_dialog.py" line="109"/>
         <source>Détails des erreurs détectées :</source>
         <translation>Fehlerdetails:</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="153"/>
+        <location filename="../ui/sub_dialog.py" line="122"/>
         <source>Fermer</source>
         <translation>Schließen</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="196"/>
+        <location filename="../ui/sub_dialog.py" line="165"/>
         <source>Les géométries pour les compositions suivantes n&apos;ont pas pu être créées : {composition_id}.</source>
         <translation>Die Geometrien für die folgenden Kompositionen konnten nicht erstellt werden: {composition_id}.</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="233"/>
+        <location filename="../ui/sub_dialog.py" line="202"/>
         <source>Erreur</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="233"/>
+        <location filename="../ui/sub_dialog.py" line="202"/>
         <source>Segment {segment_id} non trouvé.</source>
         <translation>Segment {segment_id} nicht gefunden.</translation>
     </message>
@@ -60,7 +60,7 @@
         Vous pouvez voir en détail ce qu&apos;il se passe en activant les logs &lt;br /&gt;
         Ceux-ci apparaîtront dans la console python de Qgis.
         </source>
-        <translation type="unfinished">
+        <translation type="obsolete">
 &lt;b&gt;Netzwerkmanager&lt;/b&gt;&lt;br&gt;&lt;br&gt;
 Dieses Plugin bietet Unterstützung beim Erstellen von Netzwerken, indem es&lt;br /&gt;
 die Zusammensetzungen der Segmente basierend auf den Änderungen an den Segmenten aktualisiert.&lt;br&gt;&lt;br&gt;
@@ -80,35 +80,90 @@ Diese erscheinen in der Python-Konsole von QGIS.</translation>
     <message>
         <location filename="../ui/sub_dialog.py" line="74"/>
         <source>Désactiver le logging</source>
-        <translation>Logging deaktivieren</translation>
+        <translation type="obsolete">Logging deaktivieren</translation>
     </message>
     <message>
         <location filename="../ui/sub_dialog.py" line="76"/>
         <source>Activer le logging</source>
-        <translation type="unfinished">Enable logging</translation>
+        <translation type="obsolete">Enable logging</translation>
+    </message>
+    <message>
+        <location filename="../ui/sub_dialog.py" line="33"/>
+        <source>
+        &lt;b&gt;Gestionnaire de compositions de segments&lt;/b&gt;&lt;br&gt;&lt;br&gt;
+        Ce plugin apporte une assistance dans la réalisation de compositions de segments.&lt;br&gt;&lt;br&gt;
+        &lt;i&gt;Instructions :&lt;/i&gt;&lt;br&gt;
+        &lt;ol&gt;
+            &lt;li&gt;&lt;b&gt;Sélectionnez les couches :&lt;/b&gt;&lt;br /&gt;
+                - Une couche segments avec un champ &apos;id&apos; qui sera utilisé pour faire vos compositions.&lt;br /&gt;
+                - Une couche compositions avec un champ dans lequel vous entrez les listes de segments (sans espaces et séparées par une virgule, par exemple 1,2,3).&lt;/li&gt;
+            &lt;li&gt;&lt;b&gt;Panier à segments :&lt;/b&gt;&lt;br /&gt;
+                Cliquez sur l&apos;icône, une petite bulle apparaîtra à droite du curseur. Sélectionnez les segments qui vous intéressent. La liste se remplira.&lt;br /&gt;
+                L&apos;outil cherchera toujours à combler les trous entre deux segments.&lt;br /&gt;
+                Vous pouvez appuyer sur &lt;b&gt;z&lt;/b&gt; pour retirer le dernier segment ajouté à la liste et sur &lt;b&gt;e&lt;/b&gt; pour le rétablir.&lt;/li&gt;
+        &lt;/ol&gt;
+        </source>
+        <translation>        &lt;b&gt;Segmentkompositionsmanager&lt;/b&gt;&lt;br&gt;&lt;br&gt;
+        Dieses Plugin bietet Unterstützung bei der Erstellung von Segmentkompositionen.&lt;br&gt;&lt;br&gt;
+        &lt;i&gt;Anweisungen:&lt;/i&gt;&lt;br&gt;
+        &lt;ol&gt;
+            &lt;li&gt;&lt;b&gt;Wählen Sie die Ebenen aus:&lt;/b&gt;&lt;br /&gt;
+                - Eine Segmenteebene mit einem &apos;id&apos;-Feld, das für Ihre Kompositionen verwendet wird.&lt;br /&gt;
+                - Eine Kompositionsebene mit einem Feld, in das Sie die Listen der Segmente eingeben (ohne Leerzeichen und durch Kommas getrennt, z.B. 1,2,3).&lt;/li&gt;
+            &lt;li&gt;&lt;b&gt;Segmentkorb:&lt;/b&gt;&lt;br /&gt;
+                Klicken Sie auf das Symbol, eine kleine Blase erscheint rechts vom Cursor. Wählen Sie die Segmente von Interesse aus. Die Liste füllt sich.&lt;br /&gt;
+                Das Werkzeug versucht immer, Lücken zwischen zwei Segmenten zu füllen.&lt;br /&gt;
+                Sie können &lt;b&gt;z&lt;/b&gt; drücken, um das zuletzt hinzugefügte Segment aus der Liste zu entfernen, und &lt;b&gt;e&lt;/b&gt;, um es wiederherzustellen.&lt;/li&gt;
+        &lt;/ol&gt;
+</translation>
     </message>
 </context>
 <context>
     <name>RoutesComposer</name>
     <message>
-        <location filename="../main.py" line="190"/>
+        <location filename="../main.py" line="178"/>
         <source>Le champ &apos;id&apos; n&apos;a pas été trouvé dans la couche segments</source>
-        <translation type="obsolete">Das Feld &apos;id&apos; wurde in der Schicht Segmente nicht gefunden</translation>
+        <translation>Das Feld &apos;id&apos; wurde in der Schicht Segmente nicht gefunden</translation>
     </message>
     <message>
-        <location filename="../main.py" line="198"/>
+        <location filename="../main.py" line="70"/>
         <source>Le suivi par RoutesComposer a démarré</source>
-        <translation type="obsolete">Die Überwachung durch RoutesComposer hat begonnen</translation>
+        <translation>Die Überwachung durch RoutesComposer hat begonnen</translation>
     </message>
     <message>
-        <location filename="../main.py" line="216"/>
+        <location filename="../main.py" line="100"/>
         <source>Erreur</source>
-        <translation type="obsolete">Fehler</translation>
+        <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../main.py" line="213"/>
+        <location filename="../main.py" line="92"/>
         <source>Le suivi par RoutesComposer est arrêté</source>
-        <translation type="obsolete">Die Überwachung durch RoutesComposer ist gestoppt</translation>
+        <translation>Die Überwachung durch RoutesComposer ist gestoppt</translation>
+    </message>
+    <message>
+        <location filename="../main.py" line="42"/>
+        <source>Aucun projet QGIS n&apos;est ouvert</source>
+        <translation>Kein QGIS-Projekt ist geöffnet</translation>
+    </message>
+    <message>
+        <location filename="../main.py" line="147"/>
+        <source>Veuillez sélectionner une couche de segments valide</source>
+        <translation>Bitte wählen Sie eine gültige Segmentebene aus</translation>
+    </message>
+    <message>
+        <location filename="../main.py" line="150"/>
+        <source>La couche de segments n&apos;est pas une couche vectorielle valide</source>
+        <translation>Die Segmentebene ist keine gültige Vektorebene</translation>
+    </message>
+    <message>
+        <location filename="../main.py" line="160"/>
+        <source>Veuillez sélectionner une couche de compositions valide</source>
+        <translation>Bitte wählen Sie eine gültige Kompositionsschicht aus</translation>
+    </message>
+    <message>
+        <location filename="../main.py" line="162"/>
+        <source>La couche de compositions n&apos;est pas une couche vectorielle valide</source>
+        <translation>Die Kompositionsschicht ist keine gültige Vektorschicht</translation>
     </message>
 </context>
 <context>
@@ -302,13 +357,13 @@ Diese erscheinen in der Python-Konsole von QGIS.</translation>
     <message>
         <location filename="../ui/tool.py" line="48"/>
         <source>Ouvrir Routes Composer</source>
-        <translation>Route Komponist öffnen</translation>
+        <translation type="obsolete">Route Komponist öffnen</translation>
     </message>
 </context>
 <context>
     <name>RoutesManagerTool</name>
     <message>
-        <location filename="../ui/tool.py" line="59"/>
+        <location filename="../ui/tool.py" line="58"/>
         <source>Ouvrir le panier à segments</source>
         <translation>Öffnen Sie den Segmentkorb</translation>
     </message>
@@ -316,27 +371,27 @@ Diese erscheinen in der Python-Konsole von QGIS.</translation>
 <context>
     <name>SingleSegmentDialog</name>
     <message>
-        <location filename="../ui/sub_dialog.py" line="86"/>
+        <location filename="../ui/sub_dialog.py" line="55"/>
         <source>Vérification nécessaire</source>
         <translation>Überprüfung erforderlich</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="94"/>
+        <location filename="../ui/sub_dialog.py" line="63"/>
         <source>Attention, composition d&apos;un seul segment. Veuillez vérifier que la nouvelle composition est bonne.</source>
         <translation>Achtung, Komposition aus einem einzigen Segment. Bitte überprüfen Sie, ob die neue Komposition korrekt ist.</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="105"/>
+        <location filename="../ui/sub_dialog.py" line="74"/>
         <source>Inverser l&apos;ordre</source>
         <translation>Die Reihenfolge umkehren</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="113"/>
+        <location filename="../ui/sub_dialog.py" line="82"/>
         <source>Annuler</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="121"/>
+        <location filename="../ui/sub_dialog.py" line="90"/>
         <source>Nouvelle composition proposée: {cs}</source>
         <translation>Neuer vorgeschlagener Komposition: {cs}</translation>
     </message>

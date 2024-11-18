@@ -31,31 +31,22 @@ class InfoDialog(QDialog):
         self.setWindowTitle(self.tr("Informations sur le Gestionnaire de réseaux"))
 
         info_text = self.tr("""
-        <b>Gestionnaire de réseaux</b><br><br>
-        Ce plugin apporte une assistance dans la réalisation de réseaux en mettant <br /> à jour
-        les compositions de segments en fonction des modifications <br /> faites sur les segments.<br><br>
+        <b>Gestionnaire de compositions de segments</b><br><br>
+        Ce plugin apporte une assistance dans la réalisation de compositions de segments.<br><br>
         <i>Instructions :</i><br>
         <ol>
-            <li>Sélectionnez les couches à utiliser <br /> (La couche des compositions doit avoir
-                un champ nommé "segments")</li>
-            <li>Cliquez sur 'Démarrer' pour activer le suivi</li>
-            <li>Effectuez vos modifications sur les segments</li>
-            <li>Les compositions seront mises à jour automatiquement</li>
-            <li>Cliquez sur 'Arrêter' pour désactiver le suivi</li>
+            <li><b>Sélectionnez les couches :</b><br />
+                - Une couche segments avec un champ 'id' qui sera utilisé pour faire vos compositions.<br />
+                - Une couche compositions avec un champ dans lequel vous entrez les listes de segments (sans espaces et séparées par une virgule, par exemple 1,2,3).</li>
+            <li><b>Panier à segments :</b><br />
+                Cliquez sur l'icône, une petite bulle apparaîtra à droite du curseur. Sélectionnez les segments qui vous intéressent. La liste se remplira.<br />
+                L'outil cherchera toujours à combler les trous entre deux segments.<br />
+                Vous pouvez appuyer sur <b>z</b> pour retirer le dernier segment ajouté à la liste et sur <b>e</b> pour le rétablir.</li>
         </ol>
-
-        Vous pouvez voir en détail ce qu'il se passe en activant les logs <br />
-        Ceux-ci apparaîtront dans la console python de Qgis.
         """)
 
         layout = QVBoxLayout()
         layout.addWidget(QLabel(info_text))
-
-        self.info_logging_button = QPushButton()
-        self.update_logging_button_text()
-        self.info_logging_button.clicked.connect(self.toggle_info_logging)
-        layout.addWidget(self.info_logging_button)
-
         self.setLayout(layout)
 
 class SingleSegmentDialog(QDialog):
