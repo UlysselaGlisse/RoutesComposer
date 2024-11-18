@@ -28,25 +28,12 @@ This plugin comes with another tool that allows you to select segment IDs direct
 
 # Installation
 
-Download this repository:
+* Download this [file](https://github.com/UlysselaGlisse/RoutesComposer/releases/download/v1.0/RoutesComposer.zip)
+* In QGIS > Plugins > Install from ZIP
+* Choose the zipped file.
+* Install the Plugin.
 
-```bash
-git clone https://github.com/UlysselaGlisse/RoutesComposer.git
-```
-
-* Linux:
-
-Move the directory to the QGIS plugins folder, usually located at:
-
-`~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/`
-
-* Windows:
-
-`C:\Users\USER\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins`
-
-* Mac OS:
-
-`Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins`
+_If the plugin does not appear, go to Plugins > Installed > Check the plugin's icon._
 
 ---
 

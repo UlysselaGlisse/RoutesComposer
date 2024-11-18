@@ -30,25 +30,12 @@ Dieses Plugin wird von einem anderen Tool begleitet, das es ermöglicht, die Seg
 
 # Installation
 
-Laden Sie dieses Repository herunter:
+* Laden Sie diese [Datei](https://github.com/UlysselaGlisse/RoutesComposer/releases/download/v1.0/RoutesComposer.zip) herunter
+* In QGIS > Plugins > Aus ZIP installieren
+* Wählen Sie die gezippte Datei aus.
+* Installieren Sie das Plugin.
 
-```bash
-git clone https://github.com/UlysselaGlisse/RoutesComposer.git
-```
-
-* Linux:
-
-Verschieben Sie das Verzeichnis normalerweise in den Plugin-Ordner von QGIS:
-
-`~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/`
-
-* Windows:
-
-`C:\Users\USER\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins`
-
-* Mac OS:
-
-`Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins`
+_Wenn das Plugin nicht angezeigt wird, gehen Sie zu Plugins > Installiert > Aktivieren Sie das Symbol des Plugins._
 
 ---
 

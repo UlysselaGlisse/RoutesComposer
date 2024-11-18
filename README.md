@@ -41,7 +41,7 @@ https://github.com/user-attachments/assets/e7506320-665e-49fe-bef8-5ba32d06b17d
 
 # Installation
 
-* Télécharger ce (fichier)[https://github.com/UlysselaGlisse/RoutesComposer/releases/download/v1.0/RoutesComposer.zip]
+* Télécharger ce [fichier](https://github.com/UlysselaGlisse/RoutesComposer/releases/download/v1.0/RoutesComposer.zip)
 * Dans Qgis > Extensions > Installer depuis un ZIP
 * Choisir le fichier zippé.
 * Installer le Plugin.
