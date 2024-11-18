@@ -236,7 +236,7 @@ class GeomOnFly(RoutesComposer):
         log(f"With corresponding segment id: '{segment_id}'", level='INFO')
 
         for composition in utils.get_features_list(self.compositions_layer):
-            segments_str = composition[self.segments_column_name]
+            segments_str = str(composition[self.segments_column_name])
             if str(segment_id) in segments_str.split(','):
                 # Obtenir la liste des segments pour cette composition
                 segment_ids = [int(id_str) for id_str in segments_str.split(',') if id_str.strip().isdigit()]
