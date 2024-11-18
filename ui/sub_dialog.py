@@ -58,28 +58,6 @@ class InfoDialog(QDialog):
 
         self.setLayout(layout)
 
-    def enable_logging(self):
-        """Active le logging."""
-        config.logging_enabled = True
-        log("Logging activated")
-
-    def disable_logging(self):
-        """Désactive le logging."""
-        config.logging_enabled = False
-        log("Logging deactivated")
-
-    def update_logging_button_text(self):
-        """Met à jour le texte du bouton de logging en fonction de l'état."""
-        if config.logging_enabled:
-            self.info_logging_button.setText(self.tr("Désactiver le logging"))
-        else:
-            self.info_logging_button.setText(self.tr("Activer le logging"))
-
-    def toggle_info_logging(self):
-        """Active ou désactive le logging depuis la boîte d'information."""
-        self.disable_logging()
-
-
 class SingleSegmentDialog(QDialog):
     def __init__(self, parent=None, old_id=None, new_id=None):
         super().__init__(parent)
