@@ -10,7 +10,7 @@ Les sections sont dans le plugin des segments, et la départementale correspond 
 
 Tout le travail géographique s'effectue sur les segments. Les compositions ne possèdent que des attributs et une liste avec les identifiants des segments.
 
-## Division 
+## Division
 
 La première fonction de ce plugin est d'aider au moment de la division d'un segment.
 Si le segment fait partie d'une ou plusieurs compositions, il est pénible d'aller chercher dans lesquelles et à quel endroit.
@@ -41,26 +41,12 @@ https://github.com/user-attachments/assets/e7506320-665e-49fe-bef8-5ba32d06b17d
 
 # Installation
 
-Télécharger ce répertoire :
+* Télécharger ce (fichier)[https://github.com/UlysselaGlisse/RoutesComposer/releases/download/v1.0/RoutesComposer.zip]
+* Dans Qgis > Extensions > Installer depuis un ZIP
+* Choisir le fichier zippé.
+* Installer le Plugin.
 
-```bash
-git clone https://github.com/UlysselaGlisse/RoutesComposer.git
-```
-
-* Linux :
-
-Déplacer le répertoire dans le dossier des plugins de Qgis normalement :
-
-`~.local/share/QGIS/QGIS3/profiles/default/python/plugins.`
-
-* Windows :
-
-`C:\Users\USER\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins`
-
-* Mac OS :
-
-`Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins`
-
+_Si jamais le plugin n'apparaît pas, se rendre dans Extensions > Installées > Cocher l'icone du plugin._
 ---
 
 
