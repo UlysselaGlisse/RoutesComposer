@@ -9,9 +9,9 @@ from qgis.core import (
 )
 from qgis.utils import iface
 from qgis.PyQt.QtCore import (
-    QTimer,
-    QSettings,
     QCoreApplication,
+    QTimer,
+    QSettings
 )
 from . import config
 from .func import(
@@ -49,9 +49,16 @@ class RoutesComposer:
         self.segments_column_name, self.segments_column_index = self.get_segments_column_name()
         self.id_column_index = self.get_id_column_index()
 
-        self.split_manager = split.SplitManager(self.segments_layer, self.compositions_layer,
-            self.segments_column_name, self.segments_column_index, self.id_column_index)
+        if self.segments_layer is None or self.compositions_layer is None:
+            raise ValueError("Invalid layers: segments_layer or compositions_layer is None")
 
+        self.split_manager = split.SplitManager(
+            self.segments_layer,
+            self.compositions_layer,
+            self.segments_column_name,
+            self.segments_column_index,
+            self.id_column_index
+        )
         self.is_connected = False
 
     def connect(self):
@@ -96,7 +103,7 @@ class RoutesComposer:
 
     def feature_added(self, fid):
         """Fonction prinicpale. Traite l'ajout d'une nouvelle entité dans la couche segments."""
-        # Lorsque Qgis enregistre les couches: fid >= 0, comme le script ne doit pas s'exécuter à ce moment, on le vérifie.'
+        # Pendant l'enregistrement: fid >= 0.'
         if fid >= 0:
             return
 
@@ -106,60 +113,31 @@ class RoutesComposer:
 
         segment_id = source_feature.attributes()[self.id_column_index]
         if segment_id is None:
-            log("No segment id, return.")
             return
 
-        log(f"With corresponding segment id: '{segment_id}'", level='INFO')
-
-        # Le segment a-t-il était divisé ?
         if self.split_manager.has_duplicate_segment_id(segment_id):
-            log(f"Segment '{segment_id}' has been split.")
+
             new_geometry = source_feature.geometry()
             if not new_geometry or new_geometry.isEmpty():
                 return
 
-            # Récupérer le segment original.
-            expression = f"\"id\" = '{segment_id}' AND $id != {fid}"
-            request = QgsFeatureRequest().setFilterExpression(expression)
-            original_feature = next(self.segments_layer.getFeatures(request), None)
-            print(original_feature)
+            original_feature = next(self.segments_layer.getFeatures(f"id = {segment_id}"), None)
 
-            if not original_feature:
-                return
-            # Récupérer toutes les compositions contenant ce segment
-            segments_lists_ids = self.split_manager.get_compositions_list_segments(segment_id)
-            log(f"Segment find into {len(segments_lists_ids)} compositions.", level='INFO')
-
-            if not segments_lists_ids:
-                return
-
-            next_id = self.split_manager.get_next_id()
-            log(f"New segment id to attribute: '{next_id}'", level='INFO')
-
-            self.split_manager.update_segment_id(fid, next_id)
-
-            segment_unique = False
-
-            for segment_list_ids in segments_lists_ids:
-                if len(segment_list_ids) == 1:
-                    segment_unique = True
-                    iface.mapCanvas().refresh()
-
-            if segment_unique == True:
-                log(f"Single segment found, open dialog.")
-                new_segments = self.split_manager.process_single_segment_composition(fid, segment_id, next_id)
-                if new_segments is None:
-                    pass
-            else:
-                self.split_manager.update_compositions_segments(segment_id, next_id, original_feature, source_feature, segments_lists_ids)
-
-        self.compositions_layer.triggerRepaint()
+            if original_feature:
+                segments_lists_ids = self.split_manager.get_compositions_list_segments(segment_id)
+                if segments_lists_ids:
+                    next_id = self.split_manager.get_next_id()
+                    self.split_manager.update_segment_id(fid, next_id)
+                    self.split_manager.update_compositions_segments(fid, segment_id, next_id, original_feature, source_feature, segments_lists_ids)
 
     def features_deleted(self, fids):
         """Nettoie les compositions des segments supprimés."""
+        log(f"fids = {fids}" )
+        for fid in fids:
+            if fid >= 0:
+                return
 
         self.split_manager.clean_invalid_segments()
-        log(f"Compositions has been cleaned.")
 
     def get_segments_layer(self):
 
@@ -169,8 +147,10 @@ class RoutesComposer:
         self.segments_layer = cast(QgsVectorLayer, self.project.mapLayer(segments_layer_id))
         if not self.segments_layer.isValid():
             raise Exception(QCoreApplication.translate("RoutesComposer","Veuillez sélectionner une couche de segments valide"))
+            return
         if not isinstance(self.segments_layer, QgsVectorLayer):
             raise Exception(QCoreApplication.translate("RoutesComposer","La couche de segments n'est pas une couche vectorielle valide"))
+            return
 
         return self.segments_layer
 
@@ -187,13 +167,10 @@ class RoutesComposer:
 
     def get_segments_column_name(self):
         self.segments_column_name = self.settings.value("routes_composer/segments_column_name", "segments")
-        config.segments_column_name = self.segments_column_name
 
         self.segments_column_index = self.compositions_layer.fields().indexOf(self.segments_column_name)
         if self.segments_column_index == -1:
             raise Exception(QCoreApplication.translate("RoutesComposer", "Le champ '{segments_column_name}' n'existe pas dans la couche compositions".format(segments_column_name=segments_column_name)))
-
-        config.segments_column_index = self.segments_column_index
 
         return self.segments_column_name, self.segments_column_index
 
@@ -202,7 +179,6 @@ class RoutesComposer:
         if self.id_column_index == -1:
             raise Exception(QCoreApplication.translate("RoutesComposer","Le champ 'id' n'a pas été trouvé dans la couche segments"))
 
-        config.id_column_index = self.id_column_index
         return self.id_column_index
 
 

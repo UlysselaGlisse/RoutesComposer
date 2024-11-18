@@ -67,7 +67,7 @@ class SplitManager:
         return segments_lists_ids
 
 
-    def update_compositions_segments(self, old_id: int, new_id: int, original_feature: QgsFeature, new_feature: QgsFeature, segment_lists_ids: list) -> None:
+    def update_compositions_segments(self, fid: int, old_id: int, new_id: int, original_feature: QgsFeature, new_feature: QgsFeature, segment_lists_ids: list) -> None:
         """Met à jour les compositions après division d'un segment."""
 
         self.compositions_layer.startEditing()
@@ -79,25 +79,31 @@ class SplitManager:
             try:
                 old_index = segments_list.index(int(old_id))
 
-                last_segment = old_index == len(segments_list) - 1
-                segment_geom, is_new_geom = new_geom if last_segment else original_geom, True if last_segment else False
+                if len(segments_list) > 1:
+                    last_segment = old_index == len(segments_list) - 1
+                    segment_geom, is_new_geom = new_geom if last_segment else original_geom, True if last_segment else False
 
-                is_correctly_oriented = self.check_segment_orientation(segment_geom, is_new_geom, segments_list, old_index)
+                    is_correctly_oriented = self.check_segment_orientation(segment_geom, is_new_geom, segments_list, old_index)
 
-                # On ajuste la nouvelle liste en fonction de l'orientation du segment.'
-                new_segments_list = segments_list.copy()
-                if is_correctly_oriented:
-                    new_segments_list[old_index:old_index+1] = [int(old_id), int(new_id)]
+                    # On ajuste la nouvelle liste en fonction de l'orientation du segment.'
+                    new_segments_list = segments_list.copy()
+                    if is_correctly_oriented:
+                        new_segments_list[old_index:old_index+1] = [int(old_id), int(new_id)]
+                    else:
+                        new_segments_list[old_index:old_index+1] = [int(new_id), int(old_id)]
+
+                    if composition_id:
+                        self.compositions_layer.changeAttributeValue(
+                            composition_id,
+                            self.segments_column_index,
+                            ','.join(map(str, new_segments_list))
+                    )
+                    log(f"Composition {composition_id} has been updated with list: {new_segments_list}")
+
                 else:
-                    new_segments_list[old_index:old_index+1] = [int(new_id), int(old_id)]
+                    self.process_single_segment_composition(fid, old_id, new_id)
 
-                if composition_id:
-                    self.compositions_layer.changeAttributeValue(
-                        composition_id,
-                        self.segments_column_index,
-                        ','.join(map(str, new_segments_list))
-                )
-                log(f"Composition {composition_id} has been updated with list: {new_segments_list}")
+                self.compositions_layer.triggerRepaint()
 
             except Exception as e:
                 raise Exception(f"Erreur lors de la mise-à-jour automatique de la liste des segments.")
@@ -202,6 +208,8 @@ class SplitManager:
             self.id_column_index,
             int(next_id)
         )
+        self.segments_layer.triggerRepaint()
+
 
 
     def get_next_id(self) -> int:
