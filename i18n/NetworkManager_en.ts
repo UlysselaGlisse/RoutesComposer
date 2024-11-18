@@ -85,84 +85,84 @@
         <translation type="obsolete">Routes Composer</translation>
     </message>
     <message>
-        <location filename="../main.py" line="211"/>
+        <location filename="../ui/main_dialog.py" line="90"/>
         <source>Configuration des couches</source>
-        <translation type="obsolete">Layers configuration</translation>
+        <translation>Layers configuration</translation>
     </message>
     <message>
-        <location filename="../main.py" line="216"/>
+        <location filename="../ui/main_dialog.py" line="94"/>
         <source>Couche segments:</source>
-        <translation type="obsolete">Segments layer:</translation>
+        <translation>Segments layer:</translation>
     </message>
     <message>
-        <location filename="../main.py" line="224"/>
+        <location filename="../ui/main_dialog.py" line="106"/>
         <source>Couche compositions:</source>
-        <translation type="obsolete">Compositions layer:</translation>
+        <translation>Compositions layer:</translation>
     </message>
     <message>
-        <location filename="../main.py" line="234"/>
+        <location filename="../ui/main_dialog.py" line="125"/>
         <source>Configuration de la liste de segments</source>
-        <translation type="obsolete">List of segments configuration</translation>
+        <translation>List of segments configuration</translation>
     </message>
     <message>
-        <location filename="../main.py" line="238"/>
+        <location filename="../ui/main_dialog.py" line="129"/>
         <source>Colonne contenant la liste de segments:</source>
-        <translation type="obsolete">Field where the list of segments is:</translation>
+        <translation>Field where the list of segments is:</translation>
     </message>
     <message>
-        <location filename="../main.py" line="348"/>
+        <location filename="../ui/main_dialog.py" line="265"/>
         <source>Status: Arrêté</source>
-        <translation type="obsolete">Status: Stop</translation>
+        <translation>Status: Stop</translation>
     </message>
     <message>
-        <location filename="../main.py" line="347"/>
+        <location filename="../ui/main_dialog.py" line="264"/>
         <source>Démarrer</source>
-        <translation type="obsolete">Start</translation>
+        <translation>Start</translation>
     </message>
     <message>
-        <location filename="../main.py" line="259"/>
+        <location filename="../ui/main_dialog.py" line="154"/>
         <source>Info</source>
-        <translation type="obsolete">Info</translation>
+        <translation>Info</translation>
     </message>
     <message>
-        <location filename="../main.py" line="295"/>
+        <location filename="../ui/main_dialog.py" line="161"/>
         <source>Démarrer automatiquement au lancement du projet</source>
-        <translation type="obsolete">Auto-start on project launch</translation>
+        <translation>Auto-start on project launch</translation>
     </message>
     <message>
-        <location filename="../main.py" line="324"/>
+        <location filename="../ui/main_dialog.py" line="462"/>
         <source>Attention</source>
-        <translation type="obsolete">Warning</translation>
+        <translation>Warning</translation>
     </message>
     <message>
-        <location filename="../main.py" line="320"/>
+        <location filename="../ui/main_dialog.py" line="462"/>
         <source>Veuillez sélectionner les couches segments et compositions</source>
-        <translation type="obsolete">Please select layers, segments and compositions</translation>
+        <translation>Please select layers, segments and compositions</translation>
     </message>
     <message>
-        <location filename="../main.py" line="324"/>
+        <location filename="../ui/main_dialog.py" line="238"/>
         <source>Veuillez sélectionner la colonne segments</source>
-        <translation type="obsolete">Please select column segments</translation>
+        <translation>Please select column segments</translation>
     </message>
     <message>
-        <location filename="../main.py" line="339"/>
+        <location filename="../ui/main_dialog.py" line="470"/>
         <source>Erreur</source>
-        <translation type="obsolete">Error</translation>
+        <translation>Error</translation>
     </message>
     <message>
-        <location filename="../main.py" line="339"/>
+        <location filename="../ui/main_dialog.py" line="255"/>
         <source>Une erreur est survenue: {str(e)}</source>
-        <translation type="obsolete">An error has occured: {str(e)}</translation>
+        <translation>An error has occured: {str(e)}</translation>
     </message>
     <message>
-        <location filename="../main.py" line="344"/>
+        <location filename="../ui/main_dialog.py" line="260"/>
         <source>Arrêter</source>
-        <translation type="obsolete">Stop</translation>
+        <translation>Stop</translation>
     </message>
     <message>
-        <location filename="../main.py" line="345"/>
+        <location filename="../ui/main_dialog.py" line="261"/>
         <source>Status: En cours d&apos;exécution</source>
-        <translation type="obsolete">Status: Running</translation>
+        <translation>Status: Running</translation>
     </message>
     <message>
         <location filename="../main.py" line="460"/>
@@ -201,13 +201,78 @@
         5. Click &apos;Stop&apos; to deactivate tracking
         </translation>
     </message>
+    <message>
+        <location filename="../ui/main_dialog.py" line="53"/>
+        <source>Compositeur de Routes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog.py" line="111"/>
+        <source>Activer la création géométrique en continue</source>
+        <translation>Allow geometry creation on the fly</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog.py" line="172"/>
+        <source>Vérifier les compositions</source>
+        <translation>Check compositions</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog.py" line="333"/>
+        <source>Créer les géométries</source>
+        <translation>Create geometries</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog.py" line="185"/>
+        <source>Annuler</source>
+        <translation>Cancel</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog.py" line="315"/>
+        <source>Attention: la couche des segments n&apos;a pas de géométrie</source>
+        <translation>Warning: Layer segments has no geometry</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog.py" line="328"/>
+        <source>Mettre à jour les géométries</source>
+        <translation>Update geometries</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog.py" line="359"/>
+        <source>Attention: la colonne segments n&apos;est pas de type texte</source>
+        <translation type="unfinished">Warning: segments column is not a s</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog.py" line="416"/>
+        <source>Aucune erreur</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog.py" line="416"/>
+        <source>Aucune erreur détectée.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog.py" line="429"/>
+        <source>Le champ {ss} n&apos;existe pas dans la couche des compositions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog.py" line="470"/>
+        <source>Le champ {segments_column_name} n&apos;existe pas dans la couche des compositions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog.py" line="501"/>
+        <source>Annulation en cours...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RoutesManagerTool</name>
     <message>
         <location filename="../ui/tool.py" line="59"/>
         <source>Ouvrir le panier à segments</source>
-        <translation>Open Ids Basket</translation>
+        <translation type="obsolete">Open Ids Basket</translation>
     </message>
 </context>
 </TS>
