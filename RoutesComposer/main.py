@@ -1,4 +1,3 @@
-import gc
 from typing import cast
 from qgis.core import (
     Qgis,
@@ -17,8 +16,7 @@ from . import config
 from .func import(
     split,
     geom_compo,
-    utils,
-    errors as e
+    utils
 )
 from .func.utils import log
 

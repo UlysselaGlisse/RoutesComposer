@@ -1,6 +1,5 @@
 """Main dialog class. Dialog that's open when cliking on the icon."""
 import os, gc
-from posix import error
 from typing import cast
 from qgis.core import (
     Qgis,
