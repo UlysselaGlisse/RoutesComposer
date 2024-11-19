@@ -50,13 +50,13 @@ Type "RoutesComposer" - if it does not appear, restart QGIS - > Check the checkb
 
 ### Uses:
 #### Route Composer
-* Click on the icon ![icon](ui/icons/icon.png)
+* Click on the icon ![icon](../ui/icons/icon.png)
 * Enter the names of the two layers and the field of the compositions layer that contains the list of segments.
 * Start the process.
 * You may also choose to let this plugin run continuously by checking the corresponding box.
 
 #### Segment Basket
-* Click on the icon ![icon](ui/icons/ids_basket.png)
+* Click on the icon ![icon](../ui/icons/ids_basket.png)
 * A small box will appear next to the cursor.
 * Click on the segments that interest you. The box fills up.
 * If you wish to remove the last added segment, press Z; press E to add it back.
