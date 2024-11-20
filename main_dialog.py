@@ -37,14 +37,17 @@ from .func import split
 from .func.utils import get_features_list, log
 from .func.warning import verify_segments, highlight_errors
 from .func.geom_compo import GeomCompo
-from .func import routes_composer
+from .func.routes_composer import start_routes_composer, stop_routes_composer, start_geom_on_fly, stop_geom_on_fly
 from .func import warning
 from .ui.sub_dialog import InfoDialog, ErrorDialog
+from .ui.components.status_sections import StatusSection
+
 
 def show_dialog():
     dialog = RoutesComposerDialog(iface.mainWindow())
     dialog.show()
     return dialog
+
 
 class RoutesComposerDialog(QDialog):
     """Dialogue principal"""
@@ -60,6 +63,13 @@ class RoutesComposerDialog(QDialog):
         self.update_ui_state()
         self.translator = QTranslator()
 
+        project = QgsProject.instance()
+        if project:
+            project.layersAdded.connect(self.update_layer_combos)
+            project.layerRemoved.connect(self.update_layer_combos)
+
+        self.update_layer_combos()
+
     def load_styles(self):
         """Charge les styles à partir du fichier CSS."""
         with open(os.path.join(os.path.dirname(__file__),'ui', 'styles.css'), 'r') as f:
@@ -68,6 +78,8 @@ class RoutesComposerDialog(QDialog):
     def init_ui(self):
         """Initialise l'interface utilisateur."""
         layout = QVBoxLayout()
+
+        self.status_section = StatusSection()
 
         self.create_layer_configuration_group(layout)
         self.create_status_section(layout)
@@ -194,12 +206,13 @@ class RoutesComposerDialog(QDialog):
 
         layout.addLayout(buttons_layout)
 
-        self.auto_start_checkbox = QCheckBox(self.tr("Démarrer automatiquement au lancement du projet"))
-        settings = QSettings()
-        auto_start = settings.value("routes_composer/auto_start", True, type=bool)
-        self.auto_start_checkbox.setChecked(auto_start)
-        self.auto_start_checkbox.stateChanged.connect(self.on_auto_start_check)
-        layout.addWidget(self.auto_start_checkbox)
+        if QgsProject.instance():
+            self.auto_start_checkbox = QCheckBox(self.tr("Démarrer automatiquement au lancement du projet"))
+            settings = QSettings()
+            auto_start = settings.value("routes_composer/auto_start", True, type=bool)
+            self.auto_start_checkbox.setChecked(auto_start)
+            self.auto_start_checkbox.stateChanged.connect(self.on_auto_start_check)
+            layout.addWidget(self.auto_start_checkbox)
 
     def create_action_buttons(self, layout):
         """Boutons pour vérifier les compositions et créer les géométries."""
@@ -266,7 +279,6 @@ class RoutesComposerDialog(QDialog):
         advanced_layout.addWidget(self.update_attributes_button)
 
         self.advanced_group.setLayout(advanced_layout)
-
 
     def load_settings(self):
         project = QgsProject.instance()
@@ -339,12 +351,12 @@ class RoutesComposerDialog(QDialog):
                     QMessageBox.warning(self, self.tr("Attention"), self.tr("Veuillez sélectionner la colonne segments"))
                     return
 
-                routes_composer.start_routes_composer()
+                start_routes_composer()
                 config.script_running = True
                 if self.tool:
                     self.tool.update_icon()
             else:
-                routes_composer.stop_routes_composer()
+                stop_routes_composer()
                 config.script_running = False
                 self.geom_checkbox.setChecked(False)
                 if self.tool:
@@ -418,7 +430,8 @@ class RoutesComposerDialog(QDialog):
             self.selected_segments_layer = project.mapLayer(segments_id)
             if self.selected_segments_layer:
                 log(f"Segments layer selected: {self.selected_segments_layer.name()}")
-                # Si la couche segment n'a pas de géométrie on renvoit une erreur.'
+                # Si la couche segment n'a pas de géométrie
+                # on renvoit une erreur.'
                 if not self.selected_segments_layer.isSpatial():
                     self.segments_warning_label.setText(self.tr("Attention: la couche des segments n'a pas de géométrie"))
                     self.segments_warning_label.setVisible(True)
@@ -435,7 +448,8 @@ class RoutesComposerDialog(QDialog):
                 if isinstance(self.selected_compositions_layer, QgsVectorLayer) and self.selected_compositions_layer.isSpatial():
                     self.geom_checkbox.setVisible(True)
 
-                    self.create_or_update_geom_button.setText(self.tr("Mettre à jour les géométries"))
+                    self.create_or_update_geom_button.setText(
+                        self.tr("Mettre à jour les géométries"))
                     self.create_or_update_geom_button.clicked.disconnect()
                     self.create_or_update_geom_button.clicked.connect(self.update_geometries)
                 else:
@@ -488,6 +502,20 @@ class RoutesComposerDialog(QDialog):
 
             log(f"ID column selected: {selected_id_column}")
 
+    def update_layer_combos(self):
+        """Met à jour les comboboxes des couches."""
+        # Re-populate layers combo boxes
+        self.populate_layers_combo(self.segments_combo)
+        self.populate_layers_combo(self.compositions_combo)
+
+        # Re-check selected layers, in case they were removed
+        segments_layer_id = QgsProject.instance().readEntry("routes_composer", "segments_layer_id", "")[0]
+        compositions_layer_id = QgsProject.instance().readEntry("routes_composer", "compositions_layer_id", "")[0]
+
+        for combo, layer_id in [(self.segments_combo, segments_layer_id), (self.compositions_combo, compositions_layer_id)]:
+            if combo.findData(layer_id) == -1:
+                combo.setCurrentIndex(-1)
+
     def get_start_button_style(self):
         # TODO: Mettre le css dans le fichier styles, je n'y suis pas arrivé pour l'instant.
         if not config.script_running:
@@ -526,7 +554,6 @@ class RoutesComposerDialog(QDialog):
         else:
             self.toggle_advanced_arrow.setText("▼")
         self.adjustSize()
-
 
     def on_segments_attr_selected(self):
         """Méthode appelée quand un attribut segments est sélectionné."""
@@ -581,16 +608,18 @@ class RoutesComposerDialog(QDialog):
 
     def start_attribute_linking(self):
         """Démarre la liaison des attributs."""
-        if not self.segments_attr_combo.currentText() or not self.compositions_attr_combo.currentText():
+        if (not self.segments_combo.currentData() or not self.compositions_combo.currentData()
+            or not self.segments_attr_combo.currentText() or not self.compositions_attr_combo.currentText()):
+            QMessageBox.warning(self, self.tr("Attention"), self.tr("Veuillez sélectionner les couches segments et compositions ainsi que les attributs."))
             return
 
-        segments_layer = cast(QgsVectorLayer, self.selected_segments_layer)
-        compositions_layer = cast(QgsVectorLayer, self.selected_compositions_layer)
+
+        segments_layer = self.selected_segments_layer
+        compositions_layer = self.selected_compositions_layer
         segments_column_name = self.segments_column_combo.currentText()
         id_column_name = self.id_column_combo.currentText()
-        segments_attr=self.segments_attr_combo.currentText()
-        compositions_attr=self.compositions_attr_combo.currentText()
-        priority_mode=self.priority_mode_combo.currentText().lower()
+        segments_attr = self.segments_attr_combo.currentText()
+        compositions_attr = self.compositions_attr_combo.currentText()
 
         self.attribute_linker = AttributeLinker(
             segments_layer=segments_layer,
@@ -599,7 +628,7 @@ class RoutesComposerDialog(QDialog):
             compositions_attr=compositions_attr,
             id_column_name=id_column_name,
             segments_column_name=segments_column_name,
-            priority_mode=priority_mode
+            priority_mode=self.priority_mode_combo.currentText().lower()
         )
         self.attribute_linker.update_segments_attr_values()
 
@@ -656,7 +685,6 @@ class RoutesComposerDialog(QDialog):
         config.cancel_request = False
         self.cancel_button.setVisible(True)
         self.cancel_button.setEnabled(True)
-
 
         a = GeomCompo(segments_layer, compositions_layer, segments_column_name, id_column_name)
         errors_messages = a.create_compositions_geometries(self.progress_bar)
@@ -751,10 +779,10 @@ class RoutesComposerDialog(QDialog):
             geom_on_fly = bool(state)
             log(f"config state of geom_on_fly = {geom_on_fly}")
             if geom_on_fly:
-                success = routes_composer.start_geom_on_fly()
+                success = start_geom_on_fly()
                 if success:
                     config.geom_on_fly_running = True
             if not geom_on_fly:
-                success = routes_composer.stop_geom_on_fly()
+                success = stop_geom_on_fly()
                 if success:
                     config.geom_on_fly_running = False

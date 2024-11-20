@@ -20,19 +20,45 @@ from . import(
 )
 from .utils import log
 
+routes_composer = None
 
 def start_routes_composer():
     global routes_composer
-
-    routes_composer = RoutesComposer()
-    routes_composer.connect()
-
-    return routes_composer
+    try:
+        if routes_composer is None:
+            routes_composer = RoutesComposer()
+        routes_composer.connect()
+        return routes_composer
+    except Exception as e:
+        print(f"Error starting routes composer: {str(e)}")
+        return None
 
 
 def stop_routes_composer():
     global routes_composer
-    routes_composer.disconnect()
+    try:
+        if routes_composer is not None:
+            routes_composer.disconnect()
+            routes_composer = None
+    except Exception as e:
+        print(f"Error stopping routes composer: {str(e)}")
+
+def start_geom_on_fly():
+    global routes_composer
+    try:
+        if routes_composer is None:
+            routes_composer = RoutesComposer()
+        routes_composer.connect_geom()
+    except Exception as e:
+        print(f"Error starting geometry on fly: {str(e)}")
+
+def stop_geom_on_fly():
+    global routes_composer
+    try:
+        if routes_composer is not None:
+            routes_composer.disconnect_geom()
+    except Exception as e:
+        print(f"Error stopping geometry on fly: {str(e)}")
 
 
 class RoutesComposer:
@@ -57,6 +83,12 @@ class RoutesComposer:
             self.segments_column_index,
             self.id_column_name,
             self.id_column_index
+        )
+        self.geom_compo = geom_compo.GeomCompo(
+            self.segments_layer,
+            self.compositions_layer,
+            self.segments_column_name,
+            self.id_column_name
         )
         self.is_connected = False
 
@@ -101,6 +133,26 @@ class RoutesComposer:
         except Exception as e:
             iface.messageBar().pushMessage(QCoreApplication.translate("RoutesComposer","Erreur"), str(e), level=Qgis.MessageLevel.Critical)
 
+    def connect_geom(self):
+        """Démarre la création en continue des géométries de compositions."""
+        try:
+            geom_on_fly, _ = self.project.readBoolEntry("routes_composer", "geom_on_fly", False)
+            if geom_on_fly:
+                if self.segments_layer is not None:
+                    self.segments_layer.geometryChanged.connect(self.geometry_changed)
+                    log("GeomOnFly has started")
+        except TypeError:
+            log("La fonction geometry_changed n'a pas pu être connectée.", level='WARNING')
+
+    def disconnect_geom(self):
+        try:
+            if self.segments_layer is not None:
+                self.segments_layer.geometryChanged.disconnect(self.geometry_changed)
+                log("GeomOnFly has been stoped")
+
+        except TypeError:
+            log("La fonction geometry_changed n'était pas connectée.", level='WARNING')
+
     def feature_added(self, fid):
         """Fonction prinicpale. Traite l'ajout d'une nouvelle entité dans la couche segments."""
         # Pendant l'enregistrement: fid >= 0.'
@@ -139,90 +191,6 @@ class RoutesComposer:
 
         self.split_manager.clean_invalid_segments()
 
-    def get_segments_layer(self):
-
-        segments_layer_id = self.settings.value("routes_composer/segments_layer_id", "")
-        if not segments_layer_id:
-            return
-        self.segments_layer = cast(QgsVectorLayer, self.project.mapLayer(segments_layer_id))
-        if not self.segments_layer.isValid():
-            raise Exception(QCoreApplication.translate("RoutesComposer","Veuillez sélectionner une couche de segments valide"))
-            return
-        if not isinstance(self.segments_layer, QgsVectorLayer):
-            raise Exception(QCoreApplication.translate("RoutesComposer","La couche de segments n'est pas une couche vectorielle valide"))
-            return
-
-        return self.segments_layer
-
-    def get_compositions_layer(self):
-
-        compositions_layer_id = self.settings.value("routes_composer/compositions_layer_id", "")
-        self.compositions_layer = cast(QgsVectorLayer, self.project.mapLayer(compositions_layer_id))
-        if not self.compositions_layer.isValid():
-            raise Exception(QCoreApplication.translate("RoutesComposer","Veuillez sélectionner une couche de compositions valide"))
-        if not isinstance(self.compositions_layer, QgsVectorLayer):
-            raise Exception(QCoreApplication.translate("RoutesComposer","La couche de compositions n'est pas une couche vectorielle valide"))
-
-        return self.compositions_layer
-
-    def get_segments_column_name(self):
-        self.segments_column_name = self.settings.value("routes_composer/segments_column_name", "segments")
-
-        self.segments_column_index = self.compositions_layer.fields().indexOf(self.segments_column_name)
-        if self.segments_column_index == -1:
-            raise Exception(QCoreApplication.translate("RoutesComposer", "Le champ '{segments_column_name}' n'existe pas dans la couche compositions".format(segments_column_name=segments_column_name)))
-
-        return self.segments_column_name, self.segments_column_index
-
-    def get_id_column_name(self):
-        self.id_column_name = self.settings.value("routes_composer/id_column_name", "id")
-
-        self.id_column_index = self.segments_layer.fields().indexOf(self.id_column_name)
-        if self.id_column_index == -1:
-            raise Exception(QCoreApplication.translate("RoutesComposer",f"Le champ {self.id_column_name} n'a pas été trouvé dans la couche segments"))
-
-        return self.id_column_name, self.id_column_index
-
-
-def start_geom_on_fly():
-    global geom_on_fly
-    geom_on_fly = GeomOnFly()
-    geom_on_fly.connect()
-
-    return geom_on_fly
-
-
-def stop_geom_on_fly():
-    global geom_on_fly
-    if not config.geom_on_fly_running:
-        return
-    geom_on_fly.disconnect()
-
-
-class GeomOnFly(RoutesComposer):
-    def __init__(self):
-        super().__init__()
-        self.segments_layer = self.get_segments_layer()
-        self.compositions_layer = self.get_compositions_layer()
-        self.segments_column_name, self.segments_column_index = self.get_segments_column_name()
-        self.id_column_name, self.id_column_index = self.get_id_column_name()
-
-
-    def connect(self):
-        """Démarre la création en continue des géométries de compositions."""
-        try:
-            geom_on_fly, _ = self.project.readBoolEntry("routes_composer", "geom_on_fly", False)
-            if geom_on_fly:
-                self.segments_layer.geometryChanged.connect(self.geometry_changed)
-        except TypeError:
-            log("La fonction geometry_changed n'a pas pu être connectée.", level='WARNING')
-
-    def disconnect(self):
-        try:
-            self.segments_layer.geometryChanged.disconnect(self.geometry_changed)
-        except TypeError:
-            log("La fonction geometry_changed n'était pas connectée.", level='WARNING')
-
     def geometry_changed(self, fid):
         """Crée la géométrie des compositions lors du changement de la géométrie d'un segment"""
         # Initialisation
@@ -257,3 +225,46 @@ class GeomOnFly(RoutesComposer):
                     log(f"Failed to create geometry for composition {composition.id()}", level='WARNING')
 
         self.compositions_layer.triggerRepaint()
+
+    def get_segments_layer(self):
+
+        segments_layer_id = self.settings.value("routes_composer/segments_layer_id", "")
+        if not segments_layer_id:
+            return
+        self.segments_layer = cast(QgsVectorLayer, self.project.mapLayer(segments_layer_id))
+        if not self.segments_layer.isValid():
+            raise Exception(QCoreApplication.translate("RoutesComposer","Veuillez sélectionner une couche de segments valide"))
+            return
+        if not isinstance(self.segments_layer, QgsVectorLayer):
+            raise Exception(QCoreApplication.translate("RoutesComposer","La couche de segments n'est pas une couche vectorielle valide"))
+            return
+
+        return self.segments_layer
+
+    def get_compositions_layer(self):
+
+        compositions_layer_id = self.settings.value("routes_composer/compositions_layer_id", "")
+        self.compositions_layer = cast(QgsVectorLayer, self.project.mapLayer(compositions_layer_id))
+        if not self.compositions_layer.isValid():
+            raise Exception(QCoreApplication.translate("RoutesComposer","Veuillez sélectionner une couche de compositions valide"))
+        if not isinstance(self.compositions_layer, QgsVectorLayer):
+            raise Exception(QCoreApplication.translate("RoutesComposer","La couche de compositions n'est pas une couche vectorielle valide"))
+
+        return self.compositions_layer
+
+    def get_segments_column_name(self):
+        self.segments_column_name = self.settings.value("routes_composer/segments_column_name", "segments")
+        self.segments_column_index = self.compositions_layer.fields().indexOf(self.segments_column_name)
+        if self.segments_column_index == -1:
+            raise Exception(QCoreApplication.translate("RoutesComposer", "Le champ '{segments_column_name}' n'existe pas dans la couche compositions".format(segments_column_name=segments_column_name)))
+
+        return self.segments_column_name, self.segments_column_index
+
+    def get_id_column_name(self):
+        self.id_column_name = self.settings.value("routes_composer/id_column_name", "id")
+        if self.segments_layer is not None:
+            self.id_column_index = self.segments_layer.fields().indexOf(self.id_column_name)
+        if self.id_column_index == -1:
+            raise Exception(QCoreApplication.translate("RoutesComposer",f"Le champ {self.id_column_name} n'a pas été trouvé dans la couche segments"))
+
+        return self.id_column_name, self.id_column_index

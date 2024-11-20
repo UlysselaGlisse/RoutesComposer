@@ -12,9 +12,10 @@ from qgis.PyQt.QtCore import (
     QTranslator
 )
 from . import config
-from .func import routes_composer
-from .main_dialog import show_dialog, RoutesComposerDialog
+from .func.routes_composer import start_routes_composer, start_geom_on_fly
+from .main_dialog import RoutesComposerDialog
 from .list_constructor import IDsBasket
+
 
 class RoutesComposerTool:
     def __init__(self, iface):
@@ -42,7 +43,9 @@ class RoutesComposerTool:
             QCoreApplication.installTranslator(self.translator)
 
     def initGui(self):
-        icon_path = os.path.join(os.path.dirname(__file__),'ui', 'icons', 'icon.png')
+        icon_path = os.path.join(
+            os.path.dirname(__file__), 'ui', 'icons', 'icon.png'
+        )
         show_action = QAction(
             QIcon(icon_path),
             ('Ouvrir Routes Composer'),
@@ -53,10 +56,12 @@ class RoutesComposerTool:
         self.actions.append(show_action)
 
         # Bouton pour select_tool
-        icon_path = os.path.join(os.path.dirname(__file__),'ui', 'icons', 'ids_basket.png')
+        icon_path = os.path.join(
+            os.path.dirname(__file__), 'ui', 'icons', 'ids_basket.png'
+        )
         self.ids_basket_action = QAction(
             QIcon(icon_path),
-            QCoreApplication.translate("RoutesManagerTool",'Ouvrir le panier à segments'),
+            QCoreApplication.translate("RoutesManagerTool", 'Ouvrir le panier à segments'),
             self.iface.mainWindow()
         )
         self.ids_basket_action.setCheckable(True)
@@ -80,10 +85,10 @@ class RoutesComposerTool:
             geom_on_fly, _ = project.readBoolEntry("routes_composer", "geom_on_fly", False)
 
             if auto_start:
-                routes_composer.start_routes_composer()
+                start_routes_composer()
                 config.script_running = True
             if geom_on_fly:
-                success = routes_composer.start_geom_on_fly()
+                success = start_geom_on_fly()
                 if success:
                     config.geom_on_fly_running = True
             self.update_icon()

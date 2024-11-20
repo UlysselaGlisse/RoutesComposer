@@ -23,7 +23,7 @@ from ..ui.sub_dialog import SingleSegmentDialog
 
 class SplitManager:
     def __init__(self, segments_layer: QgsVectorLayer, compositions_layer: QgsVectorLayer,
-        segments_column_name: str, segments_column_index: int, id_column_name:str, id_column_index: int):
+        segments_column_name: str, segments_column_index: int, id_column_name:str, id_column_index):
 
         self.segments_layer = segments_layer
         self.compositions_layer = compositions_layer
