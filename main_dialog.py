@@ -19,7 +19,8 @@ from qgis.PyQt.QtWidgets import (
     QMessageBox,
     QProgressBar,
     QSpacerItem,
-    QSizePolicy
+    QSizePolicy,
+    QGridLayout
 )
 from qgis.PyQt.QtCore import (
     Qt,
@@ -31,6 +32,7 @@ from qgis.PyQt.QtCore import (
 from qgis.utils import iface
 from qgis.core import QgsProject
 from . import config
+from .attribute_linker import AttributeLinker
 from .func import split
 from .func.utils import get_features_list, log
 from .func.warning import verify_segments, highlight_errors
@@ -73,6 +75,8 @@ class RoutesComposerDialog(QDialog):
         self.create_status_section(layout)
         self.create_control_buttons(layout)
         self.create_action_buttons(layout)
+        self.create_status_section(layout)
+        self.create_advanced_options_group(layout)
 
         self.setLayout(layout)
 
@@ -204,6 +208,43 @@ class RoutesComposerDialog(QDialog):
         self.progress_bar.setValue(0)
         self.progress_bar.setVisible(False)
         layout.addWidget(self.progress_bar)
+
+    def create_advanced_options_group(self, layout):
+        """Crée la section des options avancées."""
+        advanced_group = QGroupBox(self.tr("Options avancées"))
+        advanced_group.setCheckable(True)
+        advanced_group.setChecked(False)
+        advanced_layout = QVBoxLayout()
+
+        # Sélection des attributs à lier
+        attr_layout = QGridLayout()
+
+        # Attribut segments
+        attr_layout.addWidget(QLabel(self.tr("Attribut segments:")), 0, 0)
+        self.segments_attr_combo = QComboBox()
+        attr_layout.addWidget(self.segments_attr_combo, 0, 1)
+
+        # Attribut compositions
+        attr_layout.addWidget(QLabel(self.tr("Attribut compositions:")), 1, 0)
+        self.compositions_attr_combo = QComboBox()
+        attr_layout.addWidget(self.compositions_attr_combo, 1, 1)
+
+        # Mode de priorité
+        attr_layout.addWidget(QLabel(self.tr("Mode de priorité:")), 2, 0)
+        self.priority_mode_combo = QComboBox()
+        self.priority_mode_combo.addItems([
+            self.tr("Aucune"),
+            self.tr("Croissant"),
+            self.tr("Décroissant")
+        ])
+        attr_layout.addWidget(self.priority_mode_combo, 2, 1)
+
+        advanced_layout.addLayout(attr_layout)
+        advanced_group.setLayout(advanced_layout)
+        layout.addWidget(advanced_group)
+
+        # Connecter les signaux
+        advanced_group.toggled.connect(self.on_advanced_options_toggled)
 
     def load_settings(self):
         project = QgsProject.instance()
@@ -368,6 +409,7 @@ class RoutesComposerDialog(QDialog):
             settings.setValue("routes_composer/segments_layer_id", segments_id)
             settings.setValue("routes_composer/compositions_layer_id", compositions_id)
 
+        self.update_attr_combos()
         self.adjustSize()
 
     def on_column_selected(self):
@@ -430,6 +472,49 @@ class RoutesComposerDialog(QDialog):
                     background-color: #757575;
                 }
             """
+
+    def on_advanced_options_toggled(self, checked):
+        """Gère l'activation/désactivation des options avancées."""
+        if checked:
+            self.start_attribute_linking()
+        else:
+            self.stop_attribute_linking()
+
+    def update_attr_combos(self):
+        """Met à jour les combos des attributs."""
+        if not self.selected_segments_layer or not self.selected_compositions_layer:
+            return
+
+        self.segments_attr_combo.clear()
+        self.compositions_attr_combo.clear()
+
+        # Remplir les combos avec les champs disponibles
+        for field in self.selected_segments_layer.fields():
+            self.segments_attr_combo.addItem(field.name())
+
+        for field in self.selected_compositions_layer.fields():
+            self.compositions_attr_combo.addItem(field.name())
+
+    def start_attribute_linking(self):
+        """Démarre la liaison des attributs."""
+        if not self.segments_attr_combo.currentText() or not self.compositions_attr_combo.currentText():
+            return
+
+        self.attribute_linker = AttributeLinker(
+            segments_layer=self.selected_segments_layer,
+            compositions_layer=self.selected_compositions_layer,
+            segments_attr=self.segments_attr_combo.currentText(),
+            compositions_attr=self.compositions_attr_combo.currentText(),
+            id_column=self.id_column_combo.currentText(),
+            segments_list_column=self.segments_column_combo.currentText(),
+            priority_mode=self.priority_mode_combo.currentText().lower()
+        )
+        self.attribute_linker.start()
+
+    def stop_attribute_linking(self):
+        """Arrête la liaison des attributs."""
+        if hasattr(self, 'attribute_linker'):
+            self.attribute_linker.stop()
 
     def check_errors(self):
         """Vérifie les erreurs de compositions."""
