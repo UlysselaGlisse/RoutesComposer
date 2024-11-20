@@ -60,8 +60,6 @@ class RoutesComposerDialog(QDialog):
         self.update_ui_state()
         self.translator = QTranslator()
 
-
-
     def load_styles(self):
         """Charge les styles à partir du fichier CSS."""
         with open(os.path.join(os.path.dirname(__file__),'ui', 'styles.css'), 'r') as f:
@@ -80,28 +78,20 @@ class RoutesComposerDialog(QDialog):
 
         self.toggle_advanced_button_layout = QHBoxLayout()
 
-        # Créer un QLabel pour le texte
         self.toggle_advanced_label = QLabel("Options avancées")
-        self.toggle_advanced_label.setStyleSheet("cursor: pointer;")  # Ajouter un curseur de pointeur
+        self.toggle_advanced_arrow = QLabel("▶")
+        self.toggle_advanced_arrow.setStyleSheet("cursor: pointer; margin-left: 2px;")
 
-        # Créer un QLabel pour la flèche avec les bonnes proportions
-        self.toggle_advanced_arrow = QLabel("▶")  # Flèche vers la droite
-        self.toggle_advanced_arrow.setStyleSheet("cursor: pointer; margin-left: 2px;")  # Ajustez l'espace à gauche de la flèche
+        self.toggle_advanced_label.mousePressEvent = lambda ev: self.toggle_advanced_options(ev)
+        self.toggle_advanced_arrow.mousePressEvent = lambda ev: self.toggle_advanced_options(ev)
 
-        # Connecter les labels aux événements de clic
-        self.toggle_advanced_label.mousePressEvent = lambda event: self.toggle_advanced_options(event)
-        self.toggle_advanced_arrow.mousePressEvent = lambda event: self.toggle_advanced_options(event)
-
-        # Ajouter le texte et la flèche à la mise en page sans espace significatif
         self.toggle_advanced_button_layout.addWidget(self.toggle_advanced_label)
         self.toggle_advanced_button_layout.addWidget(self.toggle_advanced_arrow)
 
-        # Alignement à gauche
         self.toggle_advanced_button_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         layout.addLayout(self.toggle_advanced_button_layout)
 
-        # Crée le conteneur des options avancées
         self.advanced_options_container = QGroupBox()
         self.advanced_options_container.setLayout(QVBoxLayout())
         self.advanced_options_container.layout().addWidget(self.advanced_group)
@@ -227,7 +217,6 @@ class RoutesComposerDialog(QDialog):
 
         layout.addLayout(action_buttons_layout)
 
-
         self.cancel_button = QPushButton(self.tr("Annuler"))
         self.cancel_button.setProperty("class", "cancel-button")
         self.cancel_button.clicked.connect(self.cancel_process)
@@ -241,36 +230,41 @@ class RoutesComposerDialog(QDialog):
 
     def create_advanced_options_group(self, layout):
         """Crée la section des options avancées."""
-        self.advanced_group = QGroupBox(self.tr("Options avancées"))
+        self.advanced_group = QGroupBox(self.tr("Lier les attributs de deux couches:"))
         advanced_layout = QVBoxLayout()
 
-        # Créer un QHBoxLayout pour contenir les trois QComboBox sur une ligne
-        combo_layout = QHBoxLayout()
+        attributes_layout = QVBoxLayout()
 
-        # Attribut segments
-        combo_layout.addWidget(QLabel(self.tr("Attribut segments:")))
-        self.segments_attr_combo = QComboBox()
-        combo_layout.addWidget(self.segments_attr_combo)
-
-        # Attribut compositions
-        combo_layout.addWidget(QLabel(self.tr("Attribut compositions:")))
+        compositions_attr_layout = QHBoxLayout()
+        compositions_attr_layout.addWidget(QLabel(self.tr("Attribut compositions:")))
         self.compositions_attr_combo = QComboBox()
-        combo_layout.addWidget(self.compositions_attr_combo)
+        compositions_attr_layout.addWidget(self.compositions_attr_combo)
+        attributes_layout.addLayout(compositions_attr_layout)
 
-        # Mode de priorité
-        combo_layout.addWidget(QLabel(self.tr("Mode de priorité:")))
+        segments_attr_layout = QHBoxLayout()
+        segments_attr_layout.addWidget(QLabel(self.tr("Attribut segments:")))
+        self.segments_attr_combo = QComboBox()
+        segments_attr_layout.addWidget(self.segments_attr_combo)
+        attributes_layout.addLayout(segments_attr_layout)
+
+        priority_mode_layout = QHBoxLayout()
+        priority_mode_layout.addWidget(QLabel(self.tr("Priorité:")))
         self.priority_mode_combo = QComboBox()
         self.priority_mode_combo.addItems([
-            self.tr("Aucune"),
-            self.tr("Croissant"),
-            self.tr("Décroissant")
+            self.tr("none"),
+            self.tr("min_value"),
+            self.tr("max_value")
         ])
-        combo_layout.addWidget(self.priority_mode_combo)
+        priority_mode_layout.addWidget(self.priority_mode_combo)
+        attributes_layout.addLayout(priority_mode_layout)
 
-        # Ajouter le layout des ComboBox au layout principal
-        advanced_layout.addLayout(combo_layout)
+        advanced_layout.addLayout(attributes_layout)
 
-        # Assignez le layout au groupe avancé
+        self.update_attributes_button = QPushButton(self.tr("Mettre à jour les attributs"))
+        self.update_attributes_button.setProperty("class", "update-button")
+        self.update_attributes_button.clicked.connect(self.start_attribute_linking)
+        advanced_layout.addWidget(self.update_attributes_button)
+
         self.advanced_group.setLayout(advanced_layout)
 
 
@@ -347,13 +341,11 @@ class RoutesComposerDialog(QDialog):
 
                 routes_composer.start_routes_composer()
                 config.script_running = True
-                self.start_attribute_linking()
                 if self.tool:
                     self.tool.update_icon()
             else:
                 routes_composer.stop_routes_composer()
                 config.script_running = False
-                self.stop_attribute_linking()
                 self.geom_checkbox.setChecked(False)
                 if self.tool:
                     self.tool.update_icon()
@@ -544,6 +536,13 @@ class RoutesComposerDialog(QDialog):
             settings.setValue("routes_composer/segments_attr_name", selected_segments_attr)
             log(f"Segments attribute selected: {selected_segments_attr}")
 
+            # Vérification du type de champ
+            field_index = self.selected_segments_layer.fields().indexOf(selected_segments_attr)
+            if field_index != -1:
+                field_type = self.selected_segments_layer.fields().at(field_index).type()
+                if field_type == QVariant.String:  # Type de champ texte
+                    self.priority_mode_combo.setCurrentText(self.tr("none"))
+
     def on_compositions_attr_selected(self):
         """Méthode appelée quand un attribut compositions est sélectionné."""
         if self.compositions_attr_combo.currentText():
@@ -552,7 +551,12 @@ class RoutesComposerDialog(QDialog):
             settings.setValue("routes_composer/compositions_attr_name", selected_compositions_attr)
             log(f"Compositions attribute selected: {selected_compositions_attr}")
 
-        self.start_attribute_linking()
+            # Vérification du type de champ
+            field_index = self.selected_compositions_layer.fields().indexOf(selected_compositions_attr)
+            if field_index != -1:
+                field_type = self.selected_compositions_layer.fields().at(field_index).type()
+                if field_type == QVariant.String:  # Type de champ texte
+                    self.priority_mode_combo.setCurrentText(self.tr("none"))
 
     def on_priority_mode_selected(self):
         """Méthode appelée quand un mode de priorité est sélectionné."""
@@ -560,13 +564,6 @@ class RoutesComposerDialog(QDialog):
         settings = QSettings()
         settings.setValue("routes_composer/priority_mode", selected_priority_mode)
         log(f"Priority mode selected: {selected_priority_mode}")
-
-    def on_advanced_options_toggled(self, checked):
-        """Gère l'activation/désactivation des options avancées."""
-        if checked:
-            self.start_attribute_linking()
-        else:
-            self.stop_attribute_linking()
 
     def update_attr_combos(self):
         """Met à jour les combos des attributs."""
@@ -576,9 +573,8 @@ class RoutesComposerDialog(QDialog):
         self.segments_attr_combo.clear()
         self.compositions_attr_combo.clear()
 
-        # Remplir les combos avec tous les champs disponibles
         for field in self.selected_segments_layer.fields():
-            self.segments_attr_combo.addItem(field.name())  # Suppression de la condition (field.isNumeric())
+            self.segments_attr_combo.addItem(field.name())
 
         for field in self.selected_compositions_layer.fields():
             self.compositions_attr_combo.addItem(field.name())
@@ -588,19 +584,27 @@ class RoutesComposerDialog(QDialog):
         if not self.segments_attr_combo.currentText() or not self.compositions_attr_combo.currentText():
             return
 
+        segments_layer = cast(QgsVectorLayer, self.selected_segments_layer)
+        compositions_layer = cast(QgsVectorLayer, self.selected_compositions_layer)
+        segments_column_name = self.segments_column_combo.currentText()
+        id_column_name = self.id_column_combo.currentText()
+        segments_attr=self.segments_attr_combo.currentText()
+        compositions_attr=self.compositions_attr_combo.currentText()
+        priority_mode=self.priority_mode_combo.currentText().lower()
+
         self.attribute_linker = AttributeLinker(
-            segments_layer=self.selected_segments_layer,
-            compositions_layer=self.selected_compositions_layer,
-            segments_attr=self.segments_attr_combo.currentText(),
-            compositions_attr=self.compositions_attr_combo.currentText(),
-            id_column=self.id_column_combo.currentText(),
-            segments_list_column=self.segments_column_combo.currentText(),
-            priority_mode=self.priority_mode_combo.currentText().lower()
+            segments_layer=segments_layer,
+            compositions_layer=compositions_layer,
+            segments_attr=segments_attr,
+            compositions_attr=compositions_attr,
+            id_column_name=id_column_name,
+            segments_column_name=segments_column_name,
+            priority_mode=priority_mode
         )
-        self.attribute_linker.start()
+        self.attribute_linker.update_segments_attr_values()
 
     def stop_attribute_linking(self):
-        """Arrête la liaison des attributs."""
+        """UNUSE. Arrête la liaison des attributs."""
         if hasattr(self, 'attribute_linker'):
             self.attribute_linker.stop()
 
