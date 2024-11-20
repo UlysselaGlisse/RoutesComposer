@@ -47,7 +47,8 @@ def verify_segments(segments_layer, compositions_layer, segments_column_name, id
                     errors.append({
                         'composition_id': composition.id(),
                         'error_type': 'missing_segment',
-                        'segment_ids': (current_segment_id, next_segment_id)
+                        'segment_ids': (current_segment_id, None),
+                         'missing_segment_id': current_segment_id
                     })
                     continue
 
@@ -55,7 +56,9 @@ def verify_segments(segments_layer, compositions_layer, segments_column_name, id
                     errors.append({
                         'composition_id': composition.id(),
                         'error_type': 'missing_segment',
-                        'segment_ids': (current_segment_id, next_segment_id)
+                        'segment_ids': (next_segment_id, None),
+                        'missing_segment_id': next_segment_id
+
                     })
                     continue
 
@@ -84,12 +87,22 @@ def verify_segments(segments_layer, compositions_layer, segments_column_name, id
 
     formatted_errors = []
 
-    for segment_id, composition_ids in discontinuity_errors.items():
-        formatted_errors.append({
-            'error_type': 'discontinuity',
-            'composition_id': ', '.join(map(str, sorted(composition_ids))),
-            'segment_ids': (segment_id, segment_id)
-        })
+    for error in errors:
+        if error['error_type'] == 'missing_segment':
+            formatted_errors.append({
+                'error_type': 'missing_segment',
+                'composition_id': error['composition_id'],
+                'segment_ids': error['segment_ids'],
+                'missing_segment_id': error['missing_segment_id']
+            })
+        elif error['error_type'] == 'discontinuity':
+            segment_ids = error['segment_ids']
+            composition_id = error['composition_id']
+            formatted_errors.append({
+                'error_type': 'discontinuity',
+                'composition_id': composition_id,
+                'segment_ids': segment_ids
+            })
 
     return formatted_errors
 

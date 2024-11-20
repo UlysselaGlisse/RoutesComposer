@@ -19,6 +19,8 @@ from qgis.PyQt.QtWidgets import(
     QPushButton,
     QWidget,
     QDockWidget,
+    QTreeWidget,
+    QTreeWidgetItem
 )
 from PyQt5 import QtWidgets
 from .. import config
@@ -130,34 +132,17 @@ class ErrorDialog(QDialog):
 
         layout.addLayout(header_layout)
 
-        self.error_list_widget = QListWidget()
-        layout.addWidget(self.error_list_widget)
+        self.error_tree_widget = QTreeWidget()
+        self.error_tree_widget.setHeaderLabels([self.tr("Type d'erreur"), self.tr("Détails")])
+        # self.error_tree_widget.setColumnWidth(0, 100)
 
-        self.error_list_widget.itemClicked.connect(self.on_item_clicked)
+        layout.addWidget(self.error_tree_widget)
 
-        # Ajouter un spacer pour pousser le bouton vers le bas
-        layout.addSpacerItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
-
-        close_button = QPushButton(self.tr("Fermer"))
-        # Enlever la taille fixe pour que le bouton s'ajuste au texte
-        # close_button.setFixedSize(50, 25)  # Cette ligne est supprimée
-
-        # Créer un layout pour le bouton en bas à droite
-        button_layout = QHBoxLayout()
-        button_layout.addStretch()  # Ajouter de l'espace flexible à gauche
-        button_layout.addWidget(close_button)
-
-        layout.addLayout(button_layout)
+        self.error_tree_widget.itemClicked.connect(self.on_item_clicked)
 
         self.setLayout(layout)
 
         self.setStyleSheet(self.get_stylesheet())
-
-    def display_errors(self, errors):
-        """Affiche les erreurs dans la QListWidget."""
-        self.error_list_widget.clear()
-        for error in errors:
-            self.handle_error(error)
 
     def refresh_errors(self):
         """Méthode pour rafraîchir la liste d'erreurs."""
@@ -173,12 +158,11 @@ class ErrorDialog(QDialog):
                 font-weight: bold;
                 margin-bottom: 10px;
             }
-            QListWidget {
+            QTreeWidget {
                 border: 1px solid #cccccc;
                 border-radius: 5px;
                 padding: 5px;
                 background-color: #ffffff;
-                selection-background-color: #e2e2e2;
             }
             QPushButton {
                 background-color: white; /* Changer le fond du bouton en blanc */
@@ -204,28 +188,67 @@ class ErrorDialog(QDialog):
             }
         """
 
-    def handle_error(self, error):
-        """Gérer et formater les erreurs pour affichage."""
+    def display_errors(self, errors):
+        """Displays errors in the QTreeWidget."""
+        self.error_tree_widget.clear()
+        error_types = {}
+
+        for error in errors:
+            error_type = error.get('error_type')
+            if error_type not in error_types:
+                error_types[error_type] = []
+            error_types[error_type].append(error)
+
+        for error_type, error_list in error_types.items():
+            type_item = QTreeWidgetItem(self.error_tree_widget, [self.tr(error_type)])
+            type_item.setExpanded(True)
+            for error in error_list:
+                detail = self.format_error_detail(error)
+                QTreeWidgetItem(type_item, [self.tr(""), detail])
+
+        self.error_tree_widget.resizeColumnToContents(0)
+
+    def format_error_detail(self, error):
+        """Format error details for display."""
         error_type = error.get('error_type')
+        composition_id = error.get('composition_id', 'N/A')
+        segment_id1, segment_id2 = error.get('segment_ids', (None, None))
 
         if error_type == 'failed_compositions':
-            composition_id = error.get('composition_id', 'N/A')
-            self.error_list_widget.addItem(self.tr("Les géométries pour les compositions suivantes n'ont pas pu être créées : {composition_id}.").format(composition_id=composition_id))
+            return self.tr("Les géométries pour les compositions suivantes n'ont pas pu être créées : {composition_id}.").format(composition_id=composition_id)
 
         elif error_type == 'discontinuity':
-            segment_id1, segment_id2 = error.get('segment_ids', (None, None))
-            composition_ids = error.get('composition_id', 'N/A')
-            self.error_list_widget.addItem(f"Discontinuity in compositions: {composition_ids}. Non connected segments: {segment_id1}.")
+            return self.tr("Compositions: {composition_ids}. Entre les segments: {segment_id1}, {segment_id2}.").format(
+                composition_ids=composition_id,
+                segment_id1=segment_id1,
+                segment_id2=segment_id2
+            )
+
+        elif error_type == 'missing_segment':
+            missing_segment_id = error.get('missing_segment_id', 'N/A')
+            return self.tr("Composition : {composition_id}. Segment: {missing_segment_id}.").format(
+                composition_id=composition_id,
+                missing_segment_id=missing_segment_id
+            )
+
+        return self.tr("Erreur inconnue. Détails: {details}").format(details=str(error))
 
     def on_item_clicked(self, item):
         """Gérer le clic sur un élément de la liste d'erreurs."""
-        text = item.text()
+        error_type = item.parent().text(0)
+        detail_text = item.text(1)
 
-        if "Discontinuity" in text:
-            match = re.search(r"Non connected segments: (\d+)", text)
+        if error_type == self.tr("discontinuity"):
+            match = re.search(r"segments: (\d+), (\d+)", detail_text)
             if match:
-                segment_id = match.group(1)
-                self.zoom_to_segment(segment_id)
+                first_segment_id = match.group(1)
+                self.zoom_to_segment(first_segment_id)
+
+        elif error_type == self.tr("missing_segment"):
+            match = re.search(r"Segment: (\d+)", detail_text)
+            if match:
+                missing_segment_id = match.group(1)
+                self.zoom_to_segment(missing_segment_id)
 
     def zoom_to_segment(self, segment_id):
         """Zoomer sur le segment spécifié dans la carte QGIS."""
