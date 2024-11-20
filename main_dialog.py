@@ -70,7 +70,6 @@ class RoutesComposerDialog(QDialog):
         layout = QVBoxLayout()
 
         self.create_layer_configuration_group(layout)
-        self.create_segments_column_group(layout)
         self.create_status_section(layout)
         self.create_control_buttons(layout)
         self.create_action_buttons(layout)
@@ -89,24 +88,53 @@ class RoutesComposerDialog(QDialog):
         """
         layers_group = QGroupBox(self.tr("Configuration des couches"))
         layers_layout = QVBoxLayout()
+        max_combo_width = 200
 
         segments_layout = QHBoxLayout()
         segments_layout.addWidget(QLabel(self.tr("Couche segments:")))
         self.segments_combo = QComboBox()
         self.populate_layers_combo(self.segments_combo)
+
+        self.segments_combo.setMaximumWidth(max_combo_width)
         segments_layout.addWidget(self.segments_combo)
+
+        segments_layout.addWidget(QLabel(self.tr("Colonne id:")))
+        self.id_column_combo = QComboBox()
+        segments_layout.addWidget(self.id_column_combo)
+        self.id_column_combo.setMaximumWidth(max_combo_width)
 
         self.segments_warning_label = QLabel()
         self.segments_warning_label.setStyleSheet("color: red;")
         self.segments_warning_label.setVisible(False)
+
         layers_layout.addLayout(segments_layout)
         layers_layout.addWidget(self.segments_warning_label)
+
+        self.id_column_combo.setMaximumWidth(max_combo_width)
+        layers_layout.addLayout(segments_layout)
+
 
         compositions_layout = QHBoxLayout()
         compositions_layout.addWidget(QLabel(self.tr("Couche compositions:")))
         self.compositions_combo = QComboBox()
         self.populate_layers_combo(self.compositions_combo)
+
+        self.compositions_combo.setMaximumWidth(max_combo_width)
         compositions_layout.addWidget(self.compositions_combo)
+
+
+        self.segments_column_combo = QComboBox()
+        compositions_layout.addWidget(QLabel(self.tr("Liste:")))
+        compositions_layout.addWidget(self.segments_column_combo)
+
+        self.segments_column_combo.setMaximumWidth(max_combo_width)
+        layers_layout.addLayout(compositions_layout)
+
+        self.column_warning_label = QLabel()
+        self.column_warning_label.setStyleSheet("color: red;")
+        self.column_warning_label.setVisible(False)
+
+        layers_layout.addWidget(self.column_warning_label)
 
         self.geom_checkbox = QCheckBox(self.tr("Activer la création géométrique en continue"))
         self.geom_checkbox.setVisible(False)
@@ -114,32 +142,12 @@ class RoutesComposerDialog(QDialog):
         geom_on_fly = settings.value("routes_composer/geom_on_fly", True, type=bool)
         self.geom_checkbox.setChecked(geom_on_fly)
         self.geom_checkbox.stateChanged.connect(self.on_geom_on_fly_check)
+
         layers_layout.addLayout(compositions_layout)
         layers_layout.addWidget(self.geom_checkbox)
 
         layers_group.setLayout(layers_layout)
         layout.addWidget(layers_group)
-
-    def create_segments_column_group(self, layout):
-        """Groupe avec combo de sélection du champ des listes de segments et avertissement sur son type."""
-        column_group = QGroupBox(self.tr("Configuration de la liste de segments"))
-        column_layout = QVBoxLayout()
-
-        self.id_column_combo = QComboBox()
-        column_layout.addWidget(QLabel(self.tr("Colonne contenant les ids des segments:")))
-        column_layout.addWidget(self.id_column_combo)
-
-        self.segments_column_combo = QComboBox()
-        column_layout.addWidget(QLabel(self.tr("Colonne contenant la liste de segments:")))
-        column_layout.addWidget(self.segments_column_combo)
-
-        self.column_warning_label = QLabel()
-        self.column_warning_label.setStyleSheet("color: red;")
-        self.column_warning_label.setVisible(False)
-        column_layout.addWidget(self.column_warning_label)
-
-        column_group.setLayout(column_layout)
-        layout.addWidget(column_group)
 
     def create_status_section(self, layout):
         self.status_label = QLabel(self.tr("Status: Arrêté"))
