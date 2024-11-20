@@ -23,6 +23,7 @@ from qgis.PyQt.QtWidgets import(
 from PyQt5 import QtWidgets
 from .. import config
 from ..func.utils import log
+from ..func import warning
 
 
 class InfoDialog(QDialog):
@@ -95,38 +96,73 @@ class SingleSegmentDialog(QDialog):
 
 
 class ErrorDialog(QDialog):
-    def __init__(self, errors, segments_layer, id_column_name, parent=None):
+    def __init__(self, errors, segments_layer, id_column_name, compositions_layer, segments_column_name, parent=None):
         super().__init__(parent)
+
+        self.segments_layer = segments_layer
+        self.compositions_layer = compositions_layer
+        self.segments_column_name = segments_column_name
+        self.id_column_name = id_column_name
         self.setWindowTitle(self.tr("Erreurs détectées"))
         self.setMinimumWidth(600)
         self.resize(600, 300)
 
         self.setModal(False)
-        self.segments_layer = segments_layer
-        self.id_column_name = id_column_name
+        self.setup_ui()
+        self.refresh_errors()
 
+    def setup_ui(self):
+        """Configure the UI elements for the ErrorDialog."""
         layout = QVBoxLayout()
 
-        layout.addWidget(QLabel(self.tr("Détails des erreurs détectées :")))
+        header_layout = QHBoxLayout()
+
+        label = QLabel(self.tr("Détails des erreurs détectées :"))
+        header_layout.addWidget(label)
+
+        # Bouton d'actualisation
+        refresh_button = QPushButton()
+        refresh_button.setIcon(QtWidgets.QApplication.style().standardIcon(QtWidgets.QStyle.SP_BrowserReload))
+        refresh_button.setToolTip(self.tr("Rafraîchir les erreurs"))
+        refresh_button.clicked.connect(self.refresh_errors)
+        refresh_button.setFixedSize(30, 30)
+        header_layout.addWidget(refresh_button)
+
+        layout.addLayout(header_layout)
 
         self.error_list_widget = QListWidget()
-        displayed_segments = set()
-        discont_error_dict = {}
-
-        for error in errors:
-            self.handle_error(error)
-
         layout.addWidget(self.error_list_widget)
 
         self.error_list_widget.itemClicked.connect(self.on_item_clicked)
 
+        # Ajouter un spacer pour pousser le bouton vers le bas
+        layout.addSpacerItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
+
         close_button = QPushButton(self.tr("Fermer"))
-        close_button.clicked.connect(self.close)
-        layout.addWidget(close_button)
+        # Enlever la taille fixe pour que le bouton s'ajuste au texte
+        # close_button.setFixedSize(50, 25)  # Cette ligne est supprimée
+
+        # Créer un layout pour le bouton en bas à droite
+        button_layout = QHBoxLayout()
+        button_layout.addStretch()  # Ajouter de l'espace flexible à gauche
+        button_layout.addWidget(close_button)
+
+        layout.addLayout(button_layout)
 
         self.setLayout(layout)
 
         self.setStyleSheet(self.get_stylesheet())
+
+    def display_errors(self, errors):
+        """Affiche les erreurs dans la QListWidget."""
+        self.error_list_widget.clear()
+        for error in errors:
+            self.handle_error(error)
+
+    def refresh_errors(self):
+        """Méthode pour rafraîchir la liste d'erreurs."""
+        errors = warning.verify_segments(self.segments_layer, self.compositions_layer, self.segments_column_name, self.id_column_name)
+        self.display_errors(errors)
 
     def get_stylesheet(self):
         return """
@@ -145,15 +181,26 @@ class ErrorDialog(QDialog):
                 selection-background-color: #e2e2e2;
             }
             QPushButton {
-                background-color: #f44336;
-                color: white;
+                background-color: white; /* Changer le fond du bouton en blanc */
+                color: black; /* Vous pouvez changer la couleur du texte si nécessaire */
                 padding: 5px 10px;
-                border: none;
+                border: 1px solid #cccccc; /* Ajouter un bord pour le style */
                 border-radius: 5px;
                 margin-top: 10px;
             }
             QPushButton:hover {
-                background-color: #da190b;
+                background-color: #e2e2e2; /* Changez de couleur au survol pour réagir */
+            }
+            QPushButton:pressed { /* État lorsqu'il est enfoncé */
+                background-color: #d9d9d9; /* Une autre couleur de fond lorsqu'il est enfoncé */
+                border: 1px solid #999999;
+            }
+            QPushButton[icon] {
+                background-color: transparent;
+                border: 1px solid #cccccc;
+                min-width: 30px;
+                min-height: 30px;
+                margin-left: 10px;
             }
         """
 

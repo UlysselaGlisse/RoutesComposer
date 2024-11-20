@@ -447,7 +447,7 @@ class RoutesComposerDialog(QDialog):
         if errors:
             # highlight_errors(errors, segments_layer)
             self.close()
-            error_dialog = ErrorDialog(errors, segments_layer, id_column_name, self)
+            error_dialog = ErrorDialog(errors, segments_layer, id_column_name, compositions_layer, segments_column_name, self)
             error_dialog.show()
         else:
             QMessageBox.information(self, self.tr("Aucune erreur"), self.tr("Aucune erreur détectée."))
