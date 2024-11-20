@@ -1,3 +1,3 @@
 def classFactory(iface):
-    from .ui.tool import RoutesComposerTool
+    from .init import RoutesComposerTool
     return RoutesComposerTool(iface)

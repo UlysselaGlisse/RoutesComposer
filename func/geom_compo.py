@@ -22,10 +22,11 @@ from .. import config
 from ..ui.sub_dialog import ErrorDialog
 
 class GeomCompo:
-    def __init__(self, segments_layer, compositions_layer, segments_column_name):
+    def __init__(self, segments_layer, compositions_layer, segments_column_name, id_column_name):
         self.segments_layer = segments_layer
         self.compositions_layer = compositions_layer
         self.segments_column_name = segments_column_name
+        self.id_column_name = id_column_name
 
     def points_are_equal(self, point1: QgsPoint, point2: QgsPoint, tolerance=1e-8) -> bool:
         """
@@ -46,7 +47,7 @@ class GeomCompo:
         not_connected_segments = []
         segments_points = {}
         for segment_id in segment_ids:
-            segment_feature = next(self.segments_layer.getFeatures(f"id = {segment_id}"), None)
+            segment_feature = next(self.segments_layer.getFeatures(f"{self.id_column_name} = {segment_id}"), None)
             if segment_feature:
                 points = segment_feature.geometry().asPolyline()
                 segments_points[segment_id] = points

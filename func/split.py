@@ -23,12 +23,13 @@ from ..ui.sub_dialog import SingleSegmentDialog
 
 class SplitManager:
     def __init__(self, segments_layer: QgsVectorLayer, compositions_layer: QgsVectorLayer,
-        segments_column_name: str, segments_column_index: int, id_column_index: int):
+        segments_column_name: str, segments_column_index: int, id_column_name:str, id_column_index: int):
 
         self.segments_layer = segments_layer
         self.compositions_layer = compositions_layer
         self.segments_column_name = segments_column_name
         self.segments_column_index = segments_column_index
+        self.id_column_name = id_column_name
         self.id_column_index = id_column_index
 
     def get_compositions_list_segments(self, segment_id: int) -> list:
@@ -116,7 +117,7 @@ class SplitManager:
         else:
             adjacent_id = segments_list[old_index + 1]
 
-        adjacent_feature = next(self.segments_layer.getFeatures(f"id = {adjacent_id}"), None)
+        adjacent_feature = next(self.segments_layer.getFeatures(f"{self.id_column_name} = {adjacent_id}"), None)
 
         if adjacent_feature:
             adjacent_geom = adjacent_feature.geometry()
@@ -167,7 +168,7 @@ class SplitManager:
     def clean_invalid_segments(self) -> None:
         """Supprime les références aux segments qui n'existent plus dans la table segments."""
 
-        valid_segments_ids = {str(f['id']) for f in utils.get_features_list(self.segments_layer) if f['id'] is not None}
+        valid_segments_ids = {str(f[self.id_column_name]) for f in utils.get_features_list(self.segments_layer) if f['id'] is not None}
         compositions = utils.get_features_list(self.compositions_layer)
 
         self.compositions_layer.startEditing()
@@ -192,7 +193,7 @@ class SplitManager:
     def has_duplicate_segment_id(self, segment_id:int) -> bool:
         """Vérifie si un id de segments existe plusieurs fois. Si oui, il s'agit d'un segment divisé."""
 
-        expression = f"\"id\" = '{segment_id}'"
+        expression = f"{self.id_column_name} = '{segment_id}'"
         request = QgsFeatureRequest().setFilterExpression(expression)
         request.setLimit(2)
 

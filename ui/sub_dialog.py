@@ -95,7 +95,7 @@ class SingleSegmentDialog(QDialog):
 
 
 class ErrorDialog(QDialog):
-    def __init__(self, errors, segments_layer, parent=None):
+    def __init__(self, errors, segments_layer, id_column_name, parent=None):
         super().__init__(parent)
         self.setWindowTitle(self.tr("Erreurs détectées"))
         self.setMinimumWidth(600)
@@ -103,6 +103,7 @@ class ErrorDialog(QDialog):
 
         self.setModal(False)
         self.segments_layer = segments_layer
+        self.id_column_name = id_column_name
 
         layout = QVBoxLayout()
 
@@ -181,7 +182,7 @@ class ErrorDialog(QDialog):
 
     def zoom_to_segment(self, segment_id):
         """Zoomer sur le segment spécifié dans la carte QGIS."""
-        feature = next(self.segments_layer.getFeatures(QgsFeatureRequest().setFilterExpression(f'"id" = \'{segment_id}\'')), None)
+        feature = next(self.segments_layer.getFeatures(QgsFeatureRequest().setFilterExpression(f'"{self.id_column_name}" = \'{segment_id}\'')), None)
 
         if feature:
             project = QgsProject.instance()

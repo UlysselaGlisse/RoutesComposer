@@ -14,14 +14,14 @@
 
 /* Style pour le bouton Arrêter */
 .stop-button {
-    background-color: #f44336;
+    background-color: #757575;
     color: white;
     padding: 5px;
     border-radius: 3px;
 }
 
 .stop-button:hover {
-    background-color: #da190b;
+    background-color: #616161;
 }
 
 /* Style pour le bouton Info */
