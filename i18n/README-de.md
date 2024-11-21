@@ -52,13 +52,13 @@ Geben Sie "RoutesComposer" ein – wenn es nicht angezeigt wird, starten Sie QGI
 
 ### Anwendungen:
 #### Routenkomponist
-* Klicken Sie auf das Symbol ![Symbol](ui/icons/icon.png)
+* Klicken Sie auf das Symbol ![Symbol](../ui/icons/icon.png)
 * Geben Sie die Namen der beiden Schichten und das Feld der Kompositionsschicht ein, das die Liste der Segmente enthält.
 * Starten Sie den Prozess.
 * Sie können auch wählen, ob Sie dieses Plugin kontinuierlich ausführen möchten, indem Sie das entsprechende Kästchen aktivieren.
 
 #### Segmentkorb
-* Klicken Sie auf das Symbol ![Symbol](ui/icons/ids_basket.png)
+* Klicken Sie auf das Symbol ![Symbol](../ui/icons/ids_basket.png)
 * Ein kleines Feld erscheint neben dem Cursor.
 * Klicken Sie auf die Segmente, die Sie interessieren. Das Feld füllt sich.
 * Wenn Sie das zuletzt hinzugefügte Segment entfernen möchten, drücken Sie Z; drücken Sie E, um es wieder hinzuzufügen.
