@@ -108,10 +108,11 @@ class RoutesComposerDialog(QDialog):
         self.ui.start_button.setStyleSheet(self.ui.get_start_button_style())
 
     def closeEvent(self, a0):
-        if event:
-            event.accept()
+        if a0 is not None:
+            a0.accept()
 
     def showEvent(self, event):
-        super().showEvent(event)
-        self.layer_manager.refresh_combos()
-        self.advanced_options.update_attr_combos()
+        if event is not None:
+            super().showEvent(event)
+            self.layer_manager.refresh_combos()
+            self.advanced_options.update_attr_combos()

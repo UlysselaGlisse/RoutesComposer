@@ -1,11 +1,14 @@
-from qgis.PyQt.QtWidgets import QLabel
+"""Create ui and features to list_constructor by cliking on canvas."""
+from qgis.core import (
+    QgsApplication, QgsCoordinateTransform, QgsFeatureRequest,
+    QgsGeometry, QgsPointXY, QgsProject,
+    QgsRectangle, QgsSpatialIndex
+)
+from qgis.gui import QgsMapTool
 from qgis.PyQt.QtCore import Qt, QPoint
-from qgis.PyQt.QtGui import QClipboard, QCursor
-from qgis.core import (QgsApplication, QgsPointXY, QgsRectangle, QgsFeatureRequest,
-                      QgsProject, QgsCoordinateTransform, QgsCoordinateReferenceSystem,
-                      QgsGeometry, QgsSpatialIndex)
-from qgis.gui import QgsMapCanvas, QgsMapTool
-from qgis.utils import iface
+from qgis.PyQt.QtGui import QCursor
+from qgis.PyQt.QtWidgets import QLabel
+
 
 class IDsBasket(QgsMapTool):
     def __init__(self, canvas, layer, id_column_name):
@@ -182,7 +185,6 @@ class IDsBasket(QgsMapTool):
 
             other_geom = feature.geometry()
 
-            # Je ne suis pas sûr que touches soit la meilleure solution.
             if current_geom.touches(other_geom):
                 connected.append(feature[self.id_column_name])
 
@@ -221,7 +223,8 @@ class IDsBasket(QgsMapTool):
             return
         mousePos = e.pos()
 
-        # # TODO : ne marche pas: je pense que la classe ne sait pas où est la souris hors du canvas.
+        # # TODO : ne marche pas: je pense que la classe ne sait pas où
+        # est la souris hors du canvas.
         # if not mousePos:
         #     self.label.hide()
         #     return

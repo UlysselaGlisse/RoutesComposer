@@ -1,6 +1,4 @@
 """functions used to handle segments spliting or merging."""
-
-from logging import log
 from qgis.core import (
     Qgis,
     QgsFeature,
@@ -8,18 +6,12 @@ from qgis.core import (
     QgsGeometry,
     QgsVectorLayer,
 )
-from qgis.utils import List, Optional, iface
-from qgis.PyQt.QtWidgets import (
-    QDialog,
-    QPushButton,
-    QVBoxLayout,
-    QLabel,
-    QWidget,
-    QHBoxLayout,
-)
-from . import utils
-from .utils import get_features_list, log, timer_decorator
+from qgis.PyQt.QtWidgets import QDialog
+from qgis.utils import iface
+
+from .utils import log, get_features_list
 from ..ui.sub_dialog import SingleSegmentDialog
+
 
 class SplitManager:
     def __init__(self, segments_layer: QgsVectorLayer, compositions_layer: QgsVectorLayer,
@@ -48,7 +40,7 @@ class SplitManager:
         )
         request.setFilterExpression(expression)
 
-        compositions = utils.get_features_list(self.compositions_layer, request)
+        compositions = get_features_list(self.compositions_layer, request)
 
         for composition in compositions:
             segments_list_str = composition[self.segments_column_name]
@@ -66,7 +58,6 @@ class SplitManager:
                 log(f"Erreur lors du traitement de la composition {composition.id()}: {str(e)}", level='WARNING')
 
         return segments_lists_ids
-
 
     def update_compositions_segments(self, fid: int, old_id: int, new_id: int, original_feature: QgsFeature, new_feature: QgsFeature, segment_lists_ids: list) -> None:
         """Met à jour les compositions après division d'un segment."""
@@ -107,8 +98,7 @@ class SplitManager:
                 self.compositions_layer.triggerRepaint()
 
             except Exception as e:
-                raise Exception(f"Erreur lors de la mise-à-jour automatique de la liste des segments.")
-
+                raise Exception(f"Erreur lors de la mise-à-jour automatique de la liste des segments {e}.")
 
     def check_segment_orientation(self, segment_geom: QgsGeometry, is_new_geom: bool, segments_list: list, old_index: int) -> bool:
         """Vérifie si un segment est orienté correctement par rapport aux segments adjacents."""
@@ -128,7 +118,6 @@ class SplitManager:
 
         return True
 
-
     def process_single_segment_composition(self, fid: int, old_id: int, new_id: int):
         """Gère le cas d'une composition d'un seul segment."""
 
@@ -143,12 +132,13 @@ class SplitManager:
                 try:
                     new_segments_str = ','.join(map(str, dialog.current_segments))
                     self.compositions_layer.startEditing()
-                    success = self.compositions_layer.changeAttributeValue(
+                    self.compositions_layer.changeAttributeValue(
                         composition.id(),
                         self.segments_column_index,
                         new_segments_str
                     )
                     log(f"Composition {composition.id()} has been updated with segments: '{new_segments_str}'")
+
                 except Exception as e:
                     iface.messageBar().pushMessage(
                         "Erreur",
@@ -168,8 +158,8 @@ class SplitManager:
     def clean_invalid_segments(self) -> None:
         """Supprime les références aux segments qui n'existent plus dans la table segments."""
 
-        valid_segments_ids = {str(f[self.id_column_name]) for f in utils.get_features_list(self.segments_layer) if f['id'] is not None}
-        compositions = utils.get_features_list(self.compositions_layer)
+        valid_segments_ids = {str(f[self.id_column_name]) for f in get_features_list(self.segments_layer) if f['id'] is not None}
+        compositions = get_features_list(self.compositions_layer)
 
         self.compositions_layer.startEditing()
         for composition in compositions:
@@ -189,7 +179,6 @@ class SplitManager:
                     new_segments_str
                 )
 
-
     def has_duplicate_segment_id(self, segment_id:int) -> bool:
         """Vérifie si un id de segments existe plusieurs fois. Si oui, il s'agit d'un segment divisé."""
 
@@ -197,9 +186,8 @@ class SplitManager:
         request = QgsFeatureRequest().setFilterExpression(expression)
         request.setLimit(2)
 
-        segments = utils.get_features_list(self.segments_layer, request)
+        segments = get_features_list(self.segments_layer, request)
         return len(segments) > 1
-
 
     def update_segment_id(self, fid: int, next_id: int) -> None:
         """Met à jour l'id des segments divisés."""
@@ -210,8 +198,6 @@ class SplitManager:
             int(next_id)
         )
         self.segments_layer.triggerRepaint()
-
-
 
     def get_next_id(self) -> int:
         """Retourne le dernier id disponible."""

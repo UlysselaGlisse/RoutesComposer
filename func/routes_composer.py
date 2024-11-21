@@ -1,23 +1,14 @@
 from typing import cast
 from qgis.core import (
     Qgis,
-    QgsFeatureRequest,
     QgsProject,
-    QgsSettings,
     QgsVectorLayer,
 )
 from qgis.utils import iface
-from qgis.PyQt.QtCore import (
-    QCoreApplication,
-    QTimer,
-    QSettings
-)
+from qgis.PyQt.QtCore import QCoreApplication, QSettings
+
 from .. import config
-from . import(
-    split,
-    geom_compo,
-    utils
-)
+from . import split, geom_compo, utils
 from .utils import log
 
 routes_composer = None

@@ -1,5 +1,6 @@
-from qgis.core import QgsVectorLayer
+"""Functions for linking attributes."""
 from .func.utils import log
+
 
 class AttributeLinker:
     def __init__(self, segments_layer, compositions_layer, segments_attr,

@@ -1,26 +1,15 @@
 """Functions for creating geometries of the compositions."""
-import math
 from collections import defaultdict
-from os import error
+import math
 from typing import List, Tuple
-from qgis.utils import iface
 from qgis.core import (
-    QgsProject,
-    QgsFeature,
-    QgsGeometry,
-    QgsVectorLayer,
-    QgsPoint,
-    QgsLineString,
-    QgsWkbTypes,
-    QgsField,
-    QgsApplication
+    QgsApplication, QgsFeature, QgsGeometry,
+    QgsLineString, QgsPoint, QgsProject,
+    QgsVectorLayer
 )
-from PyQt5.QtCore import QVariant
-from qgis.PyQt.QtWidgets import QMessageBox
-from ..func.utils import get_features_list, log, timer_decorator
 from .. import config
-from . import utils
-from ..ui.sub_dialog import ErrorDialog
+from ..func.utils import get_features_list, log
+
 
 class GeomCompo:
     def __init__(self, segments_layer, compositions_layer, segments_column_name, id_column_name):
@@ -256,29 +245,3 @@ class GeomCompo:
                 })
 
         return errors_messages
-
-class GeomCompoOnTheFly:
-    def __init__(self, segments_layer, compositions_layer: QgsVectorLayer, segments_column_name, id_column_name, id_column_index):
-        self.segments_layer = segments_layer
-        self.compositions_layer = compositions_layer
-        self.segments_column_name = segments_column_name
-        self.id_column_name = id_column_name
-        self.id_column_index = id_column_index
-
-    def on_geometry_changed(self, fid):
-        print("hello")
-        source_feature = self.segments_layer.getFeature(fid)
-        if not source_feature.isValid() and source_feature.fields().names():
-            return
-
-        segment_id = source_feature.attributes()[self.id_column_index]
-        if segment_id is None:
-            log("No segment id, return.")
-            return
-
-        for composition in utils.get_features_list(self.compositions_layer, f"{self.segments_column_name} = {segment_id}"):
-            segments_list_str = composition[self.segments_column_name]
-            print(f"list_str = {segments_list_str}")
-            if segments_list_str:
-                segment_ids = [int(id_str) for id_str in segments_list_str if id_str.strip()]
-                print(segment_ids)

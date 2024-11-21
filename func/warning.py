@@ -2,28 +2,24 @@
 from collections import defaultdict
 from typing import cast
 from qgis.core import (
+    QgsFeature, QgsFeatureRequest, QgsField,
+    QgsGeometry, QgsLineSymbol, QgsProject,
     QgsVectorLayer,
-    QgsFeature,
-    QgsField,
-    QgsLineSymbol,
-    QgsProject,
-    QgsFeatureRequest,
-    QgsGeometry
 )
 from PyQt5.QtCore import QVariant
-from PyQt5.QtWidgets import QMessageBox
 from qgis.utils import iface
+
 from . import utils
 from .utils import log
 
 error_layer = None
+
 
 def verify_segments(segments_layer, compositions_layer, segments_column_name, id_column_name):
     """
     Vérifie les segments présents dans les listes des compositions et la continuité des segments.
     """
     errors = []
-    valid_segments_ids = {str(f[id_column_name]) for f in utils.get_features_list(segments_layer) if f[id_column_name] is not None}
     segments_geom_dict = {str(seg[id_column_name]): seg.geometry() for seg in utils.get_features_list(segments_layer)}
     compositions = utils.get_features_list(compositions_layer)
 
@@ -105,6 +101,7 @@ def verify_segments(segments_layer, compositions_layer, segments_column_name, id
             })
 
     return formatted_errors
+
 
 def highlight_errors(errors, segments_layer, id_column_name):
     """

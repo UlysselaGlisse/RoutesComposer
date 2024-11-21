@@ -6,6 +6,7 @@ from functools import wraps
 import time
 from .. import config
 
+
 def timer_decorator(func):
     """Indique le temps que prend une fonction à s'exécuter."""
     @wraps(func)
@@ -56,7 +57,7 @@ def print_geometry_info(geometry, label):
 
 
 def log(message, level='INFO'):
-    """Fonction pour gérer l'affichage des logs, avec timestamp et nom de fonction."""
+    """Fonction pour gérer l'affichage des logs"""
     if config.logging_enabled is True:
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
