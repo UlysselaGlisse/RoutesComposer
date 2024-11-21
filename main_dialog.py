@@ -59,16 +59,12 @@ class RoutesComposerDialog(QDialog):
         self.initial_size = self.size()
 
         self.init_ui()
+
+        # self.update_layer_combos()
         self.load_settings()
-        self.update_ui_state()
         self.translator = QTranslator()
 
-        project = QgsProject.instance()
-        if project:
-            project.layersAdded.connect(self.update_layer_combos)
-            project.layerRemoved.connect(self.update_layer_combos)
 
-        self.update_layer_combos()
 
     def load_styles(self):
         """Charge les styles à partir du fichier CSS."""
@@ -336,6 +332,10 @@ class RoutesComposerDialog(QDialog):
         self.segments_attr_combo.currentTextChanged.connect(self.on_segments_attr_selected)
         self.compositions_attr_combo.currentTextChanged.connect(self.on_compositions_attr_selected)
         self.priority_mode_combo.currentTextChanged.connect(self.on_priority_mode_selected)
+        project = QgsProject.instance()
+        if project:
+            project.layersAdded.connect(self.update_layer_combos)
+            project.layerRemoved.connect(self.update_layer_combos)
 
     def toggle_script(self):
         """Démarre ou arrête le script."""
