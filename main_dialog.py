@@ -40,7 +40,6 @@ from .func.geom_compo import GeomCompo
 from .func.routes_composer import start_routes_composer, stop_routes_composer, start_geom_on_fly, stop_geom_on_fly
 from .func import warning
 from .ui.sub_dialog import InfoDialog, ErrorDialog
-from .ui.components.status_sections import StatusSection
 
 
 def show_dialog():
@@ -60,11 +59,9 @@ class RoutesComposerDialog(QDialog):
 
         self.init_ui()
 
-        # self.update_layer_combos()
         self.load_settings()
+        self.update_ui_state()
         self.translator = QTranslator()
-
-
 
     def load_styles(self):
         """Charge les styles à partir du fichier CSS."""
@@ -74,8 +71,6 @@ class RoutesComposerDialog(QDialog):
     def init_ui(self):
         """Initialise l'interface utilisateur."""
         layout = QVBoxLayout()
-
-        self.status_section = StatusSection()
 
         self.create_layer_configuration_group(layout)
         self.create_status_section(layout)
@@ -289,19 +284,22 @@ class RoutesComposerDialog(QDialog):
             segments_layer_id = settings.value("routes_composer/segments_layer_id", "")
             compositions_layer_id = settings.value("routes_composer/compositions_layer_id", "")
             saved_column = settings.value("routes_composer/segments_column_name", "segments")
-            saved_id_column = settings.value("routes_composer/id_column_name", "")
+            saved_id_column = settings.value("routes_composer/id_column_name", "id")
             saved_segments_attr = settings.value("routes_composer/segments_attr_name", "")
             saved_compositions_attr = settings.value("routes_composer/compositions_attr_name", "")
             saved_priority_mode = settings.value("routes_composer/priority_mode", "aucune")
-
 
             segments_index = self.segments_combo.findData(segments_layer_id)
             compositions_index = self.compositions_combo.findData(compositions_layer_id)
 
             if segments_index >= 0:
                 self.segments_combo.setCurrentIndex(segments_index)
+
             if compositions_index >= 0:
                 self.compositions_combo.setCurrentIndex(compositions_index)
+
+            self.on_layer_selected()
+
             if hasattr(self, 'segments_column_combo'):
                 index = self.segments_column_combo.findText(saved_column)
                 if index >= 0:
@@ -332,10 +330,6 @@ class RoutesComposerDialog(QDialog):
         self.segments_attr_combo.currentTextChanged.connect(self.on_segments_attr_selected)
         self.compositions_attr_combo.currentTextChanged.connect(self.on_compositions_attr_selected)
         self.priority_mode_combo.currentTextChanged.connect(self.on_priority_mode_selected)
-        project = QgsProject.instance()
-        if project:
-            project.layersAdded.connect(self.update_layer_combos)
-            project.layerRemoved.connect(self.update_layer_combos)
 
     def toggle_script(self):
         """Démarre ou arrête le script."""
@@ -355,14 +349,14 @@ class RoutesComposerDialog(QDialog):
                 config.script_running = True
                 if self.tool:
                     self.tool.update_icon()
+                    self.update_ui_state()
             else:
                 stop_routes_composer()
                 config.script_running = False
                 self.geom_checkbox.setChecked(False)
                 if self.tool:
                     self.tool.update_icon()
-
-            self.update_ui_state()
+                    self.update_ui_state()
 
         except Exception as e:
             QMessageBox.critical(self, self.tr("Erreur"), self.tr(f"Une erreur est survenue: {str(e)}"))
@@ -414,10 +408,19 @@ class RoutesComposerDialog(QDialog):
             self.segments_column_combo.setCurrentIndex(index)
 
     def populate_id_fields_combo(self, segments_layer):
-        """Remplit le combo avec les champs disponibles dans la couche segments."""
         self.id_column_combo.clear()
-        field_names = [field.name() for field in segments_layer.fields()]
-        self.id_column_combo.addItems(field_names)
+
+        if segments_layer:
+            field_names = [field.name() for field in segments_layer.fields()]
+            self.id_column_combo.addItems(field_names)
+
+            settings = QSettings()
+            saved_id_column = settings.value("routes_composer/id_column_name", "id")
+
+            if saved_id_column in field_names:
+                index = self.id_column_combo.findText(saved_id_column)
+                if index >= 0:
+                    self.id_column_combo.setCurrentIndex(index)
 
     def on_layer_selected(self):
         """Méthode appelée quand une couche est sélectionnée dans les combobox."""
@@ -501,20 +504,6 @@ class RoutesComposerDialog(QDialog):
             settings.setValue("routes_composer/id_column_name", selected_id_column)
 
             log(f"ID column selected: {selected_id_column}")
-
-    def update_layer_combos(self):
-        """Met à jour les comboboxes des couches."""
-        # Re-populate layers combo boxes
-        self.populate_layers_combo(self.segments_combo)
-        self.populate_layers_combo(self.compositions_combo)
-
-        # Re-check selected layers, in case they were removed
-        segments_layer_id = QgsProject.instance().readEntry("routes_composer", "segments_layer_id", "")[0]
-        compositions_layer_id = QgsProject.instance().readEntry("routes_composer", "compositions_layer_id", "")[0]
-
-        for combo, layer_id in [(self.segments_combo, segments_layer_id), (self.compositions_combo, compositions_layer_id)]:
-            if combo.findData(layer_id) == -1:
-                combo.setCurrentIndex(-1)
 
     def get_start_button_style(self):
         # TODO: Mettre le css dans le fichier styles, je n'y suis pas arrivé pour l'instant.
@@ -612,7 +601,6 @@ class RoutesComposerDialog(QDialog):
             or not self.segments_attr_combo.currentText() or not self.compositions_attr_combo.currentText()):
             QMessageBox.warning(self, self.tr("Attention"), self.tr("Veuillez sélectionner les couches segments et compositions ainsi que les attributs."))
             return
-
 
         segments_layer = self.selected_segments_layer
         compositions_layer = self.selected_compositions_layer
@@ -786,3 +774,69 @@ class RoutesComposerDialog(QDialog):
                 success = stop_geom_on_fly()
                 if success:
                     config.geom_on_fly_running = False
+
+    def showEvent(self, event):
+        """Mise à jour des combos à l'ouverture du dialogue."""
+        super().showEvent(event)
+
+        # Sauvegarde des sélections actuelles
+        current_segments_id = self.segments_combo.currentData()
+        current_compositions_id = self.compositions_combo.currentData()
+        current_segments_column = self.segments_column_combo.currentText()
+        current_id_column = self.id_column_combo.currentText()
+        current_segments_attr = self.segments_attr_combo.currentText()
+        current_compositions_attr = self.compositions_attr_combo.currentText()
+
+        # Met à jour les combos des couches
+        self.segments_combo.blockSignals(True)
+        self.compositions_combo.blockSignals(True)
+        self.segments_column_combo.blockSignals(True)
+        self.id_column_combo.blockSignals(True)
+        self.segments_attr_combo.blockSignals(True)
+        self.compositions_attr_combo.blockSignals(True)
+
+        # Met à jour les listes de couches
+        self.populate_layers_combo(self.segments_combo)
+        self.populate_layers_combo(self.compositions_combo)
+
+        # Restaure les sélections des couches
+        segments_index = self.segments_combo.findData(current_segments_id)
+        compositions_index = self.compositions_combo.findData(current_compositions_id)
+
+        if segments_index >= 0:
+            self.segments_combo.setCurrentIndex(segments_index)
+        if compositions_index >= 0:
+            self.compositions_combo.setCurrentIndex(compositions_index)
+
+        # Met à jour et restaure les champs
+        if segments_index >= 0 or compositions_index >= 0:
+            self.on_layer_selected()
+
+            # Restaure les sélections des champs
+            if current_segments_column:
+                index = self.segments_column_combo.findText(current_segments_column)
+                if index >= 0:
+                    self.segments_column_combo.setCurrentIndex(index)
+
+            if current_id_column:
+                index = self.id_column_combo.findText(current_id_column)
+                if index >= 0:
+                    self.id_column_combo.setCurrentIndex(index)
+
+            if current_segments_attr:
+                index = self.segments_attr_combo.findText(current_segments_attr)
+                if index >= 0:
+                    self.segments_attr_combo.setCurrentIndex(index)
+
+            if current_compositions_attr:
+                index = self.compositions_attr_combo.findText(current_compositions_attr)
+                if index >= 0:
+                    self.compositions_attr_combo.setCurrentIndex(index)
+
+        # Réactive les signaux
+        self.segments_combo.blockSignals(False)
+        self.compositions_combo.blockSignals(False)
+        self.segments_column_combo.blockSignals(False)
+        self.id_column_combo.blockSignals(False)
+        self.segments_attr_combo.blockSignals(False)
+        self.compositions_attr_combo.blockSignals(False)
