@@ -1,20 +1,19 @@
 import os.path
 from typing import cast
-from qgis.PyQt.QtWidgets import QAction
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtCore import QTimer, QSettings
-from qgis.core import QgsApplication, QgsProject, QgsVectorLayer
+from qgis.core import QgsProject, QgsVectorLayer
 from qgis.PyQt.QtCore import (
-    Qt,
     QTimer,
     QSettings,
     QCoreApplication,
     QTranslator
 )
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction
+
 from . import config
 from .func.routes_composer import start_routes_composer, start_geom_on_fly
-from .ui.main_dialog.main import RoutesComposerDialog
 from .list_constructor import IDsBasket
+from .ui.main_dialog.main import RoutesComposerDialog
 
 
 class RoutesComposerTool:
@@ -55,7 +54,6 @@ class RoutesComposerTool:
         self.toolbar.addAction(show_action)
         self.actions.append(show_action)
 
-        # Bouton pour select_tool
         icon_path = os.path.join(
             os.path.dirname(__file__), 'ui', 'icons', 'ids_basket.png'
         )
@@ -72,7 +70,6 @@ class RoutesComposerTool:
     def on_project_load(self):
         self.project_loaded = True
         project = QgsProject.instance()
-        # Vérifier si l'auto-démarrage est activé pour ce projet
         if project:
             auto_start, _ = project.readBoolEntry("routes_composer", "auto_start", False)
             if auto_start:
@@ -116,7 +113,6 @@ class RoutesComposerTool:
             self.deactivate_ids_basket()
 
     def deactivate_ids_basket(self):
-        canvas = self.iface.mapCanvas()
         self.ids_basket_action.setChecked(False)
 
     def unload(self):
