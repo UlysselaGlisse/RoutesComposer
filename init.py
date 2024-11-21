@@ -13,7 +13,7 @@ from qgis.PyQt.QtCore import (
 )
 from . import config
 from .func.routes_composer import start_routes_composer, start_geom_on_fly
-from .main_dialog import RoutesComposerDialog
+from .ui.main_dialog.main import RoutesComposerDialog
 from .list_constructor import IDsBasket
 
 
@@ -86,11 +86,8 @@ class RoutesComposerTool:
 
             if auto_start:
                 start_routes_composer()
-                config.script_running = True
             if geom_on_fly:
-                success = start_geom_on_fly()
-                if success:
-                    config.geom_on_fly_running = True
+                start_geom_on_fly()
             self.update_icon()
 
     def activate_ids_basket(self):

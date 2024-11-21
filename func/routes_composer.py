@@ -22,12 +22,15 @@ from .utils import log
 
 routes_composer = None
 
+
 def start_routes_composer():
     global routes_composer
     try:
         if routes_composer is None:
             routes_composer = RoutesComposer()
         routes_composer.connect()
+        config.script_running = True
+
         return routes_composer
     except Exception as e:
         print(f"Error starting routes composer: {str(e)}")
@@ -40,8 +43,11 @@ def stop_routes_composer():
         if routes_composer is not None:
             routes_composer.disconnect()
             routes_composer = None
+            config.script_running = False
+
     except Exception as e:
         print(f"Error stopping routes composer: {str(e)}")
+
 
 def start_geom_on_fly():
     global routes_composer
@@ -49,14 +55,18 @@ def start_geom_on_fly():
         if routes_composer is None:
             routes_composer = RoutesComposer()
         routes_composer.connect_geom()
+        config.geom_on_fly_running = True
+
     except Exception as e:
         print(f"Error starting geometry on fly: {str(e)}")
+
 
 def stop_geom_on_fly():
     global routes_composer
     try:
         if routes_composer is not None:
             routes_composer.disconnect_geom()
+            config.geom_on_fly_running = False
     except Exception as e:
         print(f"Error stopping geometry on fly: {str(e)}")
 
