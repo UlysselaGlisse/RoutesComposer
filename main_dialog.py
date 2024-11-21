@@ -140,7 +140,6 @@ class RoutesComposerDialog(QDialog):
         self.id_column_combo.setMaximumWidth(max_combo_width)
         layers_layout.addLayout(segments_layout)
 
-
         compositions_layout = QHBoxLayout()
         compositions_layout.addWidget(QLabel(self.tr("Couche compositions:")))
         self.compositions_combo = QComboBox()
@@ -148,7 +147,6 @@ class RoutesComposerDialog(QDialog):
 
         self.compositions_combo.setMaximumWidth(max_combo_width)
         compositions_layout.addWidget(self.compositions_combo)
-
 
         self.segments_column_combo = QComboBox()
         compositions_layout.addWidget(QLabel(self.tr("Liste:")))
@@ -336,7 +334,6 @@ class RoutesComposerDialog(QDialog):
         try:
             print(f"is script_running: {config.script_running}")
             if not config.script_running:
-                # Vérifier que les couches sont sélectionnées
                 if not self.segments_combo.currentData() or not self.compositions_combo.currentData():
                     QMessageBox.warning(self, self.tr("Attention"), self.tr("Veuillez sélectionner les couches segments et compositions"))
                     return
@@ -429,7 +426,6 @@ class RoutesComposerDialog(QDialog):
 
         project = QgsProject.instance()
         if project:
-            # Vérification de la couche segments
             self.selected_segments_layer = project.mapLayer(segments_id)
             if self.selected_segments_layer:
                 log(f"Segments layer selected: {self.selected_segments_layer.name()}")
@@ -443,11 +439,9 @@ class RoutesComposerDialog(QDialog):
 
                 self.populate_id_fields_combo(self.selected_segments_layer)
 
-            # Vérification de la couche compositions
             self.selected_compositions_layer = project.mapLayer(compositions_id)
             if self.selected_compositions_layer:
                 log(f"Compositions layer selected: {self.selected_compositions_layer.name()}")
-                # Si la couche compositions a une géométrie, on propose le suivi de la géométrie en continue et on change pour Mettre à jour.
                 if isinstance(self.selected_compositions_layer, QgsVectorLayer) and self.selected_compositions_layer.isSpatial():
                     self.geom_checkbox.setVisible(True)
 
@@ -537,9 +531,8 @@ class RoutesComposerDialog(QDialog):
         is_visible = self.advanced_options_container.isVisible()
         self.advanced_options_container.setVisible(not is_visible)
 
-        # Change le texte de la flèche en fonction de la visibilité
         if is_visible:
-            self.toggle_advanced_arrow.setText("▶")  # Flèche vers la droite
+            self.toggle_advanced_arrow.setText("▶")
         else:
             self.toggle_advanced_arrow.setText("▼")
         self.adjustSize()
@@ -552,7 +545,6 @@ class RoutesComposerDialog(QDialog):
             settings.setValue("routes_composer/segments_attr_name", selected_segments_attr)
             log(f"Segments attribute selected: {selected_segments_attr}")
 
-            # Vérification du type de champ
             field_index = self.selected_segments_layer.fields().indexOf(selected_segments_attr)
             if field_index != -1:
                 field_type = self.selected_segments_layer.fields().at(field_index).type()
@@ -567,7 +559,6 @@ class RoutesComposerDialog(QDialog):
             settings.setValue("routes_composer/compositions_attr_name", selected_compositions_attr)
             log(f"Compositions attribute selected: {selected_compositions_attr}")
 
-            # Vérification du type de champ
             field_index = self.selected_compositions_layer.fields().indexOf(selected_compositions_attr)
             if field_index != -1:
                 field_type = self.selected_compositions_layer.fields().at(field_index).type()
@@ -639,7 +630,6 @@ class RoutesComposerDialog(QDialog):
         errors = verify_segments(segments_layer, compositions_layer, segments_column_name, id_column_name)
 
         if errors:
-            # highlight_errors(errors, segments_layer)
             self.close()
             error_dialog = ErrorDialog(errors, segments_layer, id_column_name, compositions_layer, segments_column_name, self)
             error_dialog.show()
@@ -664,7 +654,6 @@ class RoutesComposerDialog(QDialog):
             )
             return
 
-        # Afficher la barre de progression
         self.progress_bar.setVisible(True)
         self.progress_bar.setMinimum(0)
         total_compositions = sum(1 for _ in get_features_list(compositions_layer))
@@ -779,7 +768,6 @@ class RoutesComposerDialog(QDialog):
         """Mise à jour des combos à l'ouverture du dialogue."""
         super().showEvent(event)
 
-        # Sauvegarde des sélections actuelles
         current_segments_id = self.segments_combo.currentData()
         current_compositions_id = self.compositions_combo.currentData()
         current_segments_column = self.segments_column_combo.currentText()
@@ -787,7 +775,6 @@ class RoutesComposerDialog(QDialog):
         current_segments_attr = self.segments_attr_combo.currentText()
         current_compositions_attr = self.compositions_attr_combo.currentText()
 
-        # Met à jour les combos des couches
         self.segments_combo.blockSignals(True)
         self.compositions_combo.blockSignals(True)
         self.segments_column_combo.blockSignals(True)
@@ -795,11 +782,9 @@ class RoutesComposerDialog(QDialog):
         self.segments_attr_combo.blockSignals(True)
         self.compositions_attr_combo.blockSignals(True)
 
-        # Met à jour les listes de couches
         self.populate_layers_combo(self.segments_combo)
         self.populate_layers_combo(self.compositions_combo)
 
-        # Restaure les sélections des couches
         segments_index = self.segments_combo.findData(current_segments_id)
         compositions_index = self.compositions_combo.findData(current_compositions_id)
 
@@ -808,11 +793,9 @@ class RoutesComposerDialog(QDialog):
         if compositions_index >= 0:
             self.compositions_combo.setCurrentIndex(compositions_index)
 
-        # Met à jour et restaure les champs
         if segments_index >= 0 or compositions_index >= 0:
             self.on_layer_selected()
 
-            # Restaure les sélections des champs
             if current_segments_column:
                 index = self.segments_column_combo.findText(current_segments_column)
                 if index >= 0:
@@ -833,7 +816,6 @@ class RoutesComposerDialog(QDialog):
                 if index >= 0:
                     self.compositions_attr_combo.setCurrentIndex(index)
 
-        # Réactive les signaux
         self.segments_combo.blockSignals(False)
         self.compositions_combo.blockSignals(False)
         self.segments_column_combo.blockSignals(False)
