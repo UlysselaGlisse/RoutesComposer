@@ -1,8 +1,14 @@
 """Create ui and features to list_constructor by cliking on canvas."""
+
 from qgis.core import (
-    QgsApplication, QgsCoordinateTransform, QgsFeatureRequest,
-    QgsGeometry, QgsPointXY, QgsProject,
-    QgsRectangle, QgsSpatialIndex
+    QgsApplication,
+    QgsCoordinateTransform,
+    QgsFeatureRequest,
+    QgsGeometry,
+    QgsPointXY,
+    QgsProject,
+    QgsRectangle,
+    QgsSpatialIndex,
 )
 from qgis.gui import QgsMapTool
 from qgis.PyQt.QtCore import Qt, QPoint
@@ -24,12 +30,14 @@ class IDsBasket(QgsMapTool):
         self.setCursor(QCursor(Qt.PointingHandCursor))
         self.label = QLabel(self.canvas)
         self.label.setText("")
-        self.label.setStyleSheet("""
+        self.label.setStyleSheet(
+            """
             background-color: rgba(255, 255, 255, 0.9);
             padding: 5px;
             border-radius: 3px;
             color: black;
-        """)
+        """
+        )
         self.label.hide()
 
         project = QgsProject.instance()
@@ -39,9 +47,7 @@ class IDsBasket(QgsMapTool):
         self.crs_layer = self.layer.crs()
 
         self.transform = QgsCoordinateTransform(
-            self.crs_project,
-            self.crs_layer,
-            QgsProject.instance()
+            self.crs_project, self.crs_layer, QgsProject.instance()
         )
 
         self.spatial_index = QgsSpatialIndex()
@@ -69,14 +75,14 @@ class IDsBasket(QgsMapTool):
                 transformed_point.x() - search_radius,
                 transformed_point.y() - search_radius,
                 transformed_point.x() + search_radius,
-                transformed_point.y() + search_radius
+                transformed_point.y() + search_radius,
             )
 
             request = QgsFeatureRequest()
             request.setFilterRect(search_rectangle)
 
             closest_feature = None
-            min_distance = float('inf')
+            min_distance = float("inf")
 
             for feature in self.layer.getFeatures(request):
                 distance = feature.geometry().distance(
@@ -95,7 +101,9 @@ class IDsBasket(QgsMapTool):
                     # Chercher le chemin entre le dernier point sélectionné et le nouveau
                     last_id = self.selected_ids[-1]
                     if last_id != feature_id:
-                        path = self.find_connected_segments(last_id, feature_id)
+                        path = self.find_connected_segments(
+                            last_id, feature_id
+                        )
                         for segment_id in path:
                             if segment_id not in self.selected_ids:
                                 self.selected_ids.append(segment_id)
@@ -169,7 +177,9 @@ class IDsBasket(QgsMapTool):
 
         connected = []
 
-        request = QgsFeatureRequest().setFilterExpression(f"\"{self.id_column_name}\" = {segment_id}")
+        request = QgsFeatureRequest().setFilterExpression(
+            f'"{self.id_column_name}" = {segment_id}'
+        )
         current_feature = next(self.layer.getFeatures(request))
         current_geom = current_feature.geometry()
 
@@ -194,27 +204,31 @@ class IDsBasket(QgsMapTool):
     def copy_ids_to_clipboard(self):
         """Copie la liste des IDs dans le presse-papiers"""
         if self.selected_ids:
-            ids_text = ','.join(map(str, self.selected_ids))
+            ids_text = ",".join(map(str, self.selected_ids))
             clipboard = QgsApplication.clipboard()
             clipboard.setText(ids_text)
 
     def update_label(self):
         if self.selected_ids:
-            self.label.setText(', '.join(map(str, self.selected_ids)))
-            self.label.setStyleSheet("""
+            self.label.setText(", ".join(map(str, self.selected_ids)))
+            self.label.setStyleSheet(
+                """
                 background-color: rgba(255, 255, 255, 0.9);
                 padding: 5px;
                 border-radius: 3px;
                 color: black;
-            """)
+            """
+            )
         else:
             self.label.setText("")
-            self.label.setStyleSheet("""
+            self.label.setStyleSheet(
+                """
                 background-color: rgba(0, 0, 0, 0);
                 padding: 0;
                 border-radius: 0;
                 color: white;
-            """)
+            """
+            )
 
         self.label.adjustSize()
 

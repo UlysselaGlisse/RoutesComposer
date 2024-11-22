@@ -5,10 +5,10 @@ from qgis.core import (
     QgsVectorLayer,
     QgsFeatureRequest,
     QgsCoordinateTransform,
-    QgsGeometry
+    QgsGeometry,
 )
 from qgis.utils import iface
-from qgis.PyQt.QtWidgets import(
+from qgis.PyQt.QtWidgets import (
     QDialog,
     QPushButton,
     QVBoxLayout,
@@ -20,7 +20,7 @@ from qgis.PyQt.QtWidgets import(
     QWidget,
     QDockWidget,
     QTreeWidget,
-    QTreeWidgetItem
+    QTreeWidgetItem,
 )
 from PyQt5 import QtWidgets
 from .. import config
@@ -31,9 +31,12 @@ from ..func import warning
 class InfoDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle(self.tr("Informations sur le Gestionnaire de réseaux"))
+        self.setWindowTitle(
+            self.tr("Informations sur le Gestionnaire de réseaux")
+        )
 
-        info_text = self.tr("""
+        info_text = self.tr(
+            """
         <b>Gestionnaire de compositions de segments</b><br><br>
         Ce plugin apporte une assistance dans la réalisation de compositions de segments.<br><br>
         <i>Instructions :</i><br>
@@ -46,11 +49,13 @@ class InfoDialog(QDialog):
                 L'outil cherchera toujours à combler les trous entre deux segments.<br />
                 Vous pouvez appuyer sur <b>z</b> pour retirer le dernier segment ajouté à la liste et sur <b>e</b> pour le rétablir.</li>
         </ol>
-        """)
+        """
+        )
 
         layout = QVBoxLayout()
         layout.addWidget(QLabel(info_text))
         self.setLayout(layout)
+
 
 class SingleSegmentDialog(QDialog):
     def __init__(self, parent=None, old_id=None, new_id=None):
@@ -63,8 +68,12 @@ class SingleSegmentDialog(QDialog):
     def setup_ui(self):
         layout = QVBoxLayout()
 
-        warning_label = QLabel(self.tr("Attention, composition d'un seul segment. "
-                                "Veuillez vérifier que la nouvelle composition est bonne."))
+        warning_label = QLabel(
+            self.tr(
+                "Attention, composition d'un seul segment. "
+                "Veuillez vérifier que la nouvelle composition est bonne."
+            )
+        )
         warning_label.setWordWrap(True)
         layout.addWidget(warning_label)
 
@@ -90,7 +99,11 @@ class SingleSegmentDialog(QDialog):
         self.setLayout(layout)
 
     def update_proposal_label(self):
-        self.proposal_label.setText(self.tr("Nouvelle composition proposée: {cs}").format(cs=self.current_segments))
+        self.proposal_label.setText(
+            self.tr("Nouvelle composition proposée: {cs}").format(
+                cs=self.current_segments
+            )
+        )
 
     def invert_order(self):
         self.current_segments.reverse()
@@ -98,7 +111,15 @@ class SingleSegmentDialog(QDialog):
 
 
 class ErrorDialog(QDialog):
-    def __init__(self, errors, segments_layer, id_column_name, compositions_layer, segments_column_name, parent=None):
+    def __init__(
+        self,
+        errors,
+        segments_layer,
+        id_column_name,
+        compositions_layer,
+        segments_column_name,
+        parent=None,
+    ):
         super().__init__(parent)
 
         self.segments_layer = segments_layer
@@ -124,7 +145,11 @@ class ErrorDialog(QDialog):
 
         # Bouton d'actualisation
         refresh_button = QPushButton()
-        refresh_button.setIcon(QtWidgets.QApplication.style().standardIcon(QtWidgets.QStyle.SP_BrowserReload))
+        refresh_button.setIcon(
+            QtWidgets.QApplication.style().standardIcon(
+                QtWidgets.QStyle.SP_BrowserReload
+            )
+        )
         refresh_button.setToolTip(self.tr("Rafraîchir les erreurs"))
         refresh_button.clicked.connect(self.refresh_errors)
         refresh_button.setFixedSize(30, 30)
@@ -133,7 +158,9 @@ class ErrorDialog(QDialog):
         layout.addLayout(header_layout)
 
         self.error_tree_widget = QTreeWidget()
-        self.error_tree_widget.setHeaderLabels([self.tr("Type d'erreur"), self.tr("Détails")])
+        self.error_tree_widget.setHeaderLabels(
+            [self.tr("Type d'erreur"), self.tr("Détails")]
+        )
         # self.error_tree_widget.setColumnWidth(0, 100)
 
         layout.addWidget(self.error_tree_widget)
@@ -146,7 +173,12 @@ class ErrorDialog(QDialog):
 
     def refresh_errors(self):
         """Méthode pour rafraîchir la liste d'erreurs."""
-        errors = warning.verify_segments(self.segments_layer, self.compositions_layer, self.segments_column_name, self.id_column_name)
+        errors = warning.verify_segments(
+            self.segments_layer,
+            self.compositions_layer,
+            self.segments_column_name,
+            self.id_column_name,
+        )
         self.display_errors(errors)
 
     def get_stylesheet(self):
@@ -194,13 +226,15 @@ class ErrorDialog(QDialog):
         error_types = {}
 
         for error in errors:
-            error_type = error.get('error_type')
+            error_type = error.get("error_type")
             if error_type not in error_types:
                 error_types[error_type] = []
             error_types[error_type].append(error)
 
         for error_type, error_list in error_types.items():
-            type_item = QTreeWidgetItem(self.error_tree_widget, [self.tr(error_type)])
+            type_item = QTreeWidgetItem(
+                self.error_tree_widget, [self.tr(error_type)]
+            )
             type_item.setExpanded(True)
             for error in error_list:
                 detail = self.format_error_detail(error)
@@ -210,28 +244,36 @@ class ErrorDialog(QDialog):
 
     def format_error_detail(self, error):
         """Format error details for display."""
-        error_type = error.get('error_type')
-        composition_id = error.get('composition_id', 'N/A')
-        segment_id1, segment_id2 = error.get('segment_ids', (None, None))
+        error_type = error.get("error_type")
+        composition_id = error.get("composition_id", "N/A")
+        segment_id1, segment_id2 = error.get("segment_ids", (None, None))
 
-        if error_type == 'failed_compositions':
-            return self.tr("Les géométries pour les compositions suivantes n'ont pas pu être créées : {composition_id}.").format(composition_id=composition_id)
+        if error_type == "failed_compositions":
+            return self.tr(
+                "Les géométries pour les compositions suivantes n'ont pas pu être créées : {composition_id}."
+            ).format(composition_id=composition_id)
 
-        elif error_type == 'discontinuity':
-            return self.tr("Compositions: {composition_ids}. Entre les segments: {segment_id1}, {segment_id2}.").format(
+        elif error_type == "discontinuity":
+            return self.tr(
+                "Compositions: {composition_ids}. Entre les segments: {segment_id1}, {segment_id2}."
+            ).format(
                 composition_ids=composition_id,
                 segment_id1=segment_id1,
-                segment_id2=segment_id2
+                segment_id2=segment_id2,
             )
 
-        elif error_type == 'missing_segment':
-            missing_segment_id = error.get('missing_segment_id', 'N/A')
-            return self.tr("Composition : {composition_id}. Segment: {missing_segment_id}.").format(
+        elif error_type == "missing_segment":
+            missing_segment_id = error.get("missing_segment_id", "N/A")
+            return self.tr(
+                "Composition : {composition_id}. Segment: {missing_segment_id}."
+            ).format(
                 composition_id=composition_id,
-                missing_segment_id=missing_segment_id
+                missing_segment_id=missing_segment_id,
             )
 
-        return self.tr("Erreur inconnue. Détails: {details}").format(details=str(error))
+        return self.tr("Erreur inconnue. Détails: {details}").format(
+            details=str(error)
+        )
 
     def on_item_clicked(self, item):
         """Gérer le clic sur un élément de la liste d'erreurs."""
@@ -252,7 +294,14 @@ class ErrorDialog(QDialog):
 
     def zoom_to_segment(self, segment_id):
         """Zoomer sur le segment spécifié dans la carte QGIS."""
-        feature = next(self.segments_layer.getFeatures(QgsFeatureRequest().setFilterExpression(f'"{self.id_column_name}" = \'{segment_id}\'')), None)
+        feature = next(
+            self.segments_layer.getFeatures(
+                QgsFeatureRequest().setFilterExpression(
+                    f"\"{self.id_column_name}\" = '{segment_id}'"
+                )
+            ),
+            None,
+        )
 
         if feature:
             project = QgsProject.instance()
@@ -261,13 +310,23 @@ class ErrorDialog(QDialog):
                 segment_crs = self.segments_layer.crs()
 
                 if segment_crs != project_crs:
-                    transform = QgsCoordinateTransform(segment_crs, project_crs, QgsProject.instance())
+                    transform = QgsCoordinateTransform(
+                        segment_crs, project_crs, QgsProject.instance()
+                    )
                     transformed_geom = QgsGeometry(feature.geometry())
                     transformed_geom.transform(transform)
                     iface.mapCanvas().setExtent(transformed_geom.boundingBox())
                 else:
-                    iface.mapCanvas().setExtent(feature.geometry().boundingBox())
+                    iface.mapCanvas().setExtent(
+                        feature.geometry().boundingBox()
+                    )
 
                 iface.mapCanvas().refresh()
         else:
-            QMessageBox.warning(self, self.tr("Erreur"), self.tr("Segment {segment_id} non trouvé.").format(segment_id=segment_id))
+            QMessageBox.warning(
+                self,
+                self.tr("Erreur"),
+                self.tr("Segment {segment_id} non trouvé.").format(
+                    segment_id=segment_id
+                ),
+            )

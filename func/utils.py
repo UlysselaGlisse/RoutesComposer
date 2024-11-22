@@ -1,4 +1,5 @@
 """Basic functions for the project."""
+
 import datetime
 import inspect
 import logging
@@ -9,6 +10,7 @@ from .. import config
 
 def timer_decorator(func):
     """Indique le temps que prend une fonction à s'exécuter."""
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         start = time.time()
@@ -16,10 +18,11 @@ def timer_decorator(func):
         end = time.time()
         print(f"{func.__name__} a pris {(end - start)*1000:.2f} ms")
         return result
+
     return wrapper
 
 
-def get_features_list(layer, request=None, return_as='list'):
+def get_features_list(layer, request=None, return_as="list"):
     """Retourne une liste ou un set d'entités."""
     features = []
     if request:
@@ -32,7 +35,7 @@ def get_features_list(layer, request=None, return_as='list'):
         features.append(feature)
         feature = next(iterator, None)
 
-    if return_as == 'set':
+    if return_as == "set":
         return set(features)
 
     # Par défaut, retourne une liste
@@ -46,20 +49,24 @@ def print_geometry_info(geometry, label):
         return
 
     points = geometry.asPolyline()
-    print(f"""
+    print(
+        f"""
     {label}:
     - Type: {geometry.wkbType()}
     - Longueur: {geometry.length():.2f}
     - Nombre de points: {len(points)}
     - Premier point: {points[0]}
     - Dernier point: {points[-1]}
-    """)
+    """
+    )
 
 
-def log(message, level='INFO'):
+def log(message, level="INFO"):
     """Fonction pour gérer l'affichage des logs"""
     if config.logging_enabled is True:
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[
+            :-3
+        ]
 
         current_frame = inspect.currentframe()
 
@@ -71,15 +78,15 @@ def log(message, level='INFO'):
         log_message = f"[{level}][{timestamp}][{calling_function}] {message}"
         print(log_message)
 
-        if level == 'DEBUG':
+        if level == "DEBUG":
             logging.debug(log_message)
-        elif level == 'INFO':
+        elif level == "INFO":
             logging.info(log_message)
-        elif level == 'WARNING':
+        elif level == "WARNING":
             logging.warning(log_message)
-        elif level == 'ERROR':
+        elif level == "ERROR":
             logging.error(log_message)
-        elif level == 'CRITICAL':
+        elif level == "CRITICAL":
             logging.critical(log_message)
         else:
             logging.info(log_message)

@@ -1,4 +1,5 @@
 """Event handlers for RoutesComposerDialog."""
+
 from qgis.core import QgsProject, Qgis
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QMessageBox
@@ -9,7 +10,7 @@ from ...func.routes_composer import (
     start_routes_composer,
     stop_routes_composer,
     start_geom_on_fly,
-    stop_geom_on_fly
+    stop_geom_on_fly,
 )
 from ..sub_dialog import InfoDialog
 
@@ -22,14 +23,25 @@ class EventHandlers(QObject):
     def toggle_script(self):
         try:
             if not config.script_running:
-                if not self.dialog.ui.segments_combo.currentData() or not self.dialog.ui.compositions_combo.currentData():
-                    QMessageBox.warning(self.dialog, self.tr(
-                        "Attention"), self.tr("Veuillez sélectionner les couches segments et compositions"))
+                if (
+                    not self.dialog.ui.segments_combo.currentData()
+                    or not self.dialog.ui.compositions_combo.currentData()
+                ):
+                    QMessageBox.warning(
+                        self.dialog,
+                        self.tr("Attention"),
+                        self.tr(
+                            "Veuillez sélectionner les couches segments et compositions"
+                        ),
+                    )
                     return
 
                 if not self.dialog.ui.segments_column_combo.currentText():
-                    QMessageBox.warning(self.dialog, self.tr("Attention"),
-                        self.tr("Veuillez sélectionner la colonne segments"))
+                    QMessageBox.warning(
+                        self.dialog,
+                        self.tr("Attention"),
+                        self.tr("Veuillez sélectionner la colonne segments"),
+                    )
                     return
 
                 start_routes_composer()
@@ -41,8 +53,11 @@ class EventHandlers(QObject):
                 self.stop_running_routes_composer()
 
         except Exception as e:
-            QMessageBox.critical(self.dialog, self.tr("Erreur"),
-                                    self.tr(f"Une erreur est survenue: {str(e)}"))
+            QMessageBox.critical(
+                self.dialog,
+                self.tr("Erreur"),
+                self.tr(f"Une erreur est survenue: {str(e)}"),
+            )
 
     def stop_running_routes_composer(self):
         stop_routes_composer()
@@ -81,7 +96,7 @@ class EventHandlers(QObject):
         iface.messageBar().pushMessage(
             "Info",
             self.tr("Annulation en cours..."),
-            level=Qgis.MessageLevel.Info
+            level=Qgis.MessageLevel.Info,
         )
         self.dialog.ui.progress_bar.setVisible(False)
         self.dialog.ui.cancel_button.setVisible(False)
