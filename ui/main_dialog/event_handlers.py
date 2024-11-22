@@ -13,6 +13,7 @@ from ...func.routes_composer import (
     stop_geom_on_fly,
 )
 from ..sub_dialog import InfoDialog
+from ...func.utils import log
 
 
 class EventHandlers(QObject):
@@ -21,6 +22,8 @@ class EventHandlers(QObject):
         self.dialog = dialog
 
     def toggle_script(self):
+        log("r")
+
         try:
             if not config.script_running:
                 if (
@@ -60,6 +63,8 @@ class EventHandlers(QObject):
             )
 
     def stop_running_routes_composer(self):
+        log("r")
+
         stop_routes_composer()
         self.dialog.ui.geom_checkbox.setChecked(False)
 
@@ -68,6 +73,8 @@ class EventHandlers(QObject):
             self.dialog.update_ui_state()
 
     def on_auto_start_check(self, state):
+        log("r")
+
         """Save auto-start checkbox state."""
         project = QgsProject.instance()
         if project:
@@ -75,6 +82,8 @@ class EventHandlers(QObject):
             project.setDirty(True)
 
     def on_geom_on_fly_check(self, state):
+        log("r")
+
         project = QgsProject.instance()
         if project:
             project.writeEntry("routes_composer", "geom_on_fly", bool(state))
@@ -87,10 +96,14 @@ class EventHandlers(QObject):
                 stop_geom_on_fly()
 
     def show_info(self):
+        log("r")
+
         info_dialog = InfoDialog()
         info_dialog.exec_()
 
     def cancel_process(self):
+        log("r")
+
         config.cancel_request = True
         self.dialog.ui.cancel_button.setEnabled(False)
         iface.messageBar().pushMessage(

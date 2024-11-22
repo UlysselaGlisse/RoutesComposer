@@ -9,6 +9,7 @@ from . import config
 from .func.routes_composer import start_routes_composer, start_geom_on_fly
 from .list_constructor import IDsBasket
 from .ui.main_dialog.main import RoutesComposerDialog
+from .func.utils import log
 
 
 class RoutesComposerTool:
@@ -36,6 +37,7 @@ class RoutesComposerTool:
             self.translator = QTranslator()
             self.translator.load(locale_path)
             QCoreApplication.installTranslator(self.translator)
+        log("f")
 
     def initGui(self):
         icon_path = os.path.join(
@@ -68,8 +70,10 @@ class RoutesComposerTool:
         self.ids_basket_action.triggered.connect(self.toggle_ids_basket)
         self.toolbar.addAction(self.ids_basket_action)
         self.actions.append(self.ids_basket_action)
+        log("r")
 
     def on_project_load(self):
+        log("z")
         self.project_loaded = True
         project = QgsProject.instance()
         if project:
@@ -80,6 +84,7 @@ class RoutesComposerTool:
                 QTimer.singleShot(1000, self.auto_start_script)
 
     def auto_start_script(self):
+        log("d")
         project = QgsProject.instance()
         if project:
             auto_start, _ = project.readBoolEntry(
@@ -96,6 +101,7 @@ class RoutesComposerTool:
             self.update_icon()
 
     def activate_ids_basket(self):
+        log("r")
         project = QgsProject.instance()
         if not project:
             return
@@ -109,7 +115,9 @@ class RoutesComposerTool:
         if segments_layer is None:
             return
 
-        id_column_name = settings.value("routes_composer/id_column_name", "id")
+        id_column_name = settings.value(
+            "routes_composer/id_column_name", "id"
+        )
         if id_column_name not in segments_layer.fields().names():
             return
 
@@ -119,15 +127,18 @@ class RoutesComposerTool:
             canvas.setMapTool(tool)
 
     def toggle_ids_basket(self):
+        log("e")
         if self.ids_basket_action.isChecked():
             self.activate_ids_basket()
         else:
             self.deactivate_ids_basket()
 
     def deactivate_ids_basket(self):
+        log("r")
         self.ids_basket_action.setChecked(False)
 
     def unload(self):
+        log("t")
         """Supprime les éléments de l'interface"""
         for action in self.actions:
             self.iface.removeToolBarIcon(action)
@@ -137,6 +148,7 @@ class RoutesComposerTool:
         del self.toolbar
 
     def update_icon(self):
+        log("d")
         icon_path = os.path.join(
             os.path.dirname(__file__),
             "ui",
@@ -150,6 +162,7 @@ class RoutesComposerTool:
         self.actions[0].setIcon(QIcon(icon_path))
 
     def show_dialog(self):
+        log("r")
         """Affiche la fenêtre de dialogue"""
         if self.dialog is None:
             self.dialog = RoutesComposerDialog(self.iface.mainWindow(), self)

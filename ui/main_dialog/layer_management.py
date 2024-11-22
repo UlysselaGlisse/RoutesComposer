@@ -10,7 +10,7 @@ class LayerManager(QObject):
         super().__init__(dialog)
         self.dialog = dialog
 
-    def populate_segments_layer_combo(self, combo):
+    def refresh_layers_combo(self, combo):
         combo.clear()
         project = QgsProject.instance()
         if project:
@@ -26,59 +26,49 @@ class LayerManager(QObject):
                             Qt.ItemDataRole.ToolTipRole,
                         )
 
-            default_layer_name = "segments"
-            default_layer_index = combo.findText(default_layer_name)
+    def populate_segments_layer_combo(self, combo):
+        log("r")
 
-            settings = QSettings()
-            saved_segments_layer_id = settings.value(
-                "routes_composer/segments_layer_id", ""
-            )
-            log(
-                f"valeur enregistrée pour la couche segments: {saved_segments_layer_id}"
-            )
-            segments_index = combo.findData(saved_segments_layer_id)
-            log(f"Segments_index: {segments_index}")
+        default_layer_name = "segments"
+        default_layer_index = combo.findText(default_layer_name)
 
-            if segments_index >= 0:
-                combo.setCurrentIndex(segments_index)
-            elif default_layer_index >= 0:
-                combo.setCurrentIndex(default_layer_index)
+        settings = QSettings()
+        saved_segments_layer_id = settings.value(
+            "routes_composer/segments_layer_id", ""
+        )
+        log(
+            f"valeur enregistrée pour la couche segments: {saved_segments_layer_id}"
+        )
+        segments_index = combo.findData(saved_segments_layer_id)
+        log(f"Segments_index: {segments_index}")
 
-            self.on_segments_layer_selected()
+        if segments_index >= 0:
+            combo.setCurrentIndex(segments_index)
+        elif default_layer_index >= 0:
+            combo.setCurrentIndex(default_layer_index)
+
+        self.on_segments_layer_selected()
 
     def populate_compositions_layer_combo(self, combo):
-        combo.clear()
-        project = QgsProject.instance()
-        if project:
-            for layer in project.mapLayers().values():
-                if isinstance(layer, QgsVectorLayer):
-                    combo.addItem(layer.name(), layer.id())
-                    data_provider = layer.dataProvider()
-                    if data_provider is not None:
-                        full_path = data_provider.dataSourceUri()
-                        combo.setItemData(
-                            combo.count() - 1,
-                            full_path,
-                            Qt.ItemDataRole.ToolTipRole,
-                        )
+        log("r")
+        default_layer_name = "compositions"
+        default_layer_index = combo.findText(default_layer_name)
 
-            default_layer_name = "compositions"
-            default_layer_index = combo.findText(default_layer_name)
+        if default_layer_index >= 0:
+            combo.setCurrentIndex(default_layer_index)
+        else:
+            settings = QSettings()
+            saved_compositions_layer_id = settings.value(
+                "routes_composer/compositions_layer_id", ""
+            )
+            compositions_index = combo.findData(saved_compositions_layer_id)
+            if compositions_index >= 0:
+                combo.setCurrentIndex(compositions_index)
 
-            if default_layer_index >= 0:
-                combo.setCurrentIndex(default_layer_index)
-            else:
-                settings = QSettings()
-                saved_compositions_layer_id = settings.value(
-                    "routes_composer/compositions_layer_id", ""
-                )
-                compositions_index = combo.findData(
-                    saved_compositions_layer_id
-                )
-                if compositions_index >= 0:
-                    combo.setCurrentIndex(compositions_index)
+        self.on_compositions_layer_selected()
 
     def populate_id_column_combo(self, segments_layer):
+        log("r")
         self.dialog.ui.id_column_combo.clear()
 
         if segments_layer:
@@ -86,6 +76,7 @@ class LayerManager(QObject):
             self.dialog.ui.id_column_combo.addItems(field_names)
 
     def populate_segments_column_combo(self, compositions_layer):
+        log("r")
         self.dialog.ui.segments_column_combo.clear()
 
         if compositions_layer:
@@ -95,6 +86,7 @@ class LayerManager(QObject):
             self.dialog.ui.segments_column_combo.addItems(field_names)
 
     def on_segments_layer_selected(self):
+        log("r")
         segments_id = self.dialog.ui.segments_combo.currentData()
         log(f"segment_id = {segments_id}")
         project = QgsProject.instance()
@@ -131,6 +123,7 @@ class LayerManager(QObject):
         self.dialog.adjustSize()
 
     def on_compositions_layer_selected(self):
+        log("r")
         compositions_id = self.dialog.ui.compositions_combo.currentData()
 
         project = QgsProject.instance()
@@ -191,6 +184,7 @@ class LayerManager(QObject):
         self.dialog.adjustSize()
 
     def on_segments_column_selected(self):
+        log("r")
         selected_segments_column = (
             self.dialog.ui.segments_column_combo.currentText()
         )
@@ -207,6 +201,7 @@ class LayerManager(QObject):
             )
 
     def on_id_column_selected(self):
+        log("r")
         selected_id_column = self.dialog.ui.id_column_combo.currentText()
 
         if selected_id_column:

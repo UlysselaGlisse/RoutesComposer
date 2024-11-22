@@ -13,6 +13,7 @@ from qgis.PyQt.QtWidgets import (
     QVBoxLayout,
 )
 from ... import config
+from ...func.utils import log
 
 
 class UiBuilder(QObject):
@@ -21,6 +22,7 @@ class UiBuilder(QObject):
         self.dialog = dialog
 
     def init_ui(self):
+        log("r")
         layout = QVBoxLayout()
 
         self.create_layer_configuration_group(layout)
@@ -33,6 +35,7 @@ class UiBuilder(QObject):
         self.dialog.setStyleSheet(self.dialog.load_styles())
 
     def create_layer_configuration_group(self, layout):
+        log("r")
         layers_group = QGroupBox(self.tr("Configuration des couches"))
         layers_layout = QVBoxLayout()
         max_combo_width = 200
@@ -88,11 +91,13 @@ class UiBuilder(QObject):
         layout.addWidget(layers_group)
 
     def create_status_section(self, layout):
+        log("r")
         self.status_label = QLabel(self.tr("Status: Arrêté"))
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.status_label)
 
     def create_control_buttons(self, layout):
+        log("r")
         buttons_layout = QHBoxLayout()
 
         self.start_button = QPushButton(self.tr("Démarrer"))
@@ -124,6 +129,7 @@ class UiBuilder(QObject):
             layout.addWidget(self.auto_start_checkbox)
 
     def create_action_buttons(self, layout):
+        log("r")
         action_buttons_layout = QHBoxLayout()
 
         check_errors_button = QPushButton(
@@ -162,6 +168,7 @@ class UiBuilder(QObject):
         layout.addWidget(self.progress_bar)
 
     def create_advanced_options_toggle(self, layout):
+        log("r")
         self.toggle_advanced_button_layout = QHBoxLayout()
         self.toggle_advanced_label = QLabel(self.tr("Options avancées"))
         self.toggle_advanced_arrow = QLabel("▶")
@@ -192,6 +199,7 @@ class UiBuilder(QObject):
         layout.addWidget(self.advanced_options_container)
 
     def create_advanced_options_container(self):
+        log("r")
         self.advanced_options_container = QGroupBox()
         self.advanced_options_container.setLayout(QVBoxLayout())
         self.advanced_group = self.create_advanced_group()
@@ -201,6 +209,7 @@ class UiBuilder(QObject):
         self.advanced_options_container.setVisible(False)
 
     def create_advanced_group(self):
+        log("r")
         advanced_group = QGroupBox(
             self.tr("Lier les attributs de deux couches:")
         )
@@ -224,6 +233,7 @@ class UiBuilder(QObject):
         return advanced_group
 
     def create_attributes_layout(self):
+        log("r")
         attributes_layout = QVBoxLayout()
 
         compositions_attr_layout = QHBoxLayout()
@@ -246,6 +256,7 @@ class UiBuilder(QObject):
         return attributes_layout
 
     def create_priority_mode_combo(self):
+        log("r")
         combo = QComboBox()
         combo.addItems(
             [self.tr("none"), self.tr("min_value"), self.tr("max_value")]
@@ -253,6 +264,7 @@ class UiBuilder(QObject):
         return combo
 
     def toggle_advanced_options(self, event):
+        log("r")
         self.advanced_options_container.setVisible(
             not self.advanced_options_container.isVisible()
         )
@@ -264,6 +276,7 @@ class UiBuilder(QObject):
         self.dialog.adjustSize()
 
     def get_start_button_style(self):
+        log("r")
         # TODO: Mettre le css dans le fichier styles, je n'y suis pas arrivé pour l'instant.
         if not config.script_running:
             return """
