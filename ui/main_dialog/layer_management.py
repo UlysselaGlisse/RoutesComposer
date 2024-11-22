@@ -1,11 +1,12 @@
 """Layer and field management for RoutesComposerDialog."""
 from qgis.core import QgsProject, QgsVectorLayer
-from qgis.PyQt.QtCore import QSettings, Qt
+from qgis.PyQt.QtCore import QObject, QSettings, Qt
 from ...func.utils import log
 
 
-class LayerManager:
+class LayerManager(QObject):
     def __init__(self, dialog):
+        super().__init__(dialog)
         self.dialog = dialog
 
     def populate_layers_combo(self, combo):
@@ -84,7 +85,7 @@ class LayerManager:
 
                 if not self.selected_segments_layer.isSpatial():
                     self.dialog.ui.segments_warning_label.setText(
-                        self.dialog.tr("Attention: la couche des segments n'a pas de géométrie"))
+                        self.tr("Attention: la couche des segments n'a pas de géométrie"))
                     self.dialog.ui.segments_warning_label.setVisible(True)
                 else:
                     self.dialog.ui.segments_warning_label.setVisible(False)
@@ -108,13 +109,13 @@ class LayerManager:
                     self.dialog.ui.geom_checkbox.setVisible(True)
 
                     self.dialog.ui.create_or_update_geom_button.setText(
-                        self.dialog.tr("Mettre à jour les géométries"))
+                        self.tr("Mettre à jour les géométries"))
                     self.dialog.ui.create_or_update_geom_button.clicked.disconnect()
                     self.dialog.ui.create_or_update_geom_button.clicked.connect(self.dialog.geometry_ops.update_geometries)
                 else:
                     self.dialog.ui.geom_checkbox.setVisible(False)
                     self.dialog.ui.create_or_update_geom_button.setText(
-                        self.dialog.tr("Créer les géométries"))
+                        self.tr("Créer les géométries"))
                     self.dialog.ui.create_or_update_geom_button.clicked.disconnect()
                     self.dialog.ui.create_or_update_geom_button.clicked.connect(self.dialog.geometry_ops.create_geometries)
 

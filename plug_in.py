@@ -47,7 +47,7 @@ class RoutesComposerTool:
         )
         show_action = QAction(
             QIcon(icon_path),
-            ('Ouvrir Routes Composer'),
+            (QCoreApplication.translate("RoutesManagerTool", 'Ouvrir Routes Composer')),
             self.iface.mainWindow()
         )
         show_action.triggered.connect(self.show_dialog)

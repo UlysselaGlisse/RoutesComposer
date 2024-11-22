@@ -1,12 +1,13 @@
-from qgis.PyQt.QtCore import QSettings, QVariant
+from qgis.PyQt.QtCore import QObject, QSettings, QVariant
 from qgis.PyQt.QtWidgets import QMessageBox
 
 from ...attribute_linker import AttributeLinker
 from ...func.utils import log
 
 
-class AdvancedOptions:
+class AdvancedOptions(QObject):
     def __init__(self, dialog):
+        super().__init__(dialog)
         self.dialog = dialog
 
     def on_segments_attr_selected(self):
@@ -20,7 +21,7 @@ class AdvancedOptions:
             if field_index != -1:
                 field_type = self.dialog.layer_manager.selected_segments_layer.fields().at(field_index).type()
                 if field_type == QVariant.String:
-                    self.dialog.ui.priority_mode_combo.setCurrentText(self.dialog.tr("none"))
+                    self.dialog.ui.priority_mode_combo.setCurrentText("none")
 
     def on_compositions_attr_selected(self):
         if self.dialog.ui.compositions_attr_combo.currentText():
@@ -32,8 +33,8 @@ class AdvancedOptions:
             field_index = self.dialog.layer_manager.selected_compositions_layer.fields().indexOf(selected_compositions_attr)
             if field_index != -1:
                 field_type = self.dialog.layer_manager.selected_compositions_layer.fields().at(field_index).type()
-                if field_type == QVariant.String:  # Type de champ texte
-                    self.dialog.ui.priority_mode_combo.setCurrentText(self.dialog.tr("none"))
+                if field_type == QVariant.String:
+                    self.dialog.ui.priority_mode_combo.setCurrentText("none")
 
     def on_priority_mode_selected(self):
         selected_priority_mode = self.dialog.ui.priority_mode_combo.currentText()
@@ -71,7 +72,7 @@ class AdvancedOptions:
     def start_attribute_linking(self):
         if (not self.dialog.ui.segments_combo.currentData() or not self.dialog.ui.compositions_combo.currentData()
             or not self.dialog.ui.segments_attr_combo.currentText() or not self.dialog.ui.compositions_attr_combo.currentText()):
-            QMessageBox.warning(self.dialog, self.dialog.tr("Attention"), self.dialog.tr("Veuillez sélectionner les couches segments et compositions ainsi que les attributs."))
+            QMessageBox.warning(self.dialog, self.tr("Attention"), self.tr("Veuillez sélectionner les couches segments et compositions ainsi que les attributs."))
             return
 
         segments_layer = self.dialog.layer_manager.selected_segments_layer

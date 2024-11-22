@@ -1,6 +1,7 @@
 """Handle geometries operation of the main dialog"""
 from typing import cast
 from qgis.core import QgsVectorLayer
+from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.utils import iface
 
@@ -11,15 +12,16 @@ from ...func.warning import verify_segments
 from ..sub_dialog import ErrorDialog
 
 
-class GeometryOperations:
+class GeometryOperations(QObject):
     def __init__(self, dialog):
+        super().__init__(dialog)
         self.dialog = dialog
 
     def create_geometries(self):
         """Create geometries of the compositions."""
         if not self.dialog.ui.segments_combo.currentData() or not self.dialog.ui.compositions_combo.currentData():
-            QMessageBox.warning(self.dialog, self.dialog.tr("Attention"),
-                              self.dialog.tr("Veuillez sélectionner les couches segments et compositions"))
+            QMessageBox.warning(self.dialog, self.tr("Attention"),
+                              self.tr("Veuillez sélectionner les couches segments et compositions"))
             return
 
         segments_layer = cast(QgsVectorLayer, self.dialog.layer_manager.selected_segments_layer)
@@ -29,8 +31,8 @@ class GeometryOperations:
 
         if segments_column_name not in compositions_layer.fields().names():
             iface.messageBar().pushWarning(
-                self.dialog.tr("Erreur"),
-                self.dialog.tr("Le champ {ss} n'existe pas dans la couche des compositions.").format(ss=segments_column_name)
+                self.tr("Erreur"),
+                self.tr("Le champ {ss} n'existe pas dans la couche des compositions.").format(ss=segments_column_name)
             )
             return
 
@@ -48,8 +50,8 @@ class GeometryOperations:
     def update_geometries(self):
         """Update existing geometries."""
         if not self.dialog.ui.segments_combo.currentData() or not self.dialog.ui.compositions_combo.currentData():
-            QMessageBox.warning(self.dialog, self.dialog.tr("Attention"),
-                              self.dialog.tr("Veuillez sélectionner les couches segments et compositions"))
+            QMessageBox.warning(self.dialog, self.tr("Attention"),
+                              self.tr("Veuillez sélectionner les couches segments et compositions"))
             return
 
         segments_layer = cast(QgsVectorLayer, self.dialog.layer_manager.selected_segments_layer)
@@ -59,8 +61,8 @@ class GeometryOperations:
 
         if segments_column_name not in compositions_layer.fields().names():
             iface.messageBar().pushWarning(
-                self.dialog.tr("Erreur"),
-                self.dialog.tr("Le champ {segments_column_name} n'existe pas dans la couche des compositions.").format(
+                self.tr("Erreur"),
+                self.tr("Le champ {segments_column_name} n'existe pas dans la couche des compositions.").format(
                     segments_column_name=segments_column_name)
             )
             return
@@ -96,7 +98,7 @@ class GeometryOperations:
         """Vérifie les erreurs de compositions."""
         if (not self.dialog.ui.segments_combo.currentData() or not self.dialog.ui.compositions_combo.currentData()
             or not self.dialog.ui.segments_column_combo.currentText() or not self.dialog.ui.id_column_combo.currentText()):
-            QMessageBox.warning(self.dialog, self.dialog.tr("Attention"), self.dialog.tr("Veuillez sélectionner les couches segments et compositions ainsi que leurs colonnes respectives."))
+            QMessageBox.warning(self.dialog, self.tr("Attention"), self.tr("Veuillez sélectionner les couches segments et compositions ainsi que leurs colonnes respectives."))
             return
 
         segments_layer = self.dialog.layer_manager.selected_segments_layer
@@ -111,4 +113,4 @@ class GeometryOperations:
             error_dialog = ErrorDialog(errors, segments_layer, id_column_name, compositions_layer, segments_column_name)
             error_dialog.show()
         else:
-            QMessageBox.information(self.dialog, self.dialog.tr("Aucune erreur"), self.dialog.tr("Aucune erreur détectée."))
+            QMessageBox.information(self.dialog, self.tr("Aucune erreur"), self.tr("Aucune erreur détectée."))

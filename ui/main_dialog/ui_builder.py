@@ -1,6 +1,6 @@
 """Construct ui for main dialog"""
 from qgis.core import QgsProject
-from qgis.PyQt.QtCore import Qt, QSettings
+from qgis.PyQt.QtCore import QObject, Qt, QSettings
 from qgis.PyQt.QtWidgets import (
     QCheckBox, QComboBox, QGroupBox,
     QHBoxLayout, QLabel, QProgressBar,
@@ -9,8 +9,9 @@ from qgis.PyQt.QtWidgets import (
 from ... import config
 
 
-class UiBuilder:
+class UiBuilder(QObject):
     def __init__(self, dialog):
+        super().__init__(dialog)
         self.dialog = dialog
 
     def init_ui(self):
@@ -26,19 +27,19 @@ class UiBuilder:
         self.dialog.setStyleSheet(self.dialog.load_styles())
 
     def create_layer_configuration_group(self, layout):
-        layers_group = QGroupBox(self.dialog.tr("Configuration des couches"))
+        layers_group = QGroupBox(self.tr("Configuration des couches"))
         layers_layout = QVBoxLayout()
         max_combo_width = 200
 
         segments_layout = QHBoxLayout()
-        segments_layout.addWidget(QLabel(self.dialog.tr("Couche segments:")))
+        segments_layout.addWidget(QLabel(self.tr("Couche segments:")))
         self.segments_combo = QComboBox()
 
         self.dialog.layer_manager.populate_layers_combo(self.segments_combo)
         self.segments_combo.setMaximumWidth(max_combo_width)
         segments_layout.addWidget(self.segments_combo)
 
-        segments_layout.addWidget(QLabel(self.dialog.tr("Colonne id:")))
+        segments_layout.addWidget(QLabel(self.tr("Colonne id:")))
         self.id_column_combo = QComboBox()
         segments_layout.addWidget(self.id_column_combo)
         self.id_column_combo.setMaximumWidth(max_combo_width)
@@ -51,20 +52,20 @@ class UiBuilder:
         layers_layout.addWidget(self.segments_warning_label)
 
         compositions_layout = QHBoxLayout()
-        compositions_layout.addWidget(QLabel(self.dialog.tr("Couche compositions:")))
+        compositions_layout.addWidget(QLabel(self.tr("Couche compositions:")))
         self.compositions_combo = QComboBox()
         self.dialog.layer_manager.populate_layers_combo(self.compositions_combo)
         self.compositions_combo.setMaximumWidth(max_combo_width)
         compositions_layout.addWidget(self.compositions_combo)
 
         self.segments_column_combo = QComboBox()
-        compositions_layout.addWidget(QLabel(self.dialog.tr("Liste:")))
+        compositions_layout.addWidget(QLabel(self.tr("Liste:")))
         compositions_layout.addWidget(self.segments_column_combo)
         self.segments_column_combo.setMaximumWidth(max_combo_width)
 
         layers_layout.addLayout(compositions_layout)
 
-        self.geom_checkbox = QCheckBox(self.dialog.tr("Activer la création géométrique en continue"))
+        self.geom_checkbox = QCheckBox(self.tr("Activer la création géométrique en continue"))
         self.geom_checkbox.setVisible(False)
         settings = QSettings()
         geom_on_fly = settings.value("routes_composer/geom_on_fly", True, type=bool)
@@ -76,19 +77,19 @@ class UiBuilder:
         layout.addWidget(layers_group)
 
     def create_status_section(self, layout):
-        self.status_label = QLabel(self.dialog.tr("Status: Arrêté"))
+        self.status_label = QLabel(self.tr("Status: Arrêté"))
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.status_label)
 
     def create_control_buttons(self, layout):
         buttons_layout = QHBoxLayout()
 
-        self.start_button = QPushButton(self.dialog.tr("Démarrer"))
+        self.start_button = QPushButton(self.tr("Démarrer"))
         self.start_button.setProperty("class", "start-button")
         self.start_button.clicked.connect(self.dialog.event_handlers.toggle_script)
         buttons_layout.addWidget(self.start_button)
 
-        info_button = QPushButton(self.dialog.tr("Info"))
+        info_button = QPushButton(self.tr("Info"))
         info_button.setProperty("class", "info-button")
         info_button.clicked.connect(self.dialog.event_handlers.show_info)
         buttons_layout.addWidget(info_button)
@@ -96,7 +97,7 @@ class UiBuilder:
         layout.addLayout(buttons_layout)
 
         if QgsProject.instance():
-            self.auto_start_checkbox = QCheckBox(self.dialog.tr("Démarrer automatiquement au lancement du projet"))
+            self.auto_start_checkbox = QCheckBox(self.tr("Démarrer automatiquement au lancement du projet"))
             settings = QSettings()
             auto_start = settings.value("routes_composer/auto_start", True, type=bool)
             self.auto_start_checkbox.setChecked(auto_start)
@@ -106,19 +107,19 @@ class UiBuilder:
     def create_action_buttons(self, layout):
         action_buttons_layout = QHBoxLayout()
 
-        check_errors_button = QPushButton(self.dialog.tr("Vérifier les compositions"))
+        check_errors_button = QPushButton(self.tr("Vérifier les compositions"))
         check_errors_button.setProperty("class", "action-button")
         check_errors_button.clicked.connect(self.dialog.geometry_ops.check_errors)
         action_buttons_layout.addWidget(check_errors_button)
 
-        self.create_or_update_geom_button = QPushButton(self.dialog.tr("Créer les géométries"))
+        self.create_or_update_geom_button = QPushButton(self.tr("Créer les géométries"))
         self.create_or_update_geom_button.setProperty("class", "action-button")
         self.create_or_update_geom_button.clicked.connect(self.dialog.geometry_ops.create_geometries)
         action_buttons_layout.addWidget(self.create_or_update_geom_button)
 
         layout.addLayout(action_buttons_layout)
 
-        self.cancel_button = QPushButton(self.dialog.tr("Annuler"))
+        self.cancel_button = QPushButton(self.tr("Annuler"))
         self.cancel_button.setProperty("class", "cancel-button")
         self.cancel_button.clicked.connect(self.dialog.event_handlers.cancel_process)
         self.cancel_button.setVisible(False)
@@ -131,7 +132,7 @@ class UiBuilder:
 
     def create_advanced_options_toggle(self, layout):
         self.toggle_advanced_button_layout = QHBoxLayout()
-        self.toggle_advanced_label = QLabel(self.dialog.tr("Options avancées"))
+        self.toggle_advanced_label = QLabel(self.tr("Options avancées"))
         self.toggle_advanced_arrow = QLabel("▶")
         self.toggle_advanced_arrow.setStyleSheet("cursor: pointer; margin-left: 2px;")
 
@@ -155,7 +156,7 @@ class UiBuilder:
         self.advanced_options_container.setVisible(False)
 
     def create_advanced_group(self):
-        advanced_group = QGroupBox(self.dialog.tr("Lier les attributs de deux couches:"))
+        advanced_group = QGroupBox(self.tr("Lier les attributs de deux couches:"))
         advanced_layout = QVBoxLayout()
 
         self.compositions_attr_combo = QComboBox()
@@ -163,7 +164,7 @@ class UiBuilder:
         self.priority_mode_combo = self.create_priority_mode_combo()
 
         advanced_layout.addLayout(self.create_attributes_layout())
-        self.update_attributes_button = QPushButton(self.dialog.tr("Mettre à jour les attributs"))
+        self.update_attributes_button = QPushButton(self.tr("Mettre à jour les attributs"))
         self.update_attributes_button.setProperty("class", "update-button")
         self.update_attributes_button.clicked.connect(self.dialog.advanced_options.start_attribute_linking)
         advanced_layout.addWidget(self.update_attributes_button)
@@ -175,17 +176,17 @@ class UiBuilder:
         attributes_layout = QVBoxLayout()
 
         compositions_attr_layout = QHBoxLayout()
-        compositions_attr_layout.addWidget(QLabel(self.dialog.tr("Attribut compositions:")))
+        compositions_attr_layout.addWidget(QLabel(self.tr("Attribut compositions:")))
         compositions_attr_layout.addWidget(self.compositions_attr_combo)
         attributes_layout.addLayout(compositions_attr_layout)
 
         segments_attr_layout = QHBoxLayout()
-        segments_attr_layout.addWidget(QLabel(self.dialog.tr("Attribut segments:")))
+        segments_attr_layout.addWidget(QLabel(self.tr("Attribut segments:")))
         segments_attr_layout.addWidget(self.segments_attr_combo)
         attributes_layout.addLayout(segments_attr_layout)
 
         priority_mode_layout = QHBoxLayout()
-        priority_mode_layout.addWidget(QLabel(self.dialog.tr("Priorité:")))
+        priority_mode_layout.addWidget(QLabel(self.tr("Priorité:")))
         priority_mode_layout.addWidget(self.priority_mode_combo)
         attributes_layout.addLayout(priority_mode_layout)
 
@@ -194,9 +195,9 @@ class UiBuilder:
     def create_priority_mode_combo(self):
         combo = QComboBox()
         combo.addItems([
-            self.dialog.tr("none"),
-            self.dialog.tr("min_value"),
-            self.dialog.tr("max_value")
+            self.tr("none"),
+            self.tr("min_value"),
+            self.tr("max_value")
         ])
         return combo
 
