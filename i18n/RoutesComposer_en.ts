@@ -4,52 +4,52 @@
 <context>
     <name>@default</name>
     <message>
-        <location filename="../main.py" line="189"/>
+        <location filename="." line="7103842"/>
         <source>Gestionnaire de réseaux</source>
         <translation type="obsolete">Routes Composer</translation>
     </message>
     <message>
-        <location filename="../main.py" line="207"/>
+        <location filename="." line="7103842"/>
         <source>Configuration des couches</source>
         <translation type="obsolete">Layers configuration</translation>
     </message>
     <message>
-        <location filename="../main.py" line="212"/>
+        <location filename="." line="7103842"/>
         <source>Couche segments:</source>
         <translation type="obsolete">Segments layer:</translation>
     </message>
     <message>
-        <location filename="../main.py" line="220"/>
+        <location filename="." line="7103842"/>
         <source>Couche compositions:</source>
         <translation type="obsolete">Compositions layer:</translation>
     </message>
     <message>
-        <location filename="../main.py" line="230"/>
+        <location filename="." line="7103842"/>
         <source>Configuration de la liste de segments</source>
         <translation type="obsolete">List of segments configuration</translation>
     </message>
     <message>
-        <location filename="../main.py" line="234"/>
+        <location filename="." line="7103842"/>
         <source>Colonne contenant la liste de segments:</source>
         <translation type="obsolete">Field where the list of segments is:</translation>
     </message>
     <message>
-        <location filename="../main.py" line="164"/>
+        <location filename="." line="7103842"/>
         <source>Info</source>
         <translation type="obsolete">Info</translation>
     </message>
     <message>
-        <location filename="../main.py" line="166"/>
+        <location filename="." line="7103842"/>
         <source>Le suivi par RoutesComposer a démarré</source>
         <translation type="obsolete">RoutesComposer tracking has started</translation>
     </message>
     <message>
-        <location filename="../main.py" line="170"/>
+        <location filename="." line="7103842"/>
         <source>Erreur</source>
         <translation type="obsolete">Error</translation>
     </message>
     <message>
-        <location filename="../main.py" line="180"/>
+        <location filename="." line="7103842"/>
         <source>Le suivi par RoutesComposer est arrêté</source>
         <translation type="obsolete">RoutesComposer tracking has stoped</translation>
     </message>
@@ -57,45 +57,45 @@
 <context>
     <name>ErrorDialog</name>
     <message>
-        <location filename="../ui/sub_dialog.py" line="100"/>
+        <location filename="../ui/sub_dialog.py" line="108"/>
         <source>Erreurs détectées</source>
-        <translation>Detected errors</translation>
-    </message>
-    <message>
-        <location filename="../ui/sub_dialog.py" line="109"/>
-        <source>Détails des erreurs détectées :</source>
-        <translation>Detected error details:</translation>
+        <translation type="obsolete">Detected errors</translation>
     </message>
     <message>
         <location filename="../ui/sub_dialog.py" line="122"/>
+        <source>Détails des erreurs détectées :</source>
+        <translation type="obsolete">Detected error details:</translation>
+    </message>
+    <message>
+        <location filename="." line="7103842"/>
         <source>Fermer</source>
-        <translation>Close</translation>
+        <translation type="obsolete">Close</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="165"/>
+        <location filename="../ui/sub_dialog.py" line="218"/>
         <source>Les géométries pour les compositions suivantes n&apos;ont pas pu être créées : {composition_id}.</source>
-        <translation>The geometries for the following compositions could not be created: {composition_id}.</translation>
+        <translation type="obsolete">The geometries for the following compositions could not be created: {composition_id}.</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="202"/>
+        <location filename="../ui/sub_dialog.py" line="273"/>
         <source>Erreur</source>
-        <translation>Error</translation>
+        <translation type="obsolete">Error</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="202"/>
+        <location filename="../ui/sub_dialog.py" line="273"/>
         <source>Segment {segment_id} non trouvé.</source>
-        <translation>Segment {segment_id} not found.</translation>
+        <translation type="obsolete">Segment {segment_id} not found.</translation>
     </message>
 </context>
 <context>
     <name>InfoDialog</name>
     <message>
-        <location filename="../ui/sub_dialog.py" line="31"/>
+        <location filename="../ui/sub_dialog.py" line="34"/>
         <source>Informations sur le Gestionnaire de réseaux</source>
-        <translation>Road composer information.</translation>
+        <translation type="obsolete">Road composer information.</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="33"/>
+        <location filename="." line="7103842"/>
         <source>
         &lt;b&gt;Gestionnaire de réseaux&lt;/b&gt;&lt;br&gt;&lt;br&gt;
         Ce plugin apporte une assistance dans la réalisation de réseaux en mettant &lt;br /&gt; à jour
@@ -131,17 +131,17 @@ These will appear in the Python console of QGIS.
 </translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="74"/>
+        <location filename="." line="7103842"/>
         <source>Désactiver le logging</source>
         <translation type="obsolete">Disable logging</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="76"/>
+        <location filename="." line="7103842"/>
         <source>Activer le logging</source>
         <translation type="obsolete">Logging aktivieren</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="33"/>
+        <location filename="." line="7103842"/>
         <source>
         &lt;b&gt;Gestionnaire de compositions de segments&lt;/b&gt;&lt;br&gt;&lt;br&gt;
         Ce plugin apporte une assistance dans la réalisation de compositions de segments.&lt;br&gt;&lt;br&gt;
@@ -178,7 +178,7 @@ These will appear in the Python console of QGIS.
         </translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="33"/>
+        <location filename="../ui/sub_dialog.py" line="36"/>
         <source>
         &lt;b&gt;Gestionnaire de compositions de segments&lt;/b&gt;&lt;br&gt;&lt;br&gt;
         Ce plugin apporte une assistance dans la réalisation de compositions de segments.&lt;br&gt;&lt;br&gt;
@@ -193,7 +193,7 @@ These will appear in the Python console of QGIS.
                 Vous pouvez appuyer sur &lt;b&gt;z&lt;/b&gt; pour retirer le dernier segment ajouté à la liste et sur &lt;b&gt;e&lt;/b&gt; pour le rétablir.&lt;/li&gt;
         &lt;/ol&gt;
         </source>
-        <translation>        &lt;b&gt;Segment Composition Manager&lt;/b&gt;&lt;br&gt;&lt;br&gt;
+        <translation type="obsolete">        &lt;b&gt;Segment Composition Manager&lt;/b&gt;&lt;br&gt;&lt;br&gt;
         This plugin provides assistance in creating segment compositions.&lt;br&gt;&lt;br&gt;
         &lt;i&gt;Instructions:&lt;/i&gt;&lt;br&gt;
         &lt;ol&gt;
@@ -211,140 +211,140 @@ These will appear in the Python console of QGIS.
 <context>
     <name>RoutesComposer</name>
     <message>
-        <location filename="../main.py" line="70"/>
+        <location filename="../func/routes_composer.py" line="104"/>
         <source>Le suivi par RoutesComposer a démarré</source>
-        <translation>RoutesComposer tracking has started</translation>
+        <translation type="obsolete">RoutesComposer tracking has started</translation>
     </message>
     <message>
-        <location filename="../main.py" line="178"/>
+        <location filename="." line="7103842"/>
         <source>Le champ &apos;id&apos; n&apos;a pas été trouvé dans la couche segments</source>
-        <translation>Field &apos;id&apos; not found in segments layer</translation>
+        <translation type="obsolete">Field &apos;id&apos; not found in segments layer</translation>
     </message>
     <message>
-        <location filename="../main.py" line="100"/>
+        <location filename="../func/routes_composer.py" line="135"/>
         <source>Erreur</source>
-        <translation>Error</translation>
+        <translation type="obsolete">Error</translation>
     </message>
     <message>
-        <location filename="../main.py" line="92"/>
+        <location filename="../func/routes_composer.py" line="127"/>
         <source>Le suivi par RoutesComposer est arrêté</source>
-        <translation>RoutesComposer tracking has stoped</translation>
+        <translation type="obsolete">RoutesComposer tracking has stoped</translation>
     </message>
     <message>
-        <location filename="../main.py" line="42"/>
+        <location filename="../func/routes_composer.py" line="69"/>
         <source>Aucun projet QGIS n&apos;est ouvert</source>
-        <translation>No QGIS project is open</translation>
+        <translation type="obsolete">No QGIS project is open</translation>
     </message>
     <message>
-        <location filename="../main.py" line="147"/>
+        <location filename="../func/routes_composer.py" line="237"/>
         <source>Veuillez sélectionner une couche de segments valide</source>
-        <translation>Please select a valid segment layer</translation>
+        <translation type="obsolete">Please select a valid segment layer</translation>
     </message>
     <message>
-        <location filename="../main.py" line="150"/>
+        <location filename="../func/routes_composer.py" line="240"/>
         <source>La couche de segments n&apos;est pas une couche vectorielle valide</source>
-        <translation>The segment layer is not a valid vector layer</translation>
+        <translation type="obsolete">The segment layer is not a valid vector layer</translation>
     </message>
     <message>
-        <location filename="../main.py" line="160"/>
+        <location filename="../func/routes_composer.py" line="250"/>
         <source>Veuillez sélectionner une couche de compositions valide</source>
-        <translation>Please select a valid composition layer</translation>
+        <translation type="obsolete">Please select a valid composition layer</translation>
     </message>
     <message>
-        <location filename="../main.py" line="162"/>
+        <location filename="../func/routes_composer.py" line="252"/>
         <source>La couche de compositions n&apos;est pas une couche vectorielle valide</source>
-        <translation>The composition layer is not a valid vector layer</translation>
+        <translation type="obsolete">The composition layer is not a valid vector layer</translation>
     </message>
 </context>
 <context>
     <name>RoutesComposerDialog</name>
     <message>
-        <location filename="../main.py" line="193"/>
+        <location filename="." line="7103842"/>
         <source>Gestionnaire de réseaux</source>
         <translation type="obsolete">Routes Composer</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="89"/>
+        <location filename="." line="7103842"/>
         <source>Configuration des couches</source>
-        <translation>Layers configuration</translation>
+        <translation type="obsolete">Layers configuration</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="93"/>
+        <location filename="." line="7103842"/>
         <source>Couche segments:</source>
-        <translation>Segments layer:</translation>
+        <translation type="obsolete">Segments layer:</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="105"/>
+        <location filename="." line="7103842"/>
         <source>Couche compositions:</source>
-        <translation>Compositions layer:</translation>
+        <translation type="obsolete">Compositions layer:</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="124"/>
+        <location filename="." line="7103842"/>
         <source>Configuration de la liste de segments</source>
-        <translation>List of segments configuration</translation>
+        <translation type="obsolete">List of segments configuration</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="128"/>
+        <location filename="." line="7103842"/>
         <source>Colonne contenant la liste de segments:</source>
-        <translation>Field where the list of segments is:</translation>
+        <translation type="obsolete">Field where the list of segments is:</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="264"/>
+        <location filename="../ui/main_dialog/main.py" line="106"/>
         <source>Status: Arrêté</source>
         <translation>Status: Stop</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="263"/>
+        <location filename="../ui/main_dialog/main.py" line="105"/>
         <source>Démarrer</source>
         <translation>Start</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="153"/>
+        <location filename="." line="7103842"/>
         <source>Info</source>
-        <translation>Info</translation>
+        <translation type="obsolete">Info</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="160"/>
+        <location filename="." line="7103842"/>
         <source>Démarrer automatiquement au lancement du projet</source>
-        <translation>Auto-start on project launch</translation>
+        <translation type="obsolete">Auto-start on project launch</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="461"/>
+        <location filename="." line="7103842"/>
         <source>Attention</source>
-        <translation>Warning</translation>
+        <translation type="obsolete">Warning</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="461"/>
+        <location filename="." line="7103842"/>
         <source>Veuillez sélectionner les couches segments et compositions</source>
-        <translation>Please select layers, segments and compositions</translation>
+        <translation type="obsolete">Please select layers, segments and compositions</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="237"/>
+        <location filename="." line="7103842"/>
         <source>Veuillez sélectionner la colonne segments</source>
-        <translation>Please select column segments</translation>
+        <translation type="obsolete">Please select column segments</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="469"/>
+        <location filename="." line="7103842"/>
         <source>Erreur</source>
-        <translation>Error</translation>
+        <translation type="obsolete">Error</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="254"/>
+        <location filename="." line="7103842"/>
         <source>Une erreur est survenue: {str(e)}</source>
-        <translation>An error has occured: {str(e)}</translation>
+        <translation type="obsolete">An error has occured: {str(e)}</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="259"/>
+        <location filename="../ui/main_dialog/main.py" line="102"/>
         <source>Arrêter</source>
         <translation>Stop</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="260"/>
+        <location filename="../ui/main_dialog/main.py" line="103"/>
         <source>Status: En cours d&apos;exécution</source>
         <translation>Status: Running</translation>
     </message>
     <message>
-        <location filename="../main.py" line="460"/>
+        <location filename="." line="7103842"/>
         <source>
         Gestionnaire de réseaux
 
@@ -381,75 +381,75 @@ These will appear in the Python console of QGIS.
         </translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="52"/>
+        <location filename="../ui/main_dialog/main.py" line="27"/>
         <source>Compositeur de Routes</source>
         <translation>Routes Composer</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="110"/>
+        <location filename="." line="7103842"/>
         <source>Activer la création géométrique en continue</source>
-        <translation>Allow geometry creation on the fly</translation>
+        <translation type="obsolete">Allow geometry creation on the fly</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="171"/>
+        <location filename="." line="7103842"/>
         <source>Vérifier les compositions</source>
-        <translation>Check compositions</translation>
+        <translation type="obsolete">Check compositions</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="332"/>
+        <location filename="." line="7103842"/>
         <source>Créer les géométries</source>
-        <translation>Create geometries</translation>
+        <translation type="obsolete">Create geometries</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="184"/>
+        <location filename="." line="7103842"/>
         <source>Annuler</source>
-        <translation>Cancel</translation>
+        <translation type="obsolete">Cancel</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="314"/>
+        <location filename="." line="7103842"/>
         <source>Attention: la couche des segments n&apos;a pas de géométrie</source>
-        <translation>Warning: Layer segments has no geometry</translation>
+        <translation type="obsolete">Warning: Layer segments has no geometry</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="327"/>
+        <location filename="." line="7103842"/>
         <source>Mettre à jour les géométries</source>
-        <translation>Update geometries</translation>
+        <translation type="obsolete">Update geometries</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="358"/>
+        <location filename="." line="7103842"/>
         <source>Attention: la colonne segments n&apos;est pas de type texte</source>
-        <translation>Warning: the segments column is not of text type</translation>
+        <translation type="obsolete">Warning: the segments column is not of text type</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="415"/>
+        <location filename="." line="7103842"/>
         <source>Aucune erreur</source>
-        <translation>No errors</translation>
+        <translation type="obsolete">No errors</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="415"/>
+        <location filename="." line="7103842"/>
         <source>Aucune erreur détectée.</source>
-        <translation>No errors detected.</translation>
+        <translation type="obsolete">No errors detected.</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="428"/>
+        <location filename="." line="7103842"/>
         <source>Le champ {ss} n&apos;existe pas dans la couche des compositions.</source>
-        <translation>The field {ss} does not exist in the composition layer.</translation>
+        <translation type="obsolete">The field {ss} does not exist in the composition layer.</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="469"/>
+        <location filename="." line="7103842"/>
         <source>Le champ {segments_column_name} n&apos;existe pas dans la couche des compositions.</source>
-        <translation>The field {ss} does not exist in the composition layer.</translation>
+        <translation type="obsolete">The field {ss} does not exist in the composition layer.</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog.py" line="500"/>
+        <location filename="." line="7103842"/>
         <source>Annulation en cours...</source>
-        <translation>Cancelling...</translation>
+        <translation type="obsolete">Cancelling...</translation>
     </message>
 </context>
 <context>
     <name>RoutesComposerTool</name>
     <message>
-        <location filename="../ui/tool.py" line="48"/>
+        <location filename="." line="7103842"/>
         <source>Ouvrir Routes Composer</source>
         <translation type="obsolete">Open Routes Composer</translation>
     </message>
@@ -457,37 +457,220 @@ These will appear in the Python console of QGIS.
 <context>
     <name>RoutesManagerTool</name>
     <message>
-        <location filename="../ui/tool.py" line="58"/>
+        <location filename="../init.py" line="60"/>
         <source>Ouvrir le panier à segments</source>
-        <translation>Open Ids Basket</translation>
+        <translation type="obsolete">Open Ids Basket</translation>
     </message>
 </context>
 <context>
     <name>SingleSegmentDialog</name>
     <message>
-        <location filename="../ui/sub_dialog.py" line="55"/>
+        <location filename="../ui/sub_dialog.py" line="58"/>
         <source>Vérification nécessaire</source>
-        <translation>Verification required</translation>
+        <translation type="obsolete">Verification required</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="63"/>
+        <location filename="../ui/sub_dialog.py" line="66"/>
         <source>Attention, composition d&apos;un seul segment. Veuillez vérifier que la nouvelle composition est bonne.</source>
-        <translation>Warning, composition of a single segment. Please ensure that the new composition is correct.</translation>
+        <translation type="obsolete">Warning, composition of a single segment. Please ensure that the new composition is correct.</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="74"/>
+        <location filename="../ui/sub_dialog.py" line="77"/>
         <source>Inverser l&apos;ordre</source>
-        <translation>Reverse the order</translation>
+        <translation type="obsolete">Reverse the order</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="82"/>
+        <location filename="../ui/sub_dialog.py" line="85"/>
+        <source>Annuler</source>
+        <translation type="obsolete">Cancel</translation>
+    </message>
+    <message>
+        <location filename="../ui/sub_dialog.py" line="93"/>
+        <source>Nouvelle composition proposée: {cs}</source>
+        <translation type="obsolete">New proposed composition: {cs}</translation>
+    </message>
+</context>
+<context>
+    <name>self.dialog</name>
+    <message>
+        <location filename="../ui/main_dialog/geometry_operations.py" line="99"/>
+        <source>Attention</source>
+        <translation>Warning</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/advanced_options.py" line="74"/>
+        <source>Veuillez sélectionner les couches segments et compositions ainsi que les attributs.</source>
+        <translation>Please select the layers, segments, and compositions as well as the attributes.</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/geometry_operations.py" line="51"/>
+        <source>Veuillez sélectionner les couches segments et compositions</source>
+        <translation>Please select layers, segments and compositions</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/event_handlers.py" line="29"/>
+        <source>Veuillez sélectionner la colonne segments</source>
+        <translation>Please select column segments</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/geometry_operations.py" line="61"/>
+        <source>Erreur</source>
+        <translation>Error</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/event_handlers.py" line="42"/>
+        <source>Une erreur est survenue: {str(e)}</source>
+        <translation>An error has occured: {str(e)}</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/event_handlers.py" line="79"/>
+        <source>Annulation en cours...</source>
+        <translation>Cancelling...</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/geometry_operations.py" line="31"/>
+        <source>Le champ {ss} n&apos;existe pas dans la couche des compositions.</source>
+        <translation>The field {ss} does not exist in the composition layer.</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/geometry_operations.py" line="61"/>
+        <source>Le champ {segments_column_name} n&apos;existe pas dans la couche des compositions.</source>
+        <translation>The field {ss} does not exist in the composition layer.</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/geometry_operations.py" line="99"/>
+        <source>Veuillez sélectionner les couches segments et compositions ainsi que leurs colonnes respectives.</source>
+        <translation>Please select the layers, segments and compositions as well as the attributes.</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/geometry_operations.py" line="114"/>
+        <source>Aucune erreur</source>
+        <translation>No errors</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/geometry_operations.py" line="114"/>
+        <source>Aucune erreur détectée.</source>
+        <translation>No errors detected.</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/layer_management.py" line="86"/>
+        <source>Attention: la couche des segments n&apos;a pas de géométrie</source>
+        <translation>Warning: Layer segments has no geometry</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/layer_management.py" line="110"/>
+        <source>Mettre à jour les géométries</source>
+        <translation>Update geometries</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="114"/>
+        <source>Créer les géométries</source>
+        <translation>Create geometries</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="29"/>
+        <source>Configuration des couches</source>
+        <translation>Layers configuration</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="34"/>
+        <source>Couche segments:</source>
+        <translation>Segments layer:</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="41"/>
+        <source>Colonne id:</source>
+        <translation>Column ID:</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="54"/>
+        <source>Couche compositions:</source>
+        <translation>Compositions layer:</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="61"/>
+        <source>Liste:</source>
+        <translation>List:</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="67"/>
+        <source>Activer la création géométrique en continue</source>
+        <translation>Allow geometry creation on the fly</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="79"/>
+        <source>Status: Arrêté</source>
+        <translation>Status: Stopped</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="86"/>
+        <source>Démarrer</source>
+        <translation>Start</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="91"/>
+        <source>Info</source>
+        <translation>Info</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="99"/>
+        <source>Démarrer automatiquement au lancement du projet</source>
+        <translation>Auto-start on project launch</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="109"/>
+        <source>Vérifier les compositions</source>
+        <translation>Check compositions</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="121"/>
         <source>Annuler</source>
         <translation>Cancel</translation>
     </message>
     <message>
-        <location filename="../ui/sub_dialog.py" line="90"/>
-        <source>Nouvelle composition proposée: {cs}</source>
-        <translation>New proposed composition: {cs}</translation>
+        <location filename="../ui/main_dialog/ui_builder.py" line="134"/>
+        <source>Options avancées</source>
+        <translation>Advanced options</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="158"/>
+        <source>Lier les attributs de deux couches:</source>
+        <translation>Link attributes of two layers:</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="166"/>
+        <source>Mettre à jour les attributs</source>
+        <translation>Update attributes</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="178"/>
+        <source>Attribut compositions:</source>
+        <translation>Attribute compositions:</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="183"/>
+        <source>Attribut segments:</source>
+        <translation>Attribute segments:</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="188"/>
+        <source>Priorité:</source>
+        <translation>Priority:</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="196"/>
+        <source>none</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="196"/>
+        <source>min_value</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="196"/>
+        <source>max_value</source>
+        <translation></translation>
     </message>
 </context>
 </TS>
