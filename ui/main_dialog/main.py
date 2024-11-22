@@ -12,6 +12,7 @@ from .event_handlers import EventHandlers
 from .geometry_operations import GeometryOperations
 from .layer_management import LayerManager
 from .ui_builder import UiBuilder
+from ...func.utils import log
 
 
 def show_dialog():
@@ -41,6 +42,13 @@ class RoutesComposerDialog(QDialog):
         self.update_ui_state()
 
         self.translator = QTranslator()
+        settings = QSettings()
+        saved_segments_layer_id = settings.value(
+            "routes_composer/segments_layer_id", ""
+        )
+        log(
+            f"valeur enregistrée pour la couche segments: {saved_segments_layer_id}"
+        )
 
     def load_styles(self):
         with open(
@@ -56,9 +64,9 @@ class RoutesComposerDialog(QDialog):
             segments_layer_id = settings.value(
                 "routes_composer/segments_layer_id", ""
             )
-            compositions_layer_id = settings.value(
-                "routes_composer/compositions_layer_id", ""
-            )
+            # compositions_layer_id = settings.value(
+            #     "routes_composer/compositions_layer_id", ""
+            # )
             saved_segments_attr = settings.value(
                 "routes_composer/segments_attr_name", ""
             )
@@ -69,24 +77,26 @@ class RoutesComposerDialog(QDialog):
                 "routes_composer/priority_mode", "aucune"
             )
 
-            self.layer_manager.populate_layers_combo(self.ui.segments_combo)
-            self.layer_manager.populate_layers_combo(
-                self.ui.compositions_combo
+            self.layer_manager.populate_segments_layer_combo(
+                self.ui.segments_combo
             )
+            # self.layer_manager.populate_layers_combo(
+            #     self.ui.compositions_combo
+            # )
 
-            segments_index = self.ui.segments_combo.findData(segments_layer_id)
-            compositions_index = self.ui.compositions_combo.findData(
-                compositions_layer_id
+            segments_index = self.ui.segments_combo.findData(
+                segments_layer_id
             )
+            # compositions_index = self.ui.compositions_combo.findData(
+            #     compositions_layer_id
+            # )
 
             if segments_index >= 0:
                 self.ui.segments_combo.setCurrentIndex(segments_index)
-                self.layer_manager.on_segments_layer_selected()
-            if compositions_index >= 0:
-                self.ui.compositions_combo.setCurrentIndex(compositions_index)
-                self.layer_manager.on_compositions_layer_selected()
-
-            self.advanced_options.update_attr_combos()
+            #     self.layer_manager.on_segments_layer_selected()
+            # if compositions_index >= 0:
+            #     self.ui.compositions_combo.setCurrentIndex(compositions_index)
+            #     self.layer_manager.on_compositions_layer_selected()
 
             if saved_segments_attr:
                 segments_attr_index = self.ui.segments_attr_combo.findText(
@@ -162,8 +172,12 @@ class RoutesComposerDialog(QDialog):
         if a0 is not None:
             a0.accept()
 
-    def showEvent(self, event):
-        if event is not None:
-            super().showEvent(event)
-            self.layer_manager.refresh_combos()
-            self.advanced_options.update_attr_combos()
+    def showEvent(self, a0):
+        if a0 is not None:
+            super().showEvent(a0)
+            self.layer_manager.populate_segments_layer_combo(
+                self.ui.segments_combo
+            )
+            self.layer_manager.populate_compositions_layer_combo(
+                self.ui.compositions_combo
+            )

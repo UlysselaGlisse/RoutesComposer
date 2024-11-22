@@ -41,7 +41,6 @@ class UiBuilder(QObject):
         segments_layout.addWidget(QLabel(self.tr("Couche segments:")))
         self.segments_combo = QComboBox()
 
-        self.dialog.layer_manager.populate_layers_combo(self.segments_combo)
         self.segments_combo.setMaximumWidth(max_combo_width)
         segments_layout.addWidget(self.segments_combo)
 
@@ -60,9 +59,7 @@ class UiBuilder(QObject):
         compositions_layout = QHBoxLayout()
         compositions_layout.addWidget(QLabel(self.tr("Couche compositions:")))
         self.compositions_combo = QComboBox()
-        self.dialog.layer_manager.populate_layers_combo(
-            self.compositions_combo
-        )
+
         self.compositions_combo.setMaximumWidth(max_combo_width)
         compositions_layout.addWidget(self.compositions_combo)
 
@@ -129,7 +126,9 @@ class UiBuilder(QObject):
     def create_action_buttons(self, layout):
         action_buttons_layout = QHBoxLayout()
 
-        check_errors_button = QPushButton(self.tr("Vérifier les compositions"))
+        check_errors_button = QPushButton(
+            self.tr("Vérifier les compositions")
+        )
         check_errors_button.setProperty("class", "action-button")
         check_errors_button.clicked.connect(
             self.dialog.geometry_ops.check_errors
@@ -139,7 +138,9 @@ class UiBuilder(QObject):
         self.create_or_update_geom_button = QPushButton(
             self.tr("Créer les géométries")
         )
-        self.create_or_update_geom_button.setProperty("class", "action-button")
+        self.create_or_update_geom_button.setProperty(
+            "class", "action-button"
+        )
         self.create_or_update_geom_button.clicked.connect(
             self.dialog.geometry_ops.create_geometries
         )
@@ -194,7 +195,9 @@ class UiBuilder(QObject):
         self.advanced_options_container = QGroupBox()
         self.advanced_options_container.setLayout(QVBoxLayout())
         self.advanced_group = self.create_advanced_group()
-        self.advanced_options_container.layout().addWidget(self.advanced_group)
+        self.advanced_options_container.layout().addWidget(
+            self.advanced_group
+        )
         self.advanced_options_container.setVisible(False)
 
     def create_advanced_group(self):

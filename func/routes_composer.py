@@ -19,8 +19,9 @@ def start_routes_composer():
     try:
         if routes_composer is None:
             routes_composer = RoutesComposer()
-        routes_composer.connect()
-        config.script_running = True
+        if not config.script_running:
+            routes_composer.connect()
+            config.script_running = True
 
         return routes_composer
     except Exception as e:
@@ -31,7 +32,7 @@ def start_routes_composer():
 def stop_routes_composer():
     global routes_composer
     try:
-        if routes_composer is not None:
+        if routes_composer is not None and config.script_running:
             routes_composer.disconnect()
             routes_composer = None
             config.script_running = False
@@ -45,6 +46,7 @@ def start_geom_on_fly():
     try:
         if routes_composer is None:
             routes_composer = RoutesComposer()
+
         routes_composer.connect_geom()
         config.geom_on_fly_running = True
 
@@ -132,7 +134,9 @@ class RoutesComposer:
     def disconnect(self):
         try:
             if self.segments_layer is not None and self.is_connected:
-                self.segments_layer.featureAdded.disconnect(self.feature_added)
+                self.segments_layer.featureAdded.disconnect(
+                    self.feature_added
+                )
                 self.segments_layer.featuresDeleted.disconnect(
                     self.features_deleted
                 )
@@ -254,7 +258,8 @@ class RoutesComposer:
         """Crée la géométrie des compositions lors du changement de la géométrie d'un segment"""
         # Initialisation
         log(f"Geometry has changed for fid: '{fid}'", level="INFO")
-
+        if self.segments_layer is None or self.compositions_layer is None:
+            return
         source_feature = self.segments_layer.getFeature(fid)
         if not source_feature.isValid() and source_feature.fields().names():
             return
@@ -269,13 +274,12 @@ class RoutesComposer:
         for composition in utils.get_features_list(self.compositions_layer):
             segments_str = str(composition[self.segments_column_name])
             if str(segment_id) in segments_str.split(","):
-                # Obtenir la liste des segments pour cette composition
                 segment_ids = [
                     int(id_str)
                     for id_str in segments_str.split(",")
-                    if id_str.strip().isdigit()
+                    if id_str.strip()
                 ]
-
+                log(segment_ids)
                 a = geom_compo.GeomCompo(
                     self.segments_layer,
                     self.compositions_layer,
