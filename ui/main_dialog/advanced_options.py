@@ -69,20 +69,22 @@ class AdvancedOptions(QObject):
         )
         log(f"Priority mode selected: {selected_priority_mode}")
 
-    def update_attr_combos(self):
+    def update_segments_attr_combo(self):
         self.dialog.ui.segments_attr_combo.clear()
-        self.dialog.ui.compositions_attr_combo.clear()
 
-        if (
-            not self.dialog.ui.segments_combo.currentData()
-            or not self.dialog.ui.compositions_combo.currentData()
-        ):
+        if not self.dialog.ui.segments_combo.currentData():
             return
 
         for (
             field
         ) in self.dialog.layer_manager.selected_segments_layer.fields():
             self.dialog.ui.segments_attr_combo.addItem(field.name())
+
+    def update_compositions_attr_combo(self):
+        self.dialog.ui.compositions_attr_combo.clear()
+
+        if not self.dialog.ui.compositions_combo.currentData():
+            return
 
         for (
             field
