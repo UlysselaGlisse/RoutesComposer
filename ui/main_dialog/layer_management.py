@@ -104,6 +104,8 @@ class LayerManager(QObject):
                 if index >= 0:
                     self.dialog.ui.id_column_combo.setCurrentIndex(index)
 
+                self.dialog.advanced_options.update_segments_attr_combo()
+
             settings = QSettings()
             settings.setValue(
                 "routes_composer/segments_layer_id", segments_id
