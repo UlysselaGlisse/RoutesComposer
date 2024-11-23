@@ -305,6 +305,7 @@ class GeomCompo:
                 if new_geometry:
                     composition.setGeometry(new_geometry)
                     self.compositions_layer.updateFeature(composition)
+
                 else:
                     log(
                         f"La géométrie pour la composition ID {composition.id()} est vide après traitement des segments.",
