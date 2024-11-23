@@ -276,7 +276,9 @@ class GeomCompo:
         for composition in get_features_list(self.compositions_layer):
             if config.cancel_request:
                 log("Mise à jour des géométries annulée...", level="INFO")
+                self.compositions_layer.rollBack()
                 break
+
             segments_str = composition[self.segments_column_name]
 
             if isinstance(segments_str, str):

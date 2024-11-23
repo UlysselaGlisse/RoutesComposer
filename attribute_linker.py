@@ -1,6 +1,7 @@
 """Functions for linking attributes."""
 
 from .func.utils import log
+from qgis.PyQt.QtWidgets import QMessageBox
 
 
 class AttributeLinker:
@@ -50,8 +51,6 @@ class AttributeLinker:
 
     def update_segments_attr_values(self):
         """Met à jour l'attribut de segments."""
-        self.segments_layer.startEditing()
-
         try:
             segments_to_update = {}
 
@@ -77,7 +76,8 @@ class AttributeLinker:
                         segments_to_update[segment_id] = value
                     else:
                         current_value = segments_to_update[segment_id]
-                        # Conversion explicite en nombres pour la comparaison, car sinon 0 n'est pas pris en compte.'
+                        # Conversion explicite en nombres pour la comparaison,
+                        # car sinon 0 n'est pas pris en compte.'
                         value_num = float(value) if value else 0
                         current_value_num = (
                             float(current_value) if current_value else 0
@@ -96,18 +96,27 @@ class AttributeLinker:
                                 else current_value
                             )
 
+            self.segments_layer.startEditing()
+            update_count = 0
+
             for segment in self.segments_layer.getFeatures():
                 segment_id = segment[self.id_column_name]
                 if segment_id not in segments_to_update:
                     continue
 
                 new_value = segments_to_update[segment_id]
-                feature_id = segment.id()
 
                 segment[self.segments_attr] = new_value
                 self.segments_layer.updateFeature(segment)
+                update_count += 1
 
-            self.segments_layer.commitChanges()
+            QMessageBox.information(
+                None,
+                "Lier les attributs",
+                f"Mise à jour terminée pour l'attribut: {self.compositions_attr}",
+            )
+
+            return True
 
         except Exception as e:
             log(f"Erreur lors de la mise à jour : {str(e)}", level="ERROR")

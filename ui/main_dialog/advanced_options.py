@@ -105,26 +105,13 @@ class AdvancedOptions(QObject):
             )
             return
 
-        segments_layer = self.dialog.layer_manager.selected_segments_layer
-        compositions_layer = (
-            self.dialog.layer_manager.selected_compositions_layer
-        )
-        segments_column_name = (
-            self.dialog.ui.segments_column_combo.currentText()
-        )
-        id_column_name = self.dialog.ui.id_column_combo.currentText()
-        segments_attr = self.dialog.ui.segments_attr_combo.currentText()
-        compositions_attr = (
-            self.dialog.ui.compositions_attr_combo.currentText()
-        )
-
         self.attribute_linker = AttributeLinker(
-            segments_layer=segments_layer,
-            compositions_layer=compositions_layer,
-            segments_attr=segments_attr,
-            compositions_attr=compositions_attr,
-            id_column_name=id_column_name,
-            segments_column_name=segments_column_name,
+            segments_layer=self.dialog.layer_manager.selected_segments_layer,
+            compositions_layer=self.dialog.layer_manager.selected_compositions_layer,
+            segments_attr=self.dialog.ui.segments_attr_combo.currentText(),
+            compositions_attr=self.dialog.ui.compositions_attr_combo.currentText(),
+            id_column_name=self.dialog.ui.id_column_combo.currentText(),
+            segments_column_name=self.dialog.ui.segments_column_combo.currentText(),
             priority_mode=self.dialog.ui.priority_mode_combo.currentText().lower(),
         )
         self.attribute_linker.update_segments_attr_values()
