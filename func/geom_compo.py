@@ -95,7 +95,9 @@ class GeomCompo:
                             current_points[0], next_points[-1]
                         ):
                             # On met tous les points sauf le dernier pour éviter les doublons.
-                            result_points.extend(reversed(current_points[:-1]))
+                            result_points.extend(
+                                reversed(current_points[:-1])
+                            )
                         # Le dernier point touche le segment suivant
                         elif self.points_are_equal(
                             current_points[-1], next_points[0]
@@ -149,7 +151,7 @@ class GeomCompo:
 
         new_layer = QgsVectorLayer(
             "LineString?crs=" + self.segments_layer.crs().authid(),
-            "Merged Geometries",
+            "compositions_geom",
             "memory",
         )
         provider = new_layer.dataProvider()
@@ -202,7 +204,9 @@ class GeomCompo:
                     segment_ids
                 )
                 for segment_id in non_connected:
-                    not_connected_segments[segment_id].append(composition.id())
+                    not_connected_segments[segment_id].append(
+                        composition.id()
+                    )
 
                 if new_geometry:
                     feature = QgsFeature()
@@ -240,7 +244,10 @@ class GeomCompo:
             )
 
         if not_connected_segments:
-            for segment_id, compositions_ids in not_connected_segments.items():
+            for (
+                segment_id,
+                compositions_ids,
+            ) in not_connected_segments.items():
                 disconnected_ids = ", ".join(
                     map(str, sorted(compositions_ids))
                 )
@@ -291,7 +298,9 @@ class GeomCompo:
                     segment_ids
                 )
                 for segment_id in non_connected:
-                    not_connected_segments[segment_id].append(composition.id())
+                    not_connected_segments[segment_id].append(
+                        composition.id()
+                    )
 
                 if new_geometry:
                     composition.setGeometry(new_geometry)
@@ -323,7 +332,10 @@ class GeomCompo:
             )
 
         if not_connected_segments:
-            for segment_id, compositions_ids in not_connected_segments.items():
+            for (
+                segment_id,
+                compositions_ids,
+            ) in not_connected_segments.items():
                 disconnected_ids = ", ".join(
                     map(str, sorted(compositions_ids))
                 )
