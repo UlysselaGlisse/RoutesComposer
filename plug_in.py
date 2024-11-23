@@ -37,7 +37,6 @@ class RoutesComposerTool:
             self.translator = QTranslator()
             self.translator.load(locale_path)
             QCoreApplication.installTranslator(self.translator)
-        log("f")
 
     def initGui(self):
         icon_path = os.path.join(
@@ -70,21 +69,18 @@ class RoutesComposerTool:
         self.ids_basket_action.triggered.connect(self.toggle_ids_basket)
         self.toolbar.addAction(self.ids_basket_action)
         self.actions.append(self.ids_basket_action)
-        log("r")
 
     def on_project_load(self):
-        log("z")
-        self.project_loaded = True
         project = QgsProject.instance()
         if project:
             auto_start, _ = project.readBoolEntry(
                 "routes_composer", "auto_start", False
             )
+            log(f"auto_start value {auto_start}")
             if auto_start:
                 QTimer.singleShot(1000, self.auto_start_script)
 
     def auto_start_script(self):
-        log("d")
         project = QgsProject.instance()
         if project:
             auto_start, _ = project.readBoolEntry(
@@ -93,7 +89,6 @@ class RoutesComposerTool:
             geom_on_fly, _ = project.readBoolEntry(
                 "routes_composer", "geom_on_fly", False
             )
-
             if auto_start:
                 start_routes_composer()
             if geom_on_fly:
@@ -101,7 +96,6 @@ class RoutesComposerTool:
             self.update_icon()
 
     def activate_ids_basket(self):
-        log("r")
         project = QgsProject.instance()
         if not project:
             return
@@ -127,18 +121,15 @@ class RoutesComposerTool:
             canvas.setMapTool(tool)
 
     def toggle_ids_basket(self):
-        log("e")
         if self.ids_basket_action.isChecked():
             self.activate_ids_basket()
         else:
             self.deactivate_ids_basket()
 
     def deactivate_ids_basket(self):
-        log("r")
         self.ids_basket_action.setChecked(False)
 
     def unload(self):
-        log("t")
         """Supprime les éléments de l'interface"""
         for action in self.actions:
             self.iface.removeToolBarIcon(action)
@@ -148,7 +139,6 @@ class RoutesComposerTool:
         del self.toolbar
 
     def update_icon(self):
-        log("d")
         icon_path = os.path.join(
             os.path.dirname(__file__),
             "ui",
@@ -162,7 +152,6 @@ class RoutesComposerTool:
         self.actions[0].setIcon(QIcon(icon_path))
 
     def show_dialog(self):
-        log("r")
         """Affiche la fenêtre de dialogue"""
         if self.dialog is None:
             self.dialog = RoutesComposerDialog(self.iface.mainWindow(), self)

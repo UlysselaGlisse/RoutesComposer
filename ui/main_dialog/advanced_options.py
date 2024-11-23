@@ -73,6 +73,12 @@ class AdvancedOptions(QObject):
         self.dialog.ui.segments_attr_combo.clear()
         self.dialog.ui.compositions_attr_combo.clear()
 
+        if (
+            not self.dialog.ui.segments_combo.currentData()
+            or not self.dialog.ui.compositions_combo.currentData()
+        ):
+            return
+
         for (
             field
         ) in self.dialog.layer_manager.selected_segments_layer.fields():

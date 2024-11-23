@@ -45,24 +45,26 @@ class RoutesComposerDialog(QDialog):
         self.translator = QTranslator()
 
     def load_styles(self):
-        log("r")
         with open(
             os.path.join(os.path.dirname(__file__), "..", "styles.css"), "r"
         ) as f:
             return f.read()
 
     def load_settings(self):
-        log("r")
         project = QgsProject.instance()
         if project:
             settings = QSettings()
 
-            segments_layer_id = settings.value(
-                "routes_composer/segments_layer_id", ""
+            auto_start, _ = project.readBoolEntry(
+                "routes_composer", "auto_start", False
             )
-            compositions_layer_id = settings.value(
-                "routes_composer/compositions_layer_id", ""
+            self.ui.auto_start_checkbox.setChecked(auto_start)
+
+            geom_on_fly, _ = project.readBoolEntry(
+                "routes_composer", "geom_on_fly", False
             )
+            self.ui.geom_checkbox.setChecked(geom_on_fly)
+
             saved_segments_attr = settings.value(
                 "routes_composer/segments_attr_name", ""
             )
@@ -72,27 +74,6 @@ class RoutesComposerDialog(QDialog):
             saved_priority_mode = settings.value(
                 "routes_composer/priority_mode", "aucune"
             )
-
-            self.layer_manager.populate_segments_layer_combo(
-                self.ui.segments_combo
-            )
-            self.layer_manager.populate_compositions_layer_combo(
-                self.ui.compositions_combo
-            )
-
-            # segments_index = self.ui.segments_combo.findData(
-            #     segments_layer_id
-            # )
-            # compositions_index = self.ui.compositions_combo.findData(
-            #     compositions_layer_id
-            # )
-
-            # if segments_index >= 0:
-            #     self.ui.segments_combo.setCurrentIndex(segments_index)
-            #     self.layer_manager.on_segments_layer_selected()
-            # if compositions_index >= 0:
-            #     self.ui.compositions_combo.setCurrentIndex(compositions_index)
-            #     self.layer_manager.on_compositions_layer_selected()
 
             if saved_segments_attr:
                 segments_attr_index = self.ui.segments_attr_combo.findText(
@@ -116,7 +97,6 @@ class RoutesComposerDialog(QDialog):
             self.ui.priority_mode_combo.setCurrentText(saved_priority_mode)
 
     def setup_signals(self):
-        log("r")
         self.ui.segments_combo.currentIndexChanged.connect(
             self.layer_manager.on_segments_layer_selected
         )
@@ -130,19 +110,6 @@ class RoutesComposerDialog(QDialog):
             self.layer_manager.on_id_column_selected
         )
 
-        # self.ui.segments_combo.currentIndexChanged.connect(
-        #     self.event_handlers.stop_running_routes_composer
-        # )
-        # self.ui.compositions_combo.currentIndexChanged.connect(
-        #     self.event_handlers.stop_running_routes_composer
-        # )
-        # self.ui.segments_column_combo.currentTextChanged.connect(
-        #     self.event_handlers.stop_running_routes_composer
-        # )
-        # self.ui.id_column_combo.currentTextChanged.connect(
-        #     self.event_handlers.stop_running_routes_composer
-        # )
-
         self.ui.segments_attr_combo.currentTextChanged.connect(
             self.advanced_options.on_segments_attr_selected
         )
@@ -154,7 +121,6 @@ class RoutesComposerDialog(QDialog):
         )
 
     def update_ui_state(self):
-        log("r")
         if config.script_running:
             self.ui.start_button.setText(self.tr("Arrêter"))
             self.ui.status_label.setText(
@@ -167,16 +133,29 @@ class RoutesComposerDialog(QDialog):
         self.ui.start_button.setStyleSheet(self.ui.get_start_button_style())
 
     def closeEvent(self, a0):
-        log("r")
         if a0 is not None:
             a0.accept()
 
     def showEvent(self, a0):
-        log("r")
         if a0 is not None:
             super().showEvent(a0)
             log("showevent")
+            self.ui.segments_combo.blockSignals(True)
+            self.ui.compositions_combo.blockSignals(True)
+
             self.layer_manager.refresh_layers_combo(self.ui.segments_combo)
             self.layer_manager.refresh_layers_combo(
                 self.ui.compositions_combo
             )
+
+            self.layer_manager.populate_segments_layer_combo(
+                self.ui.segments_combo
+            )
+            self.layer_manager.populate_compositions_layer_combo(
+                self.ui.compositions_combo
+            )
+
+            self.advanced_options.update_attr_combos()
+
+            self.ui.segments_combo.blockSignals(False)
+            self.ui.compositions_combo.blockSignals(False)

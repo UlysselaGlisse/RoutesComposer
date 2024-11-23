@@ -77,11 +77,6 @@ class UiBuilder(QObject):
             self.tr("Activer la création géométrique en continue")
         )
         self.geom_checkbox.setVisible(False)
-        settings = QSettings()
-        geom_on_fly = settings.value(
-            "routes_composer/geom_on_fly", True, type=bool
-        )
-        self.geom_checkbox.setChecked(geom_on_fly)
         self.geom_checkbox.stateChanged.connect(
             self.dialog.event_handlers.on_geom_on_fly_check
         )
@@ -114,19 +109,13 @@ class UiBuilder(QObject):
 
         layout.addLayout(buttons_layout)
 
-        if QgsProject.instance():
-            self.auto_start_checkbox = QCheckBox(
-                self.tr("Démarrer automatiquement au lancement du projet")
-            )
-            settings = QSettings()
-            auto_start = settings.value(
-                "routes_composer/auto_start", True, type=bool
-            )
-            self.auto_start_checkbox.setChecked(auto_start)
-            self.auto_start_checkbox.stateChanged.connect(
-                self.dialog.event_handlers.on_auto_start_check
-            )
-            layout.addWidget(self.auto_start_checkbox)
+        self.auto_start_checkbox = QCheckBox(
+            self.tr("Démarrer automatiquement au lancement du projet")
+        )
+        self.auto_start_checkbox.stateChanged.connect(
+            self.dialog.event_handlers.on_auto_start_check
+        )
+        layout.addWidget(self.auto_start_checkbox)
 
     def create_action_buttons(self, layout):
         log("r")
@@ -276,7 +265,6 @@ class UiBuilder(QObject):
         self.dialog.adjustSize()
 
     def get_start_button_style(self):
-        log("r")
         # TODO: Mettre le css dans le fichier styles, je n'y suis pas arrivé pour l'instant.
         if not config.script_running:
             return """
