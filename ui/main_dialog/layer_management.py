@@ -164,6 +164,8 @@ class LayerManager(QObject):
                         index
                     )
 
+                self.dialog.advanced_options.update_compositions_attr_combo()
+
             settings = QSettings()
             settings.setValue(
                 "routes_composer/compositions_layer_id", compositions_id
