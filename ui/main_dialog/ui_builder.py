@@ -1,7 +1,6 @@
 """Construct ui for main dialog"""
 
-from qgis.core import QgsProject
-from qgis.PyQt.QtCore import QObject, Qt, QSettings
+from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtWidgets import (
     QCheckBox,
     QComboBox,

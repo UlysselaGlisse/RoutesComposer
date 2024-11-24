@@ -16,7 +16,6 @@ from ...func.utils import log
 
 
 def show_dialog():
-    log("r")
     dialog = RoutesComposerDialog(iface.mainWindow())
     dialog.show()
     return dialog
@@ -51,6 +50,7 @@ class RoutesComposerDialog(QDialog):
             return f.read()
 
     def load_settings(self):
+        log("r")
         project = QgsProject.instance()
         if project:
             settings = QSettings()
@@ -138,10 +138,12 @@ class RoutesComposerDialog(QDialog):
 
     def showEvent(self, a0):
         if a0 is not None:
+            log("r")
             super().showEvent(a0)
-            log("showevent")
             self.ui.segments_combo.blockSignals(True)
             self.ui.compositions_combo.blockSignals(True)
+            self.ui.segments_attr_combo.blockSignals(True)
+            self.ui.compositions_attr_combo.blockSignals(True)
 
             self.layer_manager.refresh_layers_combo(self.ui.segments_combo)
             self.layer_manager.refresh_layers_combo(
@@ -155,7 +157,7 @@ class RoutesComposerDialog(QDialog):
                 self.ui.compositions_combo
             )
 
-            self.advanced_options.update_attr_combos()
-
             self.ui.segments_combo.blockSignals(False)
             self.ui.compositions_combo.blockSignals(False)
+            self.ui.segments_attr_combo.blockSignals(False)
+            self.ui.compositions_attr_combo.blockSignals(False)
