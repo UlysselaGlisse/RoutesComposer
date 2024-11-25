@@ -16,12 +16,19 @@ from ...func.utils import log
 
 
 def show_dialog():
-    dialog = RoutesComposerDialog(iface.mainWindow())
+    dialog = RoutesComposerDialog.get_instance(iface.mainWindow())
     dialog.show()
     return dialog
 
 
 class RoutesComposerDialog(QDialog):
+    _instance = None
+
+    @classmethod
+    def get_instance(cls, parent=None, tool=None):
+        if not cls._instance:
+            cls._instance = cls(parent, tool)
+        return cls._instance
 
     def __init__(self, parent=None, tool=None):
         super().__init__(parent)
@@ -103,6 +110,12 @@ class RoutesComposerDialog(QDialog):
         self.ui.compositions_combo.currentIndexChanged.connect(
             self.layer_manager.on_compositions_layer_selected
         )
+        self.ui.segments_combo.currentIndexChanged.connect(
+            self.event_handlers.stop_running_routes_composer
+        )
+        self.ui.compositions_combo.currentIndexChanged.connect(
+            self.event_handlers.stop_running_routes_composer
+        )
 
         self.ui.segments_attr_combo.currentTextChanged.connect(
             self.advanced_options.on_segments_attr_selected
@@ -129,6 +142,7 @@ class RoutesComposerDialog(QDialog):
     def closeEvent(self, a0):
         if a0 is not None:
             a0.accept()
+            RoutesComposerDialog._instance = None
 
     def reset_ui_state(self):
         log("r")

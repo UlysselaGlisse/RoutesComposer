@@ -1,6 +1,6 @@
 """Layer and field management for RoutesComposerDialog."""
 
-from qgis.core import QgsProject, QgsVectorLayer
+from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes
 from qgis.PyQt.QtCore import QObject, QSettings, Qt
 from ...func.utils import log
 
@@ -131,11 +131,13 @@ class LayerManager(QObject):
                 log(
                     f"Segments layer selected: {self.selected_segments_layer.name()}"
                 )
-
-                if not self.selected_segments_layer.isSpatial():
+                if (
+                    self.selected_segments_layer.geometryType()
+                    != QgsWkbTypes.LineGeometry
+                ):
                     self.dialog.ui.segments_warning_label.setText(
                         self.tr(
-                            "Attention: la couche des segments n'a pas de géométrie"
+                            "Attention: la géométrie de la couche des segments doit être de type ligne"
                         )
                     )
                     self.dialog.ui.segments_warning_label.setVisible(True)

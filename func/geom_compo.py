@@ -88,45 +88,50 @@ class GeomCompo:
                 if i < len(segment_ids) - 1:
                     next_points = segments_points.get(segment_ids[i + 1])
                     if next_points:
-                        # Le premier point touche le segment suivant
-                        if self.points_are_equal(
-                            current_points[0], next_points[0]
-                        ) or self.points_are_equal(
-                            current_points[0], next_points[-1]
-                        ):
-                            # On met tous les points sauf le dernier pour éviter les doublons.
-                            result_points.extend(
-                                reversed(current_points[:-1])
-                            )
                         # Le dernier point touche le segment suivant
-                        elif self.points_are_equal(
+                        if self.points_are_equal(
                             current_points[-1], next_points[0]
                         ) or self.points_are_equal(
                             current_points[-1], next_points[-1]
                         ):
+                            # On met tous les points sauf le dernier pour éviter les doublons.
                             result_points.extend(current_points[:-1])
+
+                            # Le premier point touche le segment suivant
+                        elif self.points_are_equal(
+                            current_points[0], next_points[0]
+                        ) or self.points_are_equal(
+                            current_points[0], next_points[-1]
+                        ):
+                            result_points.extend(
+                                reversed(current_points[:-1])
+                            )
                         else:
-                            # Aucun des points ne touche le segment suivant. On met à l'endroit par défaut.'
+                            # Aucun des points ne touche le segment suivant.
+                            # On met à l'endroit par défaut.'
                             result_points.extend(current_points[:-1])
                             not_connected_segments.append(current_segment_id)
+
                 else:
                     # Le dernier segment de la liste
                     prev_points = segments_points.get(segment_ids[i - 1])
                     if prev_points:
-                        # Le dernier point touche le segment précédent.
-                        if self.points_are_equal(
-                            prev_points[0], current_points[-1]
-                        ) or self.points_are_equal(
-                            prev_points[-1], current_points[-1]
-                        ):
-                            result_points.extend(reversed(current_points))
                         # Le premier point touche le segment précédent.
-                        elif self.points_are_equal(
+                        if self.points_are_equal(
                             prev_points[0], current_points[0]
                         ) or self.points_are_equal(
                             prev_points[-1], current_points[0]
                         ):
                             result_points.extend(current_points)
+
+                        # Le dernier point touche le segment précédent.
+                        elif self.points_are_equal(
+                            prev_points[0], current_points[-1]
+                        ) or self.points_are_equal(
+                            prev_points[-1], current_points[-1]
+                        ):
+                            result_points.extend(reversed(current_points))
+
                         else:
                             # Aucun point ne touche le précédent, par défaut on met à l'endroit.'
                             result_points.extend(current_points)

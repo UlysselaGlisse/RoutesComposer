@@ -1,9 +1,6 @@
 from typing import cast
-from qgis.core import (
-    Qgis,
-    QgsProject,
-    QgsVectorLayer,
-)
+from PyQt5.QtWidgets import QMessageBox
+from qgis.core import Qgis, QgsProject, QgsVectorLayer, QgsWkbTypes
 from qgis.utils import iface
 from qgis.PyQt.QtCore import QCoreApplication, QSettings
 
@@ -11,57 +8,19 @@ from .. import config
 from . import split, geom_compo, utils
 from .utils import log
 
-routes_composer = None
-
-
-def start_routes_composer():
-    global routes_composer
-    try:
-        if routes_composer is None:
-            routes_composer = RoutesComposer()
-        if not config.script_running:
-            routes_composer.connect()
-
-        return routes_composer
-    except Exception as e:
-        print(f"Error starting routes composer: {str(e)}")
-        return None
-
-
-def stop_routes_composer():
-    global routes_composer
-    try:
-        if routes_composer is not None and config.script_running:
-            routes_composer.disconnect()
-            routes_composer = None
-
-    except Exception as e:
-        print(f"Error stopping routes composer: {str(e)}")
-
-
-def start_geom_on_fly():
-    global routes_composer
-    try:
-        if routes_composer is None:
-            routes_composer = RoutesComposer()
-
-        routes_composer.connect_geom()
-
-    except Exception as e:
-        print(f"Error starting geometry on fly: {str(e)}")
-
-
-def stop_geom_on_fly():
-    global routes_composer
-    try:
-        if routes_composer is not None:
-            routes_composer.disconnect_geom()
-    except Exception as e:
-        print(f"Error stopping geometry on fly: {str(e)}")
-
 
 class RoutesComposer:
+    _instance = None
+
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
+
     def __init__(self):
+        if RoutesComposer._instance is not None:
+            raise Exception("Cette classe est un singleton!")
         self.project = QgsProject.instance()
         if not self.project:
             raise Exception(
@@ -99,6 +58,10 @@ class RoutesComposer:
             self.id_column_name,
         )
         self.is_connected = False
+
+    @classmethod
+    def destroy_instance(cls):
+        cls._instance = None
 
     def connect(self):
         try:
@@ -147,7 +110,6 @@ class RoutesComposer:
                 self.id_column_name = None
                 self.id_column_index = None
                 config.script_running = False
-                routes_composer = None
 
                 log("Script has been stopped.", level="INFO")
                 iface.messageBar().pushMessage(
@@ -170,6 +132,8 @@ class RoutesComposer:
     def connect_geom(self):
         """Démarre la création en continue des géométries de compositions."""
         try:
+            if not self.project:
+                return
             geom_on_fly, _ = self.project.readBoolEntry(
                 "routes_composer", "geom_on_fly", False
             )
@@ -178,7 +142,6 @@ class RoutesComposer:
                     self.segments_layer.geometryChanged.connect(
                         self.geometry_changed
                     )
-                    config.geom_on_fly_running = True
                     log("GeomOnFly has started")
         except TypeError:
             log(
@@ -188,13 +151,14 @@ class RoutesComposer:
 
     def disconnect_geom(self):
         try:
-            if self.segments_layer is not None:
+            if self.segments_layer is None:
+                self.destroy_instance()
+            else:
                 self.segments_layer.geometryChanged.disconnect(
                     self.geometry_changed
                 )
-                config.geom_on_fly_running = False
 
-                log("GeomOnFly has been stoped")
+            log("GeomOnFly has been stoped")
 
         except TypeError:
             log(
@@ -206,6 +170,8 @@ class RoutesComposer:
         """Fonction prinicpale. Traite l'ajout d'une nouvelle entité dans la couche segments."""
         # Pendant l'enregistrement: fid >= 0.'
         if fid >= 0:
+            return
+        if self.segments_layer is None or self.compositions_layer is None:
             return
 
         source_feature = self.segments_layer.getFeature(fid)
@@ -235,9 +201,16 @@ class RoutesComposer:
                         segment_id
                     )
                 )
+                if not segments_lists_ids:
+                    QMessageBox.information(
+                        None,
+                        "RoutesComposer",
+                        f"Attention: Le segment {segment_id} n'est dans aucune composition",
+                    )
+                next_id = self.split_manager.get_next_id()
+                self.split_manager.update_segment_id(fid, next_id)
+
                 if segments_lists_ids:
-                    next_id = self.split_manager.get_next_id()
-                    self.split_manager.update_segment_id(fid, next_id)
                     self.split_manager.update_compositions_segments(
                         fid,
                         segment_id,
@@ -253,12 +226,17 @@ class RoutesComposer:
         for fid in fids:
             if fid >= 0:
                 return
+        if self.segments_layer is None or self.compositions_layer is None:
+            return
 
         self.split_manager.clean_invalid_segments()
 
     def geometry_changed(self, fid):
         """Crée la géométrie des compositions lors du changement de la géométrie d'un segment"""
         log(f"Geometry has changed for fid: '{fid}'", level="INFO")
+
+        if self.segments_layer is None or self.compositions_layer is None:
+            return
         source_feature = self.segments_layer.getFeature(fid)
         if not source_feature.isValid() and source_feature.fields().names():
             return
@@ -306,6 +284,8 @@ class RoutesComposer:
         self.compositions_layer.triggerRepaint()
 
     def get_segments_layer(self):
+        if not self.project:
+            return
 
         self.segments_layer_id = self.settings.value(
             "routes_composer/segments_layer_id", ""
@@ -323,6 +303,7 @@ class RoutesComposer:
                 )
             )
             return
+
         if not isinstance(self.segments_layer, QgsVectorLayer):
             raise Exception(
                 QCoreApplication.translate(
@@ -335,7 +316,8 @@ class RoutesComposer:
         return self.segments_layer
 
     def get_compositions_layer(self):
-
+        if not self.project:
+            return
         self.compositions_layer_id = self.settings.value(
             "routes_composer/compositions_layer_id", ""
         )
@@ -365,18 +347,21 @@ class RoutesComposer:
         self.segments_column_name = self.settings.value(
             "routes_composer/segments_column_name", "segments"
         )
-        self.segments_column_index = self.compositions_layer.fields().indexOf(
-            self.segments_column_name
-        )
-        if self.segments_column_index == -1:
-            raise Exception(
-                QCoreApplication.translate(
-                    "RoutesComposer",
-                    "Le champ '{segments_column_name}' n'existe pas dans la couche compositions".format(
-                        segments_column_name=self.segments_column_name
-                    ),
+        if self.compositions_layer is not None:
+            self.segments_column_index = (
+                self.compositions_layer.fields().indexOf(
+                    self.segments_column_name
                 )
             )
+            if self.segments_column_index == -1:
+                raise Exception(
+                    QCoreApplication.translate(
+                        "RoutesComposer",
+                        "Le champ '{segments_column_name}' n'existe pas dans la couche compositions".format(
+                            segments_column_name=self.segments_column_name
+                        ),
+                    )
+                )
 
         return self.segments_column_name, self.segments_column_index
 
@@ -399,9 +384,13 @@ class RoutesComposer:
         return self.id_column_name, self.id_column_index
 
     def on_layer_removed(self, layer_id):
+        if not self.project:
+            return
         if not self.project.mapLayer(
             self.segments_layer_id
         ) or not self.project.mapLayer(self.compositions_layer_id):
-            self.disconnect()
-            if config.geom_on_fly_running:
-                self.disconnect_geom()
+            from ..ui.main_dialog.main import RoutesComposerDialog
+
+            dialog = RoutesComposerDialog.get_instance()
+            if dialog:
+                dialog.event_handlers.stop_running_routes_composer()

@@ -8,6 +8,7 @@ from qgis.core import (
     QgsGeometry,
 )
 from qgis.utils import iface
+from PyQt5.QtCore import QTimer
 from qgis.PyQt.QtWidgets import (
     QDialog,
     QPushButton,
@@ -132,7 +133,7 @@ class ErrorDialog(QDialog):
 
         self.setModal(False)
         self.setup_ui()
-        self.refresh_errors()
+        # self.refresh_errors()
 
     def setup_ui(self):
         """Configure the UI elements for the ErrorDialog."""
@@ -221,7 +222,6 @@ class ErrorDialog(QDialog):
         """
 
     def display_errors(self, errors):
-        """Displays errors in the QTreeWidget."""
         self.error_tree_widget.clear()
         error_types = {}
 
@@ -277,6 +277,9 @@ class ErrorDialog(QDialog):
 
     def on_item_clicked(self, item):
         """Gérer le clic sur un élément de la liste d'erreurs."""
+        if not item.parent():
+            return
+
         error_type = item.parent().text(0)
         detail_text = item.text(1)
 
@@ -315,7 +318,9 @@ class ErrorDialog(QDialog):
                     )
                     transformed_geom = QgsGeometry(feature.geometry())
                     transformed_geom.transform(transform)
-                    iface.mapCanvas().setExtent(transformed_geom.boundingBox())
+                    iface.mapCanvas().setExtent(
+                        transformed_geom.boundingBox()
+                    )
                 else:
                     iface.mapCanvas().setExtent(
                         feature.geometry().boundingBox()

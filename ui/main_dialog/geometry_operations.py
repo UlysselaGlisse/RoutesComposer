@@ -11,6 +11,7 @@ from ...func.geom_compo import GeomCompo
 from ...func.utils import get_features_list
 from ...func.warning import verify_segments
 from ..sub_dialog import ErrorDialog
+from ...func.utils import log
 
 
 class GeometryOperations(QObject):
@@ -166,6 +167,7 @@ class GeometryOperations(QObject):
                 segments_column_name,
                 self.dialog,
             )
+            error_dialog.display_errors(errors_messages)
             error_dialog.show()
 
         self.dialog.adjustSize()
@@ -204,15 +206,16 @@ class GeometryOperations(QObject):
         )
 
         if errors:
-            self.dialog.close()
-            error_dialog = ErrorDialog(
+            self.error_dialog = ErrorDialog(
                 errors,
                 segments_layer,
                 id_column_name,
                 compositions_layer,
                 segments_column_name,
             )
-            error_dialog.show()
+            self.dialog.close()
+            self.error_dialog.refresh_errors()
+            self.error_dialog.show()
         else:
             QMessageBox.information(
                 self.dialog,

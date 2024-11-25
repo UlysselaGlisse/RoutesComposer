@@ -6,13 +6,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
 from . import config
-from .func.routes_composer import (
-    routes_composer,
-    start_routes_composer,
-    start_geom_on_fly,
-    stop_routes_composer,
-    stop_geom_on_fly,
-)
+from .func.routes_composer import RoutesComposer
 from .list_constructor import IDsBasket
 from .ui.main_dialog.main import RoutesComposerDialog
 from .func.utils import log
@@ -43,6 +37,7 @@ class RoutesComposerTool:
             self.translator = QTranslator()
             self.translator.load(locale_path)
             QCoreApplication.installTranslator(self.translator)
+        self.iface.mapCanvas().mapToolSet.connect(self.deactivate_ids_basket)
 
     def initGui(self):
         icon_path = os.path.join(
@@ -77,8 +72,7 @@ class RoutesComposerTool:
         self.actions.append(self.ids_basket_action)
 
     def on_project_load(self):
-        log("r")
-        self.reset_plugin_state()
+        # self.reset_plugin_state()
         project = QgsProject.instance()
         if project:
             auto_start, _ = project.readBoolEntry(
@@ -98,10 +92,29 @@ class RoutesComposerTool:
                 "routes_composer", "geom_on_fly", False
             )
             if auto_start:
-                start_routes_composer()
+                if self.checks_layers():
+                    routes_composer = RoutesComposer.get_instance()
+                    routes_composer.connect()
             if geom_on_fly:
-                start_geom_on_fly()
+                routes_composer = RoutesComposer.get_instance()
+                routes_composer.connect_geom()
+
             self.update_icon()
+
+    def checks_layers(self):
+        project = QgsProject.instance()
+        if project:
+            settings = QSettings()
+            saved_segments_layer_id = settings.value(
+                "routes_composer/segments_layer_id", ""
+            )
+            saved_compositions_layer_id = settings.value(
+                "routes_composer/compositions_layer_id", ""
+            )
+            if not project.mapLayer(
+                saved_segments_layer_id
+            ) or not project.mapLayer(saved_compositions_layer_id):
+                return False
 
     def activate_ids_basket(self):
         project = QgsProject.instance()
@@ -132,15 +145,17 @@ class RoutesComposerTool:
         if self.ids_basket_action.isChecked():
             self.activate_ids_basket()
         else:
-            self.deactivate_ids_basket()
+            self.ids_basket_action.setChecked(False)
 
-    def deactivate_ids_basket(self):
-        self.ids_basket_action.setChecked(False)
+    def deactivate_ids_basket(self, tool):
+        # Vérifie si l'outil activé n'est pas IDsBasket
+        if not isinstance(tool, IDsBasket):
+            self.ids_basket_action.setChecked(False)
 
     def reset_plugin_state(self):
-        if routes_composer:
-            stop_geom_on_fly()
-            stop_routes_composer()
+        routes_composer = RoutesComposer.get_instance()
+        routes_composer.disconnect()
+        routes_composer.destroy_instance()
 
         if self.dialog:
             self.dialog.reset_ui_state()
