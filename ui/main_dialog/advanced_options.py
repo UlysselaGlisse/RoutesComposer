@@ -11,8 +11,6 @@ class AdvancedOptions(QObject):
         self.dialog = dialog
 
     def update_segments_attr_combo(self, segments_layer):
-        log("r")
-
         self.dialog.ui.segments_attr_combo.clear()
         if segments_layer:
             field_names = [field.name() for field in segments_layer.fields()]
@@ -34,8 +32,6 @@ class AdvancedOptions(QObject):
                     )
 
     def update_compositions_attr_combo(self, compositions_layer):
-        log("r")
-
         self.dialog.ui.compositions_attr_combo.clear()
         if compositions_layer:
             field_names = [
@@ -60,8 +56,6 @@ class AdvancedOptions(QObject):
                     )
 
     def on_segments_attr_selected(self):
-        log("r")
-
         if self.dialog.ui.segments_attr_combo.currentText():
             selected_attr = self.dialog.ui.segments_attr_combo.currentText()
             layer = self.dialog.layer_manager.selected_segments_layer
@@ -86,8 +80,6 @@ class AdvancedOptions(QObject):
                         )
 
     def on_compositions_attr_selected(self):
-        log("r")
-
         if self.dialog.ui.compositions_attr_combo.currentText():
             selected_attr = (
                 self.dialog.ui.compositions_attr_combo.currentText()
@@ -114,8 +106,6 @@ class AdvancedOptions(QObject):
                         )
 
     def on_priority_mode_selected(self):
-        log("r")
-
         selected_priority_mode = (
             self.dialog.ui.priority_mode_combo.currentText()
         )
@@ -126,8 +116,6 @@ class AdvancedOptions(QObject):
         log(f"Priority mode selected: {selected_priority_mode}")
 
     def start_attribute_linking(self):
-        log("r")
-
         if (
             not self.dialog.ui.segments_combo.currentData()
             or not self.dialog.ui.compositions_combo.currentData()

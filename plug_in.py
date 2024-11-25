@@ -6,7 +6,13 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
 from . import config
-from .func.routes_composer import start_routes_composer, start_geom_on_fly
+from .func.routes_composer import (
+    routes_composer,
+    start_routes_composer,
+    start_geom_on_fly,
+    stop_routes_composer,
+    stop_geom_on_fly,
+)
 from .list_constructor import IDsBasket
 from .ui.main_dialog.main import RoutesComposerDialog
 from .func.utils import log
@@ -71,6 +77,8 @@ class RoutesComposerTool:
         self.actions.append(self.ids_basket_action)
 
     def on_project_load(self):
+        log("r")
+        self.reset_plugin_state()
         project = QgsProject.instance()
         if project:
             auto_start, _ = project.readBoolEntry(
@@ -128,6 +136,17 @@ class RoutesComposerTool:
 
     def deactivate_ids_basket(self):
         self.ids_basket_action.setChecked(False)
+
+    def reset_plugin_state(self):
+        if routes_composer:
+            stop_geom_on_fly()
+            stop_routes_composer()
+
+        if self.dialog:
+            self.dialog.reset_ui_state()
+            self.dialog.close()
+            self.dialog = None
+            self.update_icon()
 
     def unload(self):
         """Supprime les éléments de l'interface"""

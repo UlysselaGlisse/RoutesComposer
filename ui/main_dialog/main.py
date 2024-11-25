@@ -50,7 +50,7 @@ class RoutesComposerDialog(QDialog):
             return f.read()
 
     def load_settings(self):
-        log("r")
+
         project = QgsProject.instance()
         if project:
             settings = QSettings()
@@ -103,12 +103,6 @@ class RoutesComposerDialog(QDialog):
         self.ui.compositions_combo.currentIndexChanged.connect(
             self.layer_manager.on_compositions_layer_selected
         )
-        self.ui.segments_column_combo.currentTextChanged.connect(
-            self.layer_manager.on_segments_column_selected
-        )
-        self.ui.id_column_combo.currentTextChanged.connect(
-            self.layer_manager.on_id_column_selected
-        )
 
         self.ui.segments_attr_combo.currentTextChanged.connect(
             self.advanced_options.on_segments_attr_selected
@@ -136,9 +130,33 @@ class RoutesComposerDialog(QDialog):
         if a0 is not None:
             a0.accept()
 
+    def reset_ui_state(self):
+        log("r")
+        self.ui.auto_start_checkbox.setChecked(False)
+        self.ui.geom_checkbox.setChecked(False)
+
+        self.ui.segments_combo.setCurrentIndex(-1)
+        self.ui.compositions_combo.setCurrentIndex(-1)
+        self.ui.segments_column_combo.clear()
+        self.ui.id_column_combo.clear()
+        self.ui.segments_attr_combo.clear()
+        self.ui.compositions_attr_combo.clear()
+
+        self.ui.priority_mode_combo.setCurrentIndex(0)
+
+        self.ui.progress_bar.setValue(0)
+        self.ui.progress_bar.setVisible(False)
+
+        self.ui.status_label.setText(self.tr("Status: Arrêté"))
+        self.ui.start_button.setText(self.tr("Démarrer"))
+        self.ui.start_button.setStyleSheet(self.ui.get_start_button_style())
+
+        self.ui.advanced_options_container.setVisible(False)
+        self.ui.toggle_advanced_arrow.setText("▶")
+
     def showEvent(self, a0):
         if a0 is not None:
-            log("r")
+
             super().showEvent(a0)
             self.ui.segments_combo.blockSignals(True)
             self.ui.compositions_combo.blockSignals(True)

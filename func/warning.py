@@ -44,9 +44,6 @@ def verify_segments(
         ):
             continue
         segments_list = [seg.strip() for seg in str(segments_str).split(",")]
-        log(
-            f"Composition {composition.id()} début de traitement pour la liste: {segments_list}"
-        )
 
         for i, current_segment_id in enumerate(segments_list):
             # Pour tous les segments sauf le dernier de la liste (dont la coninuité est vérifié par celle du précédent).
@@ -200,7 +197,9 @@ def highlight_errors(errors, segments_layer, id_column_name):
                 None,
             )
             geom1 = (
-                segment_id1_feature.geometry() if segment_id1_feature else None
+                segment_id1_feature.geometry()
+                if segment_id1_feature
+                else None
             )
 
             segment_id2_feature = next(
@@ -212,21 +211,36 @@ def highlight_errors(errors, segments_layer, id_column_name):
                 None,
             )
             geom2 = (
-                segment_id2_feature.geometry() if segment_id2_feature else None
+                segment_id2_feature.geometry()
+                if segment_id2_feature
+                else None
             )
 
-            if geom1 and geom2 and geom1.isGeosValid() and geom2.isGeosValid():
+            if (
+                geom1
+                and geom2
+                and geom1.isGeosValid()
+                and geom2.isGeosValid()
+            ):
                 feat1 = QgsFeature()
                 feat1.setGeometry(geom1)
                 feat1.setAttributes(
-                    [segment_id1, error["error_type"], error["composition_id"]]
+                    [
+                        segment_id1,
+                        error["error_type"],
+                        error["composition_id"],
+                    ]
                 )
                 features.append(feat1)
 
                 feat2 = QgsFeature()
                 feat2.setGeometry(geom2)
                 feat2.setAttributes(
-                    [segment_id2, error["error_type"], error["composition_id"]]
+                    [
+                        segment_id2,
+                        error["error_type"],
+                        error["composition_id"],
+                    ]
                 )
                 features.append(feat2)
 

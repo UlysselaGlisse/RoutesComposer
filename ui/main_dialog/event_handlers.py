@@ -1,7 +1,7 @@
 """Event handlers for RoutesComposerDialog."""
 
 from qgis.core import QgsProject, Qgis
-from qgis.PyQt.QtCore import QObject
+from qgis.PyQt.QtCore import QObject, QSettings
 from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.utils import iface
 
@@ -22,7 +22,6 @@ class EventHandlers(QObject):
         self.dialog = dialog
 
     def toggle_script(self):
-        log("r")
 
         try:
             if not config.script_running:
@@ -47,6 +46,7 @@ class EventHandlers(QObject):
                     )
                     return
 
+                self.save_selected_layers_and_columns()
                 start_routes_composer()
 
                 if self.dialog.tool:
@@ -63,7 +63,6 @@ class EventHandlers(QObject):
             )
 
     def stop_running_routes_composer(self):
-        log("r")
 
         stop_routes_composer()
         self.dialog.ui.geom_checkbox.setChecked(False)
@@ -73,8 +72,6 @@ class EventHandlers(QObject):
             self.dialog.update_ui_state()
 
     def on_auto_start_check(self, state):
-        log("r")
-
         """Save auto-start checkbox state."""
         project = QgsProject.instance()
         if project:
@@ -82,7 +79,6 @@ class EventHandlers(QObject):
             project.setDirty(True)
 
     def on_geom_on_fly_check(self, state):
-        log("r")
 
         project = QgsProject.instance()
         if project:
@@ -95,14 +91,39 @@ class EventHandlers(QObject):
             else:
                 stop_geom_on_fly()
 
+    def save_selected_layers_and_columns(self):
+        project = QgsProject.instance()
+        if project:
+            settings = QSettings()
+
+            segments_id = self.dialog.ui.segments_combo.currentData()
+            settings.setValue(
+                "routes_composer/segments_layer_id", segments_id
+            )
+
+            compositions_id = self.dialog.ui.compositions_combo.currentData()
+            settings.setValue(
+                "routes_composer/compositions_layer_id", compositions_id
+            )
+
+            id_column = self.dialog.ui.id_column_combo.currentText()
+            settings.setValue("routes_composer/id_column_name", id_column)
+
+            segments_column = (
+                self.dialog.ui.segments_column_combo.currentText()
+            )
+            settings.setValue(
+                "routes_composer/segments_column_name", segments_column
+            )
+
+            project.setDirty(True)
+
     def show_info(self):
-        log("r")
 
         info_dialog = InfoDialog()
         info_dialog.exec_()
 
     def cancel_process(self):
-        log("r")
 
         config.cancel_request = True
         self.dialog.ui.cancel_button.setEnabled(False)

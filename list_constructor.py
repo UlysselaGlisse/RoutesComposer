@@ -14,6 +14,7 @@ from qgis.gui import QgsMapTool
 from qgis.PyQt.QtCore import Qt, QPoint
 from qgis.PyQt.QtGui import QCursor
 from qgis.PyQt.QtWidgets import QLabel
+from .func.utils import log
 
 
 class IDsBasket(QgsMapTool):
@@ -135,6 +136,7 @@ class IDsBasket(QgsMapTool):
             last_id = self.selected_ids.pop()
             self.removed_ids.append(last_id)
             self.layer.removeSelection()
+            self.copy_ids_to_clipboard()
             self.highlight_selected_segments()
             self.update_label()
 
@@ -143,33 +145,62 @@ class IDsBasket(QgsMapTool):
         if self.removed_ids:
             last_removed_id = self.removed_ids.pop()
             self.selected_ids.append(last_removed_id)
+            self.copy_ids_to_clipboard()
             self.highlight_selected_segments()
             self.update_label()
 
     def find_connected_segments(self, start_id, end_id):
         if start_id == end_id:
             return [start_id]
-
+        # Algorithme de Dijkstra
+        distances = {start_id: 0}
+        previous = {}
+        unvisited = {start_id: 0}
         visited = set()
-        queue = [(start_id, [start_id])]
 
-        while queue:
-            current_id, path = queue.pop(0)
+        while unvisited:
+            current_id = min(unvisited, key=unvisited.get)
+            current_distance = unvisited[current_id]
+            log(f"current_distance: {current_distance}")
 
             if current_id == end_id:
-                return path
+                break
 
-            if current_id in visited:
-                continue
-
+            del unvisited[current_id]
             visited.add(current_id)
 
-            for next_id in self.get_connected_segments(current_id):
-                if next_id not in visited:
-                    new_path = path + [next_id]
-                    queue.append((next_id, new_path))
+            for neighbor_id in self.get_connected_segments(current_id):
+                if neighbor_id in visited:
+                    continue
+                log(f"neighbor: {neighbor_id}")
+                neighbor_feature = next(
+                    self.layer.getFeatures(
+                        QgsFeatureRequest().setFilterExpression(
+                            f'"{self.id_column_name}" = {neighbor_id}'
+                        )
+                    )
+                )
+                segment_length = neighbor_feature.geometry().length()
+                new_distance = current_distance + segment_length
+                if (
+                    neighbor_id not in distances
+                    or new_distance < distances[neighbor_id]
+                ):
+                    distances[neighbor_id] = new_distance
+                    unvisited[neighbor_id] = new_distance
+                    previous[neighbor_id] = current_id
 
-        return []
+        if end_id not in previous and start_id != end_id:
+            return []
+
+        path = []
+        current_id = end_id
+        while current_id in previous:
+            path.insert(0, current_id)
+            current_id = previous[current_id]
+        path.insert(0, start_id)
+
+        return path
 
     def get_connected_segments(self, segment_id):
         if segment_id in self.connectivity_cache:
