@@ -94,7 +94,7 @@ class IDsBasket(QgsMapTool):
                     closest_feature = feature
 
             if closest_feature:
-                feature_id = closest_feature[self.id_column_name]
+                feature_id = int(closest_feature[self.id_column_name])
 
                 if not self.selected_ids:
                     self.selected_ids.append(feature_id)
@@ -150,6 +150,9 @@ class IDsBasket(QgsMapTool):
             self.update_label()
 
     def find_connected_segments(self, start_id, end_id):
+        start_id = int(start_id)
+        end_id = int(end_id)
+
         if start_id == end_id:
             return [start_id]
         # Algorithme de Dijkstra
@@ -227,7 +230,7 @@ class IDsBasket(QgsMapTool):
             other_geom = feature.geometry()
 
             if current_geom.touches(other_geom):
-                connected.append(feature[self.id_column_name])
+                connected.append(int(feature[self.id_column_name]))
 
         self.connectivity_cache[segment_id] = connected
         return connected
