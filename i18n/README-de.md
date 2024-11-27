@@ -10,7 +10,7 @@ Alle geografischen Arbeiten werden an den Segmenten ausgeführt. Die Komposition
 
 Die erste Funktion dieses Plugins besteht darin, bei der Teilung eines Segments zu helfen. Wenn das Segment Teil einer oder mehrerer Kompositionen ist, kann es mühsam sein, herauszufinden, in welchen und wo. Das Plugin übernimmt dies für Sie.
 
-![Segmentteilung](https://github.com/user-attachments/assets/82e68484-61c9-49c2-8f8e-dd5668f01f40)
+https://github.com/user-attachments/assets/82e68484-61c9-49c2-8f8e-dd5668f01f40
 
 Im obigen Video sehen Sie eine Reihe von Segmenten auf der Karte und eine Segmentliste am unteren Bildschirmrand. Wenn das Segment 2516 geteilt wird, wird ein neues Segment erstellt, und die Listen der Segmente werden automatisch aktualisiert.
 
