@@ -18,13 +18,13 @@ Im obigen Video sehen Sie eine Reihe von Segmenten auf der Karte und eine Segmen
 
 Sie können direkt über die Plugin-Oberfläche die Geometrien der Kompositionen erstellen, sie aktualisieren, wenn Ihre Ebene bereits welche hat, und sie bei jeder Änderung der Geometrie der Segmente aktualisieren.
 
-![RoutesComposer](https://github.com/user-attachments/assets/33897f19-8f54-49e9-b7ea-8a9dd685000d)
+https://github.com/user-attachments/assets/33897f19-8f54-49e9-b7ea-8a9dd685000d
 
 ## Auswahl
 
 Dieses Plugin wird von einem anderen Tool begleitet, das es ermöglicht, die Segment-IDs direkt auf der Karte auszuwählen. Ein kleiner Algorithmus hilft dabei, Lücken zu schließen, wenn Sie nicht zwei zusammenhängende Segmente auswählen.
 
-![Auswahlwerkzeug](https://github.com/user-attachments/assets/e7506320-665e-49fe-bef8-5ba32d06b17d)
+https://github.com/user-attachments/assets/e7506320-665e-49fe-bef8-5ba32d06b17d
 
 ---
 
