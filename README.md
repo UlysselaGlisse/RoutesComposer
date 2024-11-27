@@ -1,6 +1,6 @@
 # RoutesComposer
 
-This README is also available in [:fr: French](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-en.md) and [:de: German](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-de.md)
+This README is also available in [:fr: French](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-fr.md) and [:de: German](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-de.md)
 
 This QGIS plugin allows you to create routes between two points from a vector network. The most obvious example of a network is that of roads: department road 42 is both a single road and consists of dozens of different sections.
 
