@@ -2,7 +2,7 @@ from typing import cast
 from PyQt5.QtWidgets import QMessageBox
 from qgis.core import Qgis, QgsProject, QgsVectorLayer
 from qgis.utils import iface
-from qgis.PyQt.QtCore import QCoreApplication, QSettings, QObject, QTranslator
+from qgis.PyQt.QtCore import QSettings, QObject, QTranslator
 
 from .. import config
 from . import split, geom_compo
