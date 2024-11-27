@@ -1,4 +1,4 @@
-This README is also available in [:gb: English](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-en.md) and [:de: German](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-de.md)
+This README is also available in [:gb: English](https://github.com/UlysselaGlisse/RoutesComposer/README.md) and [:de: German](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-de.md)
 
 Ce plugin Qgis permet de créer des routes entre deux points à partir d'un réseau de vecteurs.
 L'exemple le plus évident de réseau est celui des routes :
@@ -34,7 +34,7 @@ https://github.com/user-attachments/assets/e7506320-665e-49fe-bef8-5ba32d06b17d
 
 # Installation
 
-* Télécharger ce [fichier](https://github.com/UlysselaGlisse/RoutesComposer/releases/download/v1.0/RoutesComposer.zip)
+* Télécharger ce [fichier](https://github.com/UlysselaGlisse/RoutesComposer/releases/download/v1.1/RoutesComposer.zip)
 * Dans Qgis > Extensions > Installer depuis un ZIP
 * Choisir le fichier zippé.
 * Installer le Plugin.
@@ -52,7 +52,7 @@ _Si jamais le plugin n'apparaît pas, se rendre dans Extensions > Installées > 
 
 ### Usages:
 #### Compositeur de routes
-* Cliquer sur l'icone ![icône](ui/icons/icon.png)
+* Cliquer sur l'icone ![icône](../ui/icons/icon.png)
 * Entrer le nom des deux couches puis du champ de la couche des compositions où se trouve la liste des segments.
 * Démarrer
 * Vous pouvez aussi choisir de laisser tourner ce plugin en permanence en cochant la case correspondante.
@@ -60,7 +60,7 @@ _Si jamais le plugin n'apparaît pas, se rendre dans Extensions > Installées > 
 
 #### Panier à segments
 
-* Cliquer sur l'icone ![icône](ui/icons/ids_basket.png)
+* Cliquer sur l'icone ![icône](../ui/icons/ids_basket.png)
 * Vous verrez apparaître une petite boîte à côté du curseur.
 * Cliquez sur les segments qui vous intéressent. La boîte se remplie.
 * Si vous souhaitez retirer le dernier segment ajouté, appuyez sur Z, E pour le remettre.

@@ -1,4 +1,4 @@
-Dieses README ist auch verfügbar in [:gb: Englisch](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-en.md) und [:de: Deutsch](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-de.md)
+Dieses README ist auch verfügbar in [:fr: French](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-fr.md) und [:de: Deutsch](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-de.md)
 
 Dieses QGIS-Plugin ist hilfreich für diejenigen, die Routen zwischen zwei Punkten aus einem Vektornetzwerk (Linien) erstellen möchten. Das naheliegendste Beispiel für ein Netzwerk sind Straßen: Die D42-Straße ist sowohl eine einzelne Straße als auch aus Dutzenden verschiedener Segmente zusammengesetzt.
 
@@ -10,7 +10,7 @@ Alle geografischen Arbeiten werden an den Segmenten ausgeführt. Die Komposition
 
 Die erste Funktion dieses Plugins besteht darin, bei der Teilung eines Segments zu helfen. Wenn das Segment Teil einer oder mehrerer Kompositionen ist, kann es mühsam sein, herauszufinden, in welchen und wo. Das Plugin übernimmt dies für Sie.
 
-![Segmentteilung](https://github.com/user-attachments/assets/82e68484-61c9-49c2-8f8e-dd5668f01f40)
+https://github.com/user-attachments/assets/82e68484-61c9-49c2-8f8e-dd5668f01f40
 
 Im obigen Video sehen Sie eine Reihe von Segmenten auf der Karte und eine Segmentliste am unteren Bildschirmrand. Wenn das Segment 2516 geteilt wird, wird ein neues Segment erstellt, und die Listen der Segmente werden automatisch aktualisiert.
 
@@ -18,19 +18,19 @@ Im obigen Video sehen Sie eine Reihe von Segmenten auf der Karte und eine Segmen
 
 Sie können direkt über die Plugin-Oberfläche die Geometrien der Kompositionen erstellen, sie aktualisieren, wenn Ihre Ebene bereits welche hat, und sie bei jeder Änderung der Geometrie der Segmente aktualisieren.
 
-![RoutesComposer](https://github.com/user-attachments/assets/33897f19-8f54-49e9-b7ea-8a9dd685000d)
+![interface](https://github.com/user-attachments/assets/33897f19-8f54-49e9-b7ea-8a9dd685000d)
 
 ## Auswahl
 
 Dieses Plugin wird von einem anderen Tool begleitet, das es ermöglicht, die Segment-IDs direkt auf der Karte auszuwählen. Ein kleiner Algorithmus hilft dabei, Lücken zu schließen, wenn Sie nicht zwei zusammenhängende Segmente auswählen.
 
-![Auswahlwerkzeug](https://github.com/user-attachments/assets/e7506320-665e-49fe-bef8-5ba32d06b17d)
+https://github.com/user-attachments/assets/e7506320-665e-49fe-bef8-5ba32d06b17d
 
 ---
 
 # Installation
 
-* Laden Sie diese [Datei](https://github.com/UlysselaGlisse/RoutesComposer/releases/download/v1.0/RoutesComposer.zip) herunter
+* Laden Sie diese [Datei](https://github.com/UlysselaGlisse/RoutesComposer/releases/download/v1.1/RoutesComposer.zip) herunter
 * In QGIS > Plugins > Aus ZIP installieren
 * Wählen Sie die gezippte Datei aus.
 * Installieren Sie das Plugin.
