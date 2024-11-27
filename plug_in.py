@@ -156,7 +156,7 @@ class RoutesComposerTool:
 
     def reset_plugin_state(self):
         routes_composer = RoutesComposer.get_instance()
-        routes_composer.disconnect()
+        routes_composer.disconnect_routes_composer()
         routes_composer.destroy_instance()
 
         if self.dialog:

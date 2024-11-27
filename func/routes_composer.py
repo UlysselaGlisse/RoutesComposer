@@ -2,34 +2,32 @@ from typing import cast
 from PyQt5.QtWidgets import QMessageBox
 from qgis.core import Qgis, QgsProject, QgsVectorLayer
 from qgis.utils import iface
-from qgis.PyQt.QtCore import QCoreApplication, QSettings
+from qgis.PyQt.QtCore import QCoreApplication, QSettings, QObject, QTranslator
 
 from .. import config
 from . import split, geom_compo
 from .utils import log
 
 
-class RoutesComposer:
+class RoutesComposer(QObject):
     _instance = None
 
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls, parent=None):
         if cls._instance is None:
             cls._instance = cls()
         return cls._instance
 
-    def __init__(self):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         if RoutesComposer._instance is not None:
             raise Exception("Une instance de cette classe existe déjà.")
         self.project = QgsProject.instance()
         if not self.project:
-            raise Exception(
-                QCoreApplication.translate(
-                    "RoutesComposer", "Aucun projet QGIS n'est ouvert"
-                )
-            )
+            raise Exception(self.tr("Aucun projet QGIS n'est ouvert"))
         # self.project.layerRemoved.connect(self.on_layer_removed)
         self.settings = QSettings()
+        self.translator = QTranslator()
 
         self.segments_layer = self.get_segments_layer()
         self.compositions_layer = self.get_compositions_layer()
@@ -149,8 +147,7 @@ class RoutesComposer:
                 log("Script has started", level="INFO")
                 iface.messageBar().pushMessage(
                     "Info",
-                    QCoreApplication.translate(
-                        "RoutesComposer",
+                    self.tr(
                         "Le suivi par RoutesComposer a démarré",
                     ),
                     level=Qgis.MessageLevel.Info,
@@ -159,13 +156,13 @@ class RoutesComposer:
 
         except Exception as e:
             iface.messageBar().pushMessage(
-                QCoreApplication.translate("RoutesComposer", "Erreur"),
+                self.tr("Erreur"),
                 str(e),
                 level=Qgis.MessageLevel.Critical,
             )
             return False
 
-    def disconnect(self):
+    def disconnect_routes_composer(self):
         try:
             if self.segments_layer is not None and self.is_connected:
                 self.segments_layer.featureAdded.disconnect(
@@ -187,8 +184,7 @@ class RoutesComposer:
                 log("Script has been stopped.", level="INFO")
                 iface.messageBar().pushMessage(
                     "Info",
-                    QCoreApplication.translate(
-                        "RoutesComposer",
+                    self.tr(
                         "Le suivi par RoutesComposer est arrêté",
                     ),
                     level=Qgis.MessageLevel.Info,
@@ -197,7 +193,7 @@ class RoutesComposer:
                 log("Segments layer is None or is_connect is false.")
         except Exception as e:
             iface.messageBar().pushMessage(
-                QCoreApplication.translate("RoutesComposer", "Erreur"),
+                self.tr("Erreur"),
                 str(e),
                 level=Qgis.MessageLevel.Critical,
             )
@@ -253,8 +249,7 @@ class RoutesComposer:
         )
         if self.segments_layer is None:
             raise Exception(
-                QCoreApplication.translate(
-                    "RoutesComposer",
+                self.tr(
                     "Veuillez sélectionner une couche de segments valide",
                 )
             )
@@ -262,8 +257,7 @@ class RoutesComposer:
 
         if not isinstance(self.segments_layer, QgsVectorLayer):
             raise Exception(
-                QCoreApplication.translate(
-                    "RoutesComposer",
+                self.tr(
                     "La couche de segments n'est pas une couche vectorielle valide",
                 )
             )
@@ -284,15 +278,13 @@ class RoutesComposer:
         )
         if self.compositions_layer is None:
             raise Exception(
-                QCoreApplication.translate(
-                    "RoutesComposer",
+                self.tr(
                     "Veuillez sélectionner une couche de compositions valide",
                 )
             )
         if not isinstance(self.compositions_layer, QgsVectorLayer):
             raise Exception(
-                QCoreApplication.translate(
-                    "RoutesComposer",
+                self.tr(
                     "La couche de compositions n'est pas une couche vectorielle valide",
                 )
             )
@@ -312,8 +304,7 @@ class RoutesComposer:
 
             if self.segments_column_index == -1:
                 raise Exception(
-                    QCoreApplication.translate(
-                        "RoutesComposer",
+                    self.tr(
                         "Le champ '{segments_column_name}' n'existe pas dans la couche compositions".format(
                             segments_column_name=self.segments_column_name
                         ),
@@ -332,8 +323,7 @@ class RoutesComposer:
             )
         if self.id_column_index == -1:
             raise Exception(
-                QCoreApplication.translate(
-                    "RoutesComposer",
+                self.tr(
                     f"Le champ {self.id_column_name} n'a pas été trouvé dans la couche segments",
                 )
             )

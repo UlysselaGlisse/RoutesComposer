@@ -53,8 +53,7 @@ class EventHandlers(QObject):
 
         routes_composer = RoutesComposer.get_instance()
         if routes_composer.is_connected:
-            routes_composer.disconnect()
-            routes_composer.disconnect()
+            routes_composer.disconnect_routes_composer()
             routes_composer.destroy_instance()
 
             if self.dialog.tool:
