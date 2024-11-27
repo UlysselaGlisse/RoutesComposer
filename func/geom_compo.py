@@ -2,19 +2,15 @@
 
 from collections import defaultdict
 import math
-import os
 from typing import List, Tuple
 from qgis.core import (
     QgsApplication,
-    QgsCoordinateReferenceSystem,
     QgsFeature,
     QgsGeometry,
     QgsLineString,
     QgsPoint,
     QgsProject,
-    QgsVectorFileWriter,
     QgsVectorLayer,
-    QgsWkbTypes,
 )
 from .. import config
 from ..func.utils import get_features_list, log

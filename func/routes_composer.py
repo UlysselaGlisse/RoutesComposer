@@ -1,12 +1,11 @@
 from typing import cast
 from PyQt5.QtWidgets import QMessageBox
 from qgis.core import Qgis, QgsProject, QgsVectorLayer
-from qgis.core.additions.qgsfunction import QgsFeatureRequest
 from qgis.utils import iface
 from qgis.PyQt.QtCore import QCoreApplication, QSettings
 
 from .. import config
-from . import split, geom_compo, utils
+from . import split, geom_compo
 from .utils import log
 
 

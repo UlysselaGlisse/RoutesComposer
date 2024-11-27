@@ -1,5 +1,3 @@
-from posix import replace
-
 """Handle geometries operation of the main dialog"""
 
 from qgis.PyQt.QtCore import QObject

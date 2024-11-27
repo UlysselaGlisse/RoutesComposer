@@ -214,7 +214,9 @@ class LayerManager(QObject):
             )
             return False
 
-        if self.segments_layer.geometryType() != QgsWkbTypes.LineGeometry:
+        if (
+            self.segments_layer.geometryType() != QgsWkbTypes.LineGeometry  # type: ignore
+        ):  # ignore
             if message_type == "box":
                 QMessageBox.warning(
                     self.dialog,

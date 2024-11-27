@@ -10,10 +10,8 @@ from qgis.PyQt.QtWidgets import (
     QProgressBar,
     QPushButton,
     QVBoxLayout,
-    QWidget,
 )
 from ... import config
-from ...func.utils import log
 
 
 class UiBuilder(QObject):
@@ -192,7 +190,7 @@ class UiBuilder(QObject):
         self.advanced_options_container = QGroupBox()
         self.advanced_options_container.setLayout(QVBoxLayout())
         self.advanced_group = self.create_advanced_group()
-        self.advanced_options_container.layout().addWidget(
+        self.advanced_options_container.layout().addWidget(  # type: ignore
             self.advanced_group
         )
         self.advanced_options_container.setVisible(False)

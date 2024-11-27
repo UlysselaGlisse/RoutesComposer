@@ -14,7 +14,6 @@ from qgis.gui import QgsMapTool
 from qgis.PyQt.QtCore import Qt, QPoint
 from qgis.PyQt.QtGui import QCursor
 from qgis.PyQt.QtWidgets import QLabel
-from .func.utils import log
 
 
 class IDsBasket(QgsMapTool):
@@ -28,7 +27,7 @@ class IDsBasket(QgsMapTool):
         self.removed_ids = []
         self.canvas = canvas
 
-        self.setCursor(QCursor(Qt.PointingHandCursor))
+        self.setCursor(QCursor(Qt.PointingHandCursor))  # type: ignore
         self.label = QLabel(self.canvas)
         self.label.setText("")
         self.label.setStyleSheet(
@@ -60,14 +59,14 @@ class IDsBasket(QgsMapTool):
     def canvasReleaseEvent(self, e):
         if not e:
             return
-        if e.button() == Qt.RightButton:
+        if e.button() == Qt.RightButton:  # type: ignore
             self.selected_ids.clear()
             self.layer.removeSelection()
             self.update_label()
 
             return
 
-        if e.button() == Qt.LeftButton:
+        if e.button() == Qt.LeftButton:  # type: ignore
             click_point = self.toMapCoordinates(e.pos())
             transformed_point = self.transform.transform(click_point)
 
@@ -125,9 +124,9 @@ class IDsBasket(QgsMapTool):
     def keyPressEvent(self, e):
         if not e:
             return
-        if e.key() == Qt.Key_Z:
+        if e.key() == Qt.Key_Z:  # type: ignore
             self.remove_last_segment()
-        elif e.key() == Qt.Key_E:
+        elif e.key() == Qt.Key_E:  # type: ignore
             self.restore_last_removed_segment()
 
     def remove_last_segment(self):

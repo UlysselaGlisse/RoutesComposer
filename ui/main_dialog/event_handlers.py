@@ -1,7 +1,7 @@
 """Event handlers for RoutesComposerDialog."""
 
 from qgis.core import QgsProject, Qgis
-from qgis.PyQt.QtCore import QObject, QSettings
+from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.utils import iface
 
@@ -9,7 +9,6 @@ from ... import config
 from ...func.routes_composer import RoutesComposer
 
 from ..sub_dialog import InfoDialog
-from ...func.utils import log
 
 
 class EventHandlers(QObject):

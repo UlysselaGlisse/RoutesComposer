@@ -12,7 +12,6 @@ from .event_handlers import EventHandlers
 from .geometry_operations import GeometryOperations
 from .layer_management import LayerManager
 from .ui_builder import UiBuilder
-from ...func.utils import log
 
 
 def show_dialog():
