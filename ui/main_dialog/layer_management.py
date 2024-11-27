@@ -17,6 +17,8 @@ class LayerManager(QObject):
     def __init__(self, dialog):
         super().__init__(dialog)
         self.dialog = dialog
+        self.segments_manager = None
+        self.compositions_layer = None
 
     def refresh_layers_combo(self, combo):
         combo.clear()

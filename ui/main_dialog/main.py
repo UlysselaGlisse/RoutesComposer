@@ -115,6 +115,9 @@ class RoutesComposerDialog(QDialog):
         self.ui.compositions_combo.currentIndexChanged.connect(
             self.event_handlers.stop_running_routes_composer
         )
+        self.ui.geom_checkbox.stateChanged.connect(
+            self.event_handlers.on_geom_on_fly_check
+        )
 
         self.ui.segments_attr_combo.currentTextChanged.connect(
             self.advanced_options.on_segments_attr_selected
@@ -168,7 +171,6 @@ class RoutesComposerDialog(QDialog):
 
     def showEvent(self, a0):
         if a0 is not None:
-
             super().showEvent(a0)
             self.ui.segments_combo.blockSignals(True)
             self.ui.compositions_combo.blockSignals(True)

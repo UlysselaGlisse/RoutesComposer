@@ -75,9 +75,6 @@ class UiBuilder(QObject):
             self.tr("Activer la création géométrique en continue")
         )
         self.geom_checkbox.setVisible(False)
-        self.geom_checkbox.stateChanged.connect(
-            self.dialog.event_handlers.on_geom_on_fly_check
-        )
 
         layers_layout.addWidget(self.geom_checkbox)
         layers_group.setLayout(layers_layout)
