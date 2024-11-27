@@ -200,6 +200,15 @@ class UiBuilder(QObject):
         advanced_group = QGroupBox(
             self.tr("Lier les attributs de deux couches:")
         )
+        advanced_group.setToolTip(
+            self.tr(
+                "Permet de donner la valeur de l'attribut de la composition aux segments qu'elle contient.<br><br>"
+                "<strong>Exemple :</strong><br>"
+                "Si la route composée des segments 1, 2 et 3 est de difficulté 8, "
+                "alors l'attribut 'difficulté' des segments "
+                "1, 2 et 3 sera mis à jour pour devenir 8."
+            )
+        )
         advanced_layout = QVBoxLayout()
 
         self.compositions_attr_combo = QComboBox()
@@ -247,6 +256,15 @@ class UiBuilder(QObject):
         combo = QComboBox()
         combo.addItems(
             [self.tr("none"), self.tr("min_value"), self.tr("max_value")]
+        )
+        combo.setToolTip(
+            self.tr(
+                "Sélectionnez le mode de priorité pour le lien des attributs.<br>"
+                "<strong>Options disponibles:</strong><br>"
+                "- <em>none</em>: Pas de priorité.<br>"
+                "- <em>min_value</em>: Prioriser la valeur minimale.<br>"
+                "- <em>max_value</em>: Prioriser la valeur maximale."
+            )
         )
         return combo
 

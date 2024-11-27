@@ -770,39 +770,49 @@ These will appear in the Python console of QGIS.
         <translation>Link attributes of two layers:</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/ui_builder.py" line="210"/>
+        <location filename="../ui/main_dialog/ui_builder.py" line="219"/>
         <source>Mettre à jour les attributs</source>
         <translation>Update attributes</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/ui_builder.py" line="227"/>
+        <location filename="../ui/main_dialog/ui_builder.py" line="236"/>
         <source>Attribut compositions:</source>
         <translation>Attribute compositions:</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/ui_builder.py" line="234"/>
+        <location filename="../ui/main_dialog/ui_builder.py" line="243"/>
         <source>Attribut segments:</source>
         <translation>Attribute segments:</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/ui_builder.py" line="239"/>
+        <location filename="../ui/main_dialog/ui_builder.py" line="248"/>
         <source>Priorité:</source>
         <translation>Priority:</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/ui_builder.py" line="248"/>
+        <location filename="../ui/main_dialog/ui_builder.py" line="257"/>
         <source>none</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/ui_builder.py" line="248"/>
+        <location filename="../ui/main_dialog/ui_builder.py" line="257"/>
         <source>min_value</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/ui_builder.py" line="248"/>
+        <location filename="../ui/main_dialog/ui_builder.py" line="257"/>
         <source>max_value</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="203"/>
+        <source>Permet de donner la valeur de l&apos;attribut de la composition aux segments qu&apos;elle contient.&lt;br&gt;&lt;br&gt;&lt;strong&gt;Exemple :&lt;/strong&gt;&lt;br&gt;Si la route composée des segments 1, 2 et 3 est de difficulté 8, alors l&apos;attribut &apos;difficulté&apos; des segments 1, 2 et 3 sera mis à jour pour devenir 8.</source>
+        <translation>Allows assigning the value of the composition&apos;s attribute to the segments it contains.&lt;br&gt;&lt;br&gt;&lt;strong&gt;Example:&lt;/strong&gt;&lt;br&gt;If the road composed of segments 1, 2, and 3 has a difficulty of 8, then the &apos;difficulty&apos; attribute of segments 1, 2, and 3 will be updated to become 8.</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="260"/>
+        <source>Sélectionnez le mode de priorité pour le lien des attributs.&lt;br&gt;&lt;strong&gt;Options disponibles:&lt;/strong&gt;&lt;br&gt;- &lt;em&gt;none&lt;/em&gt;: Pas de priorité.&lt;br&gt;- &lt;em&gt;min_value&lt;/em&gt;: Prioriser la valeur minimale.&lt;br&gt;- &lt;em&gt;max_value&lt;/em&gt;: Prioriser la valeur maximale.</source>
+        <translation>Select the priority mode for linking attributes.&lt;br&gt;&lt;strong&gt;Available options:&lt;/strong&gt;&lt;br&gt;- &lt;em&gt;none&lt;/em&gt;: No priority.&lt;br&gt;- &lt;em&gt;min_value&lt;/em&gt;: Prioritize the minimum value.&lt;br&gt;- &lt;em&gt;max_value&lt;/em&gt;: Prioritize the maximum value.</translation>
     </message>
 </context>
 <context>

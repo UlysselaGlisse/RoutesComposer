@@ -522,38 +522,48 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/ui_builder.py" line="210"/>
+        <location filename="../ui/main_dialog/ui_builder.py" line="219"/>
         <source>Mettre à jour les attributs</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/ui_builder.py" line="227"/>
+        <location filename="../ui/main_dialog/ui_builder.py" line="236"/>
         <source>Attribut compositions:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/ui_builder.py" line="234"/>
+        <location filename="../ui/main_dialog/ui_builder.py" line="243"/>
         <source>Attribut segments:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/ui_builder.py" line="239"/>
+        <location filename="../ui/main_dialog/ui_builder.py" line="248"/>
         <source>Priorité:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/ui_builder.py" line="248"/>
+        <location filename="../ui/main_dialog/ui_builder.py" line="257"/>
         <source>none</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/ui_builder.py" line="248"/>
+        <location filename="../ui/main_dialog/ui_builder.py" line="257"/>
         <source>min_value</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/ui_builder.py" line="248"/>
+        <location filename="../ui/main_dialog/ui_builder.py" line="257"/>
         <source>max_value</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="203"/>
+        <source>Permet de donner la valeur de l&apos;attribut de la composition aux segments qu&apos;elle contient.&lt;br&gt;&lt;br&gt;&lt;strong&gt;Exemple :&lt;/strong&gt;&lt;br&gt;Si la route composée des segments 1, 2 et 3 est de difficulté 8, alors l&apos;attribut &apos;difficulté&apos; des segments 1, 2 et 3 sera mis à jour pour devenir 8.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="260"/>
+        <source>Sélectionnez le mode de priorité pour le lien des attributs.&lt;br&gt;&lt;strong&gt;Options disponibles:&lt;/strong&gt;&lt;br&gt;- &lt;em&gt;none&lt;/em&gt;: Pas de priorité.&lt;br&gt;- &lt;em&gt;min_value&lt;/em&gt;: Prioriser la valeur minimale.&lt;br&gt;- &lt;em&gt;max_value&lt;/em&gt;: Prioriser la valeur maximale.</source>
         <translation></translation>
     </message>
 </context>
