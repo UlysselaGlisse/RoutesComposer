@@ -1,4 +1,4 @@
-Dieses README ist auch verfügbar in [:gb: Englisch](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-en.md) und [:de: Deutsch](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-de.md)
+Dieses README ist auch verfügbar in [:fr: French](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-fr.md) und [:de: Deutsch](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-de.md)
 
 Dieses QGIS-Plugin ist hilfreich für diejenigen, die Routen zwischen zwei Punkten aus einem Vektornetzwerk (Linien) erstellen möchten. Das naheliegendste Beispiel für ein Netzwerk sind Straßen: Die D42-Straße ist sowohl eine einzelne Straße als auch aus Dutzenden verschiedener Segmente zusammengesetzt.
 
@@ -30,7 +30,7 @@ Dieses Plugin wird von einem anderen Tool begleitet, das es ermöglicht, die Seg
 
 # Installation
 
-* Laden Sie diese [Datei](https://github.com/UlysselaGlisse/RoutesComposer/releases/download/v1.0/RoutesComposer.zip) herunter
+* Laden Sie diese [Datei](https://github.com/UlysselaGlisse/RoutesComposer/releases/download/v1.1/RoutesComposer.zip) herunter
 * In QGIS > Plugins > Aus ZIP installieren
 * Wählen Sie die gezippte Datei aus.
 * Installieren Sie das Plugin.
