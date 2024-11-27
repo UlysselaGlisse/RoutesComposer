@@ -628,7 +628,7 @@ Diese erscheinen in der Python-Konsole von QGIS.</translation>
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="68"/>
         <source>Liste:</source>
-        <translation>Liste:</translation>
+        <translation type="obsolete">Liste:</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="74"/>
@@ -724,6 +724,11 @@ Diese erscheinen in der Python-Konsole von QGIS.</translation>
         <location filename="../ui/main_dialog/ui_builder.py" line="257"/>
         <source>Sélectionnez le mode de priorité pour le lien des attributs.&lt;br&gt;&lt;strong&gt;Options disponibles:&lt;/strong&gt;&lt;br&gt;- &lt;em&gt;none&lt;/em&gt;: Pas de priorité.&lt;br&gt;- &lt;em&gt;min_value&lt;/em&gt;: Prioriser la valeur minimale.&lt;br&gt;- &lt;em&gt;max_value&lt;/em&gt;: Prioriser la valeur maximale.</source>
         <translation>Wählen Sie den Prioritätsmodus für die Verknüpfung der Attribute aus.&lt;br&gt;&lt;strong&gt;Verfügbare Optionen:&lt;/strong&gt;&lt;br&gt;- &lt;em&gt;none&lt;/em&gt;: Keine Priorität.&lt;br&gt;- &lt;em&gt;min_value&lt;/em&gt;: Minimale Priorität.&lt;br&gt;- &lt;em&gt;max_value&lt;/em&gt;: Maximale Priorität.</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="68"/>
+        <source>Liste d&apos;ids:</source>
+        <translation>Liste von IDs:</translation>
     </message>
 </context>
 <context>

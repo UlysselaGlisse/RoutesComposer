@@ -507,11 +507,6 @@
         <translation>Couche compositions:</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/ui_builder.py" line="68"/>
-        <source>Liste:</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="74"/>
         <source>Activer la création géométrique en continue</source>
         <translation>Activer la création géométrique en continue</translation>
@@ -604,6 +599,11 @@
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="257"/>
         <source>Sélectionnez le mode de priorité pour le lien des attributs.&lt;br&gt;&lt;strong&gt;Options disponibles:&lt;/strong&gt;&lt;br&gt;- &lt;em&gt;none&lt;/em&gt;: Pas de priorité.&lt;br&gt;- &lt;em&gt;min_value&lt;/em&gt;: Prioriser la valeur minimale.&lt;br&gt;- &lt;em&gt;max_value&lt;/em&gt;: Prioriser la valeur maximale.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="68"/>
+        <source>Liste d&apos;ids:</source>
         <translation></translation>
     </message>
 </context>

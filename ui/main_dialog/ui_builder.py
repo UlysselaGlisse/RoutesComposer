@@ -65,7 +65,7 @@ class UiBuilder(QObject):
         compositions_layout.addWidget(self.compositions_combo)
 
         self.segments_column_combo = QComboBox()
-        compositions_layout.addWidget(QLabel(self.tr("Liste:")))
+        compositions_layout.addWidget(QLabel(self.tr("Liste d'ids:")))
         compositions_layout.addWidget(self.segments_column_combo)
         self.segments_column_combo.setMaximumWidth(max_combo_width)
 
