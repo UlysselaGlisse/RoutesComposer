@@ -18,7 +18,7 @@ Im obigen Video sehen Sie eine Reihe von Segmenten auf der Karte und eine Segmen
 
 Sie können direkt über die Plugin-Oberfläche die Geometrien der Kompositionen erstellen, sie aktualisieren, wenn Ihre Ebene bereits welche hat, und sie bei jeder Änderung der Geometrie der Segmente aktualisieren.
 
-https://github.com/user-attachments/assets/33897f19-8f54-49e9-b7ea-8a9dd685000d
+![interface](https://github.com/user-attachments/assets/33897f19-8f54-49e9-b7ea-8a9dd685000d)
 
 ## Auswahl
 
