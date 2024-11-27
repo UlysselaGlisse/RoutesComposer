@@ -56,8 +56,8 @@ class ErrorDialog(QDialog):
         # Bouton d'actualisation
         refresh_button = QPushButton()
         refresh_button.setIcon(
-            QtWidgets.QApplication.style().standardIcon(
-                QtWidgets.QStyle.SP_BrowserReload
+            QtWidgets.QApplication.style().standardIcon(  # type: ignore
+                QtWidgets.QStyle.SP_BrowserReload  # type: ignore
             )
         )
         refresh_button.setToolTip(self.tr("Rafraîchir les erreurs"))
