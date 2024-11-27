@@ -1,81 +1,63 @@
+# RoutesComposer
+
 This README is also available in [:gb: English](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-en.md) and [:de: German](https://github.com/UlysselaGlisse/RoutesComposer/blob/main/i18n/README-de.md)
 
+This QGIS plugin allows you to create routes between two points from a vector network. The most obvious example of a network is that of roads: department road 42 is both a single road and consists of dozens of different sections.
 
-
-Ce plugin Qgis sera utile à ceux qui souhaitent créer des routes entre deux points à partir d'un réseau de vecteurs (de lignes).
-L'exemple le plus évident de réseau est celui des routes :
-la départementale 42 est à la fois une seule route et est composée de dizaines de sections différentes.
-
-Les sections sont dans le plugin des segments, et la départementale correspond à une composition.
-
-Tout le travail géographique s'effectue sur les segments. Les compositions ne possèdent que des attributs et une liste avec les identifiants des segments.
+The sections are segments in the plugin, while the department road corresponds to a composition. All geographical work is done on the segments. Compositions only have attributes and a list containing the identifiers of the segments.
 
 ## Division
 
-La première fonction de ce plugin est d'aider au moment de la division d'un segment.
-Si le segment fait partie d'une ou plusieurs compositions, il est pénible d'aller chercher dans lesquelles et à quel endroit.
-Le plugin s'occupe de cela à votre place.
+The first function of this plugin is to assist when dividing a segment. If the segment is part of one or more compositions, it can be cumbersome to find in which ones and at what location. The plugin takes care of this for you.
 
 https://github.com/user-attachments/assets/82e68484-61c9-49c2-8f8e-dd5668f01f40
 
-Dans la vidéo ci-dessus, vous pouvez voir un ensemble de segments sur la carte et une liste de segments en bas de l'écran. Lorsque le segment 2516 est divisé, un nouveau segment est créé et les listes de segments sont automatiquement mises-à-jour.
+In the video above, you can see a set of segments on the map and a list of segments at the bottom of the screen. When segment 2516 is divided, a new segment is created, and the lists of segments are automatically updated.
 
-## Création de géométries et erreurs:
+## Creating Geometries and Errors:
 
-Vous pourrez directement depuis l'interface du plugin créer les géométries des compositions, les mettre à jour si votre couche en possède déjà et les mettre à jour à chaque modification de la géométrie des segments.
+You will be able to directly create the geometries of compositions from the plugin interface, update them if your layer already has them, and refresh them with each modification of the segment geometries.
 
 ![RoutesComposer](https://github.com/user-attachments/assets/33897f19-8f54-49e9-b7ea-8a9dd685000d)
 
+## Selection
 
-## Sélection
-
-Ce plugin est accompagné d'un autre outil, permettant de sélectionner les ids des segments directement sur la carte. Un petit algorithme permet de boucher les trous si l'on ne sélectionne pas deux segments contigus.
+This plugin is accompanied by another tool that allows you to select the IDs of segments directly on the map. A small algorithm fills in the gaps if two contiguous segments are not selected.
 
 https://github.com/user-attachments/assets/e7506320-665e-49fe-bef8-5ba32d06b17d
 
-
-
-
-
-
-
 # Installation
 
-* Télécharger ce [fichier](https://github.com/UlysselaGlisse/RoutesComposer/releases/download/v1.0/RoutesComposer.zip)
-* Dans Qgis > Extensions > Installer depuis un ZIP
-* Choisir le fichier zippé.
-* Installer le Plugin.
+* Download this [file](https://github.com/UlysselaGlisse/RoutesComposer/releases/download/v1.0/RoutesComposer.zip).
+* In QGIS > Plugins > Install from ZIP.
+* Choose the zipped file.
+* Install the Plugin.
 
-_Si jamais le plugin n'apparaît pas, se rendre dans Extensions > Installées > Cocher l'icone du plugin._
+*If the plugin does not appear, go to Plugins > Installed > Check the plugin icon.*
 
 ---
 
-# Utilisation
-### Prérequis:
-* Deux couches sont requises en entrée, une pour les segments et une autre pour les compositions.
-* Les couches peuvent être de n'importe quel format (GeoPackage, Postgresql, shp, geojson, ...).
-* Elles peuvent avoir le nom que vous souhaitez
-* La seule chose nécessaire est que le champ contenant la liste de segments soit de type string et que la couche des segments ait un champ nommé "id" - celui avec lequel vous construisez vos compositions.
+# Usage
+### Prerequisites:
+* Two input layers are required, one for segments and another for compositions.
+* The layers can be in any format (GeoPackage, PostgreSQL, shp, geojson, ...).
+* They can have any name you want.
+* The only requirement is that the field containing the segment list must be of type string, and the segment layer must have a field named "id" - the one used to build your compositions.
 
-### Usages:
-#### Compositeur de routes
-* Cliquer sur l'icone ![icône](ui/icons/icon.png)
-* Entrer le nom des deux couches puis du champ de la couche des compositions où se trouve la liste des segments.
-* Démarrer
-* Vous pouvez aussi choisir de laisser tourner ce plugin en permanence en cochant la case correspondante.
+### Uses:
+#### Route Composer
+* Click on the icon ![icon](ui/icons/icon.png).
+* Enter the names of the two layers and the field of the composition layer where the list of segments is located.
+* Start.
+* You may also choose to have this plugin run continuously by checking the corresponding box.
 
+#### Segment Basket
+* Click on the icon ![icon](ui/icons/ids_basket.png).
+* A small box will appear next to the cursor.
+* Click on the segments you are interested in. The box will fill up.
+* If you want to remove the last added segment, press Z, E to restore it.
+* To empty the box, right-click.
+* Segments are copied to the clipboard with each addition. You just have to paste them where needed.
 
-#### Panier à segments
-
-* Cliquer sur l'icone ![icône](ui/icons/ids_basket.png)
-* Vous verrez apparaître une petite boîte à côté du curseur.
-* Cliquez sur les segments qui vous intéressent. La boîte se remplie.
-* Si vous souhaitez retirer le dernier segment ajouté, appuyez sur Z, E pour le remettre.
-* Pour vider la boite, faites un clique-droit
-* Les segments sont copiés dans le presse-papier à chaque ajout. Vous n'avez qu'à les coller là où il le faut.
-
-
-
-# Essai
-Si vous souhaitez simplement essayer ce plugin, vous trouverez dans le dossier etc/ un Géopackage d'exemple.
-Ouvrez-le et essayez.
+# Trial
+If you simply want to try this plugin, you will find an example GeoPackage in the etc/ folder. Open it and give it a try.
