@@ -1,23 +1,23 @@
 [general]
 name=RoutesComposer
 description=Outil de gestion de réseaux de vecteurs.
-version=0.2
+version=1.1
 qgisMinimumVersion=3.0
 author=Ulysse Descamps
 email=ulysse38250@gmail.com
-about=Ce plugin Qgis sera utile à ceux qui souhaitent créer des routes entre deux points à partir d'un réseau de vecteurs (de lignes).
-    L'exemple le plus évident de réseau est celui des routes :
-    la départementale 42 est à la fois une seule route et est composée de dizaines de sections différentes.
+about=This Qgis plugin allows you to create routes between two points from a
+    vector network. The most obvious example of a network is that of roads: department road 42 is both a single road and consists of dozens of different sections.
 
-    Les sections sont dans le plugin des segments, et la départementale correspond à une composition.
+    The sections are segments in the plugin, while the department road corresponds to a composition. All geographical work is done on the segments. Compositions only have attributes and a list containing the identifiers of the segments.
 
-    Tout le travail géographique s'effectue sur les segments. Les compositions ne possèdent que des attributs et une liste avec les identifiants des segments.
+    The first function of this plugin is to assist when dividing a segment. If the segment is part of one or more compositions, it can be cumbersome to find in which ones and at what location. The plugin takes care of this for you.
 
-    La première fonction de ce plugin est d'aider au moment de la division d'un segment.
-    Si le segment fait partie d'une ou plusieurs compositions, il est pénible d'aller chercher dans lesquelles et à quel endroit.
-    Le plugin s'occupe de cela à votre place.
+    This plugin can also help you keep your compositions correct by searching for potential errors.
+    It can furthermore create the geometries of each from your compositions.
+
+    Another tool, called the segment basket, allows you to directly select on the map the IDs of the segments that will make up your next road.
 repository=https://github.com/UlysselaGlisse/RoutesComposer
 category=Vector
 icon=ui/icons/icon.png
-experimental=True
+experimental=False
 deprecated=False
