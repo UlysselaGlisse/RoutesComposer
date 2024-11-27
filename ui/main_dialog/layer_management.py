@@ -1,8 +1,16 @@
 """Layer and field management for RoutesComposerDialog."""
 
+from typing import cast
 from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes
-from qgis.PyQt.QtCore import QObject, QSettings, Qt
-from ...func.utils import log
+from qgis.PyQt.QtCore import (
+    QObject,
+    QSettings,
+    Qt,
+    QVariant,
+    QCoreApplication,
+)
+from qgis.PyQt.QtWidgets import QMessageBox
+from ...func.utils import log, get_features_list
 
 
 class LayerManager(QObject):
@@ -126,27 +134,15 @@ class LayerManager(QObject):
 
         project = QgsProject.instance()
         if project:
-            self.selected_segments_layer = project.mapLayer(segments_id)
-            if self.selected_segments_layer:
-                log(
-                    f"Segments layer selected: {self.selected_segments_layer.name()}"
-                )
-                if (
-                    self.selected_segments_layer.geometryType()
-                    != QgsWkbTypes.LineGeometry
-                ):
-                    self.dialog.ui.segments_warning_label.setText(
-                        self.tr(
-                            "Attention: la géométrie de la couche des segments doit être de type ligne"
-                        )
-                    )
-                    self.dialog.ui.segments_warning_label.setVisible(True)
-                else:
-                    self.dialog.ui.segments_warning_label.setVisible(False)
-
-                self.populate_id_column_combo(self.selected_segments_layer)
+            self.segments_layer = cast(
+                QgsVectorLayer, project.mapLayer(segments_id)
+            )
+            if self.segments_layer is not None:
+                log(f"Segments layer selected: {self.segments_layer.name()}")
+                self.check_segments_layer(message_type="warning")
+                self.populate_id_column_combo(self.segments_layer)
                 self.dialog.advanced_options.update_segments_attr_combo(
-                    self.selected_segments_layer
+                    self.segments_layer
                 )
 
     def on_compositions_layer_selected(self):
@@ -154,42 +150,208 @@ class LayerManager(QObject):
 
         project = QgsProject.instance()
         if project:
-            self.selected_compositions_layer = project.mapLayer(
-                compositions_id
+            self.compositions_layer = cast(
+                QgsVectorLayer, project.mapLayer(compositions_id)
             )
-            if self.selected_compositions_layer:
+            if self.compositions_layer is not None:
                 log(
-                    f"Compositions layer selected: {self.selected_compositions_layer.name()}"
+                    f"Compositions layer selected: {self.compositions_layer.name()}"
                 )
-                if (
-                    isinstance(
-                        self.selected_compositions_layer, QgsVectorLayer
-                    )
-                    and self.selected_compositions_layer.isSpatial()
-                ):
-                    self.dialog.ui.geom_checkbox.setVisible(True)
-
-                    self.dialog.ui.create_or_update_geom_button.setText(
-                        self.tr("Mettre à jour les géométries")
-                    )
-                    self.dialog.ui.create_or_update_geom_button.clicked.disconnect()
-                    self.dialog.ui.create_or_update_geom_button.clicked.connect(
-                        self.dialog.geometry_ops.update_geometries
-                    )
-                else:
-                    self.dialog.ui.geom_checkbox.setVisible(False)
-                    self.dialog.ui.create_or_update_geom_button.setText(
-                        self.tr("Créer les géométries")
-                    )
-                    self.dialog.ui.create_or_update_geom_button.clicked.disconnect()
-                    self.dialog.ui.create_or_update_geom_button.clicked.connect(
-                        self.dialog.geometry_ops.create_geometries
-                    )
-
-            if isinstance(self.selected_compositions_layer, QgsVectorLayer):
-                self.populate_segments_column_combo(
-                    self.selected_compositions_layer
-                )
+            if self.check_compositions_layer():
+                self.populate_segments_column_combo(self.compositions_layer)
                 self.dialog.advanced_options.update_compositions_attr_combo(
-                    self.selected_compositions_layer
+                    self.compositions_layer
                 )
+
+    def check_layers_and_columns(self):
+        if not self.check_segments_layer(message_type="box"):
+            return False
+
+        if not self.is_id_column_valid():
+            return False
+
+        if not self.is_segments_column_valid():
+            return False
+
+        else:
+            self.save_selected_layers_and_columns()
+            return True
+
+    def save_selected_layers_and_columns(self):
+        project = QgsProject.instance()
+        if project:
+            settings = QSettings()
+
+            segments_id = self.dialog.ui.segments_combo.currentData()
+            settings.setValue(
+                "routes_composer/segments_layer_id", segments_id
+            )
+
+            compositions_id = self.dialog.ui.compositions_combo.currentData()
+            settings.setValue(
+                "routes_composer/compositions_layer_id", compositions_id
+            )
+
+            id_column = self.dialog.ui.id_column_combo.currentText()
+            settings.setValue("routes_composer/id_column_name", id_column)
+
+            segments_column = (
+                self.dialog.ui.segments_column_combo.currentText()
+            )
+            settings.setValue(
+                "routes_composer/segments_column_name", segments_column
+            )
+
+            project.setDirty(True)
+
+    def check_segments_layer(self, message_type="box"):
+        if not isinstance(self.segments_layer, QgsVectorLayer):
+            raise Exception(
+                QCoreApplication.translate(
+                    "RoutesComposer",
+                    "La couche de segments n'est pas une couche vectorielle valide",
+                )
+            )
+            return False
+
+        if self.segments_layer.geometryType() != QgsWkbTypes.LineGeometry:
+            if message_type == "box":
+                QMessageBox.warning(
+                    self.dialog,
+                    self.tr("Attention"),
+                    self.tr(
+                        "Veuillez sélectionnez une couche segments de type LineString"
+                    ),
+                )
+                return False
+
+            elif message_type == "warning":
+                self.dialog.ui.segments_warning_label.setText(
+                    self.tr(
+                        "Attention: la géométrie de la couche des segments doit être de type LineString"
+                    )
+                )
+                self.dialog.ui.segments_warning_label.setVisible(True)
+                return False
+        else:
+            self.dialog.ui.segments_warning_label.setVisible(False)
+            return True
+
+    def is_id_column_valid(self):
+        if self.segments_layer is None:
+            return False
+
+        id_column_name = self.dialog.ui.id_column_combo.currentText()
+        if not id_column_name:
+            return False
+
+        if id_column_name not in self.segments_layer.fields().names():
+            return False
+
+        id_field = self.segments_layer.fields().field(id_column_name)
+
+        if id_field.type() not in (QVariant.Int, QVariant.LongLong):
+            QMessageBox.warning(
+                self.dialog,
+                self.tr("Erreur de validation"),
+                self.tr(
+                    "La colonne 'id' de la couche 'segments' doit être de type int."
+                ),
+            )
+            return False
+
+        return True
+
+    def check_compositions_layer(self):
+        if not isinstance(self.compositions_layer, QgsVectorLayer):
+            return False
+
+        if self.compositions_layer.isSpatial():
+
+            self.dialog.ui.geom_checkbox.setVisible(True)
+
+            self.dialog.ui.create_or_update_geom_button.setText(
+                self.tr("Mettre à jour les géométries")
+            )
+            self.dialog.ui.create_or_update_geom_button.clicked.disconnect()
+            self.dialog.ui.create_or_update_geom_button.clicked.connect(
+                self.dialog.geometry_ops.update_geometries
+            )
+        else:
+            self.dialog.ui.geom_checkbox.setVisible(False)
+            self.dialog.ui.create_or_update_geom_button.setText(
+                self.tr("Créer les géométries")
+            )
+            self.dialog.ui.create_or_update_geom_button.clicked.disconnect()
+            self.dialog.ui.create_or_update_geom_button.clicked.connect(
+                self.dialog.geometry_ops.create_geometries
+            )
+
+        return True
+
+    def is_segments_column_valid(self):
+        if self.compositions_layer is None:
+            return False
+
+        segments_column_name = (
+            self.dialog.ui.segments_column_combo.currentText()
+        )
+        if not segments_column_name:
+            return False
+
+        if (
+            segments_column_name
+            not in self.compositions_layer.fields().names()
+        ):
+            return False
+
+        segment_field = self.compositions_layer.fields().field(
+            segments_column_name
+        )
+
+        if segment_field.type() != QVariant.String:
+            QMessageBox.warning(
+                self.dialog,
+                self.tr("Erreur de validation"),
+                self.tr(
+                    "La colonne 'segments' de la couche 'compositions' doit être de type texte."
+                ),
+            )
+            return False
+
+        count = 0
+        max_features = 10
+
+        for feature in get_features_list(self.compositions_layer):
+            if count >= max_features:
+                break
+
+            segment_value = feature[segments_column_name]
+            if not self.validate_segment_value(segment_value):
+                QMessageBox.warning(
+                    self.dialog,
+                    self.tr("Erreur de validation"),
+                    self.tr(
+                        "La colonne 'segments' de la couche 'compositions' doit être de type texte et ne peut contenir que des chiffres et des virgules."
+                    ),
+                )
+                return False
+
+            count += 1
+
+        return True
+
+    def validate_segment_value(self, value):
+        if value is None or value == "":
+            return True
+
+        if isinstance(value, QVariant):
+            value = str(value)
+
+        if value.isdigit():
+            return True
+
+        if all(c.isdigit() or c == "," for c in value.strip()):
+            return True
+
+        return False

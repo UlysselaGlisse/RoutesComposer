@@ -91,13 +91,13 @@ class RoutesComposerTool:
             geom_on_fly, _ = project.readBoolEntry(
                 "routes_composer", "geom_on_fly", False
             )
-            if auto_start:
-                if self.checks_layers():
+            if self.checks_layers():
+                if auto_start:
                     routes_composer = RoutesComposer.get_instance()
                     routes_composer.connect()
-            if geom_on_fly:
-                routes_composer = RoutesComposer.get_instance()
-                routes_composer.connect_geom()
+                if geom_on_fly:
+                    routes_composer = RoutesComposer.get_instance()
+                    routes_composer.connect_geom()
 
             self.update_icon()
 
@@ -115,6 +115,8 @@ class RoutesComposerTool:
                 saved_segments_layer_id
             ) or not project.mapLayer(saved_compositions_layer_id):
                 return False
+
+            return True
 
     def activate_ids_basket(self):
         project = QgsProject.instance()

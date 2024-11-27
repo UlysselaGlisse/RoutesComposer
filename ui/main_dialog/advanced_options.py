@@ -58,19 +58,21 @@ class AdvancedOptions(QObject):
     def on_segments_attr_selected(self):
         if self.dialog.ui.segments_attr_combo.currentText():
             selected_attr = self.dialog.ui.segments_attr_combo.currentText()
-            layer = self.dialog.layer_manager.selected_segments_layer
+            layer = self.dialog.layer_manager.segments_layer
             if layer:
                 settings = QSettings()
                 settings.setValue(
                     f"routes_composer/segments_attr_{layer.id()}",
                     selected_attr,
                 )
-                field_index = self.dialog.layer_manager.selected_segments_layer.fields().indexOf(
-                    selected_attr
+                field_index = (
+                    self.dialog.layer_manager.segments_layer.fields().indexOf(
+                        selected_attr
+                    )
                 )
                 if field_index != -1:
                     field_type = (
-                        self.dialog.layer_manager.selected_segments_layer.fields()
+                        self.dialog.layer_manager.segments_layer.fields()
                         .at(field_index)
                         .type()
                     )
@@ -84,19 +86,19 @@ class AdvancedOptions(QObject):
             selected_attr = (
                 self.dialog.ui.compositions_attr_combo.currentText()
             )
-            layer = self.dialog.layer_manager.selected_compositions_layer
+            layer = self.dialog.layer_manager.compositions_layer
             if layer:
                 settings = QSettings()
                 settings.setValue(
                     f"routes_composer/compositions_attr_{layer.id()}",
                     selected_attr,
                 )
-                field_index = self.dialog.layer_manager.selected_compositions_layer.fields().indexOf(
+                field_index = self.dialog.layer_manager.compositions_layer.fields().indexOf(
                     selected_attr
                 )
                 if field_index != -1:
                     field_type = (
-                        self.dialog.layer_manager.selected_compositions_layer.fields()
+                        self.dialog.layer_manager.compositions_layer.fields()
                         .at(field_index)
                         .type()
                     )
@@ -132,8 +134,8 @@ class AdvancedOptions(QObject):
             return
 
         self.attribute_linker = AttributeLinker(
-            segments_layer=self.dialog.layer_manager.selected_segments_layer,
-            compositions_layer=self.dialog.layer_manager.selected_compositions_layer,
+            segments_layer=self.dialog.layer_manager.segments_layer,
+            compositions_layer=self.dialog.layer_manager.compositions_layer,
             segments_attr=self.dialog.ui.segments_attr_combo.currentText(),
             compositions_attr=self.dialog.ui.compositions_attr_combo.currentText(),
             id_column_name=self.dialog.ui.id_column_combo.currentText(),

@@ -1,17 +1,15 @@
+from posix import replace
+
 """Handle geometries operation of the main dialog"""
 
-from typing import cast
-from qgis.core import QgsVectorLayer
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QMessageBox
-from qgis.utils import iface
+
+from .errors_dialog import ErrorDialog
 
 from ... import config
 from ...func.geom_compo import GeomCompo
-from ...func.utils import get_features_list
 from ...func.warning import verify_segments
-from ..sub_dialog import ErrorDialog
-from ...func.utils import log
 
 
 class GeometryOperations(QObject):
@@ -20,155 +18,60 @@ class GeometryOperations(QObject):
         self.dialog = dialog
 
     def create_geometries(self):
-        """Create geometries of the compositions."""
-        if (
-            not self.dialog.ui.segments_combo.currentData()
-            or not self.dialog.ui.compositions_combo.currentData()
-        ):
-            QMessageBox.warning(
-                self.dialog,
-                self.tr("Attention"),
-                self.tr(
-                    "Veuillez sélectionner les couches segments et compositions"
-                ),
+        if self.dialog.layer_manager.check_layers_and_columns():
+            self.setup_progress_bar(
+                self.dialog.layer_manager.compositions_layer
             )
-            return
-
-        segments_layer = cast(
-            QgsVectorLayer, self.dialog.layer_manager.selected_segments_layer
-        )
-        compositions_layer = cast(
-            QgsVectorLayer,
-            self.dialog.layer_manager.selected_compositions_layer,
-        )
-        segments_column_name = (
-            self.dialog.ui.segments_column_combo.currentText()
-        )
-        id_column_name = self.dialog.ui.id_column_combo.currentText()
-
-        if segments_column_name not in compositions_layer.fields().names():
-            iface.messageBar().pushWarning(
-                self.tr("Erreur"),
-                self.tr(
-                    "Le champ {ss} n'existe pas dans la couche des compositions."
-                ).format(ss=segments_column_name),
+            geom_compo = GeomCompo(
+                self.dialog.layer_manager.segments_layer,
+                self.dialog.layer_manager.compositions_layer,
+                self.dialog.ui.id_column_combo.currentText(),
+                self.dialog.ui.segments_column_combo.currentText(),
             )
-            return
 
-        self.setup_progress_bar(compositions_layer)
-
-        config.cancel_request = False
-        self.dialog.ui.cancel_button.setVisible(True)
-        self.dialog.ui.cancel_button.setEnabled(True)
-
-        geom_compo = GeomCompo(
-            segments_layer,
-            compositions_layer,
-            segments_column_name,
-            id_column_name,
-        )
-        errors_messages = geom_compo.create_compositions_geometries(
-            self.dialog.ui.progress_bar
-        )
-
-        self.cleanup_after_operation(
-            errors_messages,
-            segments_layer,
-            id_column_name,
-            compositions_layer,
-            segments_column_name,
-        )
+            errors_messages = geom_compo.update_compositions_geometries(
+                self.dialog.ui.progress_bar, mode="new"
+            )
+            self.cleanup_after_operation(errors_messages)
 
     def update_geometries(self):
-        """Update existing geometries."""
-        if (
-            not self.dialog.ui.segments_combo.currentData()
-            or not self.dialog.ui.compositions_combo.currentData()
-        ):
-            QMessageBox.warning(
-                self.dialog,
-                self.tr("Attention"),
-                self.tr(
-                    "Veuillez sélectionner les couches segments et compositions"
-                ),
+        if self.dialog.layer_manager.check_layers_and_columns():
+            self.setup_progress_bar(
+                self.dialog.layer_manager.compositions_layer
             )
-            return
-
-        segments_layer = cast(
-            QgsVectorLayer, self.dialog.layer_manager.selected_segments_layer
-        )
-        compositions_layer = cast(
-            QgsVectorLayer,
-            self.dialog.layer_manager.selected_compositions_layer,
-        )
-        segments_column_name = (
-            self.dialog.ui.segments_column_combo.currentText()
-        )
-        id_column_name = self.dialog.ui.id_column_combo.currentText()
-
-        if segments_column_name not in compositions_layer.fields().names():
-            iface.messageBar().pushWarning(
-                self.tr("Erreur"),
-                self.tr(
-                    "Le champ {segments_column_name} n'existe pas dans la couche des compositions."
-                ).format(segments_column_name=segments_column_name),
+            geom_compo = GeomCompo(
+                self.dialog.layer_manager.segments_layer,
+                self.dialog.layer_manager.compositions_layer,
+                self.dialog.ui.id_column_combo.currentText(),
+                self.dialog.ui.segments_column_combo.currentText(),
             )
-            return
-
-        self.setup_progress_bar(compositions_layer)
-
-        config.cancel_request = False
-        self.dialog.ui.cancel_button.setVisible(True)
-        self.dialog.ui.cancel_button.setEnabled(True)
-
-        geom_compo = GeomCompo(
-            segments_layer,
-            compositions_layer,
-            segments_column_name,
-            id_column_name,
-        )
-        errors_messages = geom_compo.update_compositions_geometries(
-            self.dialog.ui.progress_bar
-        )
-
-        self.cleanup_after_operation(
-            errors_messages,
-            segments_layer,
-            id_column_name,
-            compositions_layer,
-            segments_column_name,
-        )
+            errors_messages = geom_compo.update_compositions_geometries(
+                self.dialog.ui.progress_bar, mode="update"
+            )
+            self.cleanup_after_operation(errors_messages)
 
     def setup_progress_bar(self, compositions_layer):
         self.dialog.ui.progress_bar.setVisible(True)
         self.dialog.ui.progress_bar.setMinimum(0)
-        total_compositions = sum(
-            1 for _ in get_features_list(compositions_layer)
+        total_compositions = (
+            self.dialog.layer_manager.compositions_layer.featureCount()
         )
         self.dialog.ui.progress_bar.setMaximum(total_compositions)
 
-    def cleanup_after_operation(
-        self,
-        errors_messages,
-        segments_layer,
-        id_column_name,
-        compositions_layer,
-        segments_column_name,
-    ):
+        config.cancel_request = False
+        self.dialog.ui.cancel_button.setVisible(True)
+        self.dialog.ui.cancel_button.setEnabled(True)
+
+    def cleanup_after_operation(self, errors_messages):
+
         self.dialog.ui.progress_bar.setVisible(False)
         self.dialog.ui.cancel_button.setVisible(False)
 
         if errors_messages:
-            error_dialog = ErrorDialog(
-                errors_messages,
-                segments_layer,
-                id_column_name,
-                compositions_layer,
-                segments_column_name,
-                self.dialog,
-            )
+            error_dialog = ErrorDialog(self.dialog, errors_messages)
+
             error_dialog.display_errors(errors_messages)
-            error_dialog.show()
+            error_dialog.exec()
 
         self.dialog.adjustSize()
 
@@ -189,10 +92,8 @@ class GeometryOperations(QObject):
             )
             return
 
-        segments_layer = self.dialog.layer_manager.selected_segments_layer
-        compositions_layer = (
-            self.dialog.layer_manager.selected_compositions_layer
-        )
+        segments_layer = self.dialog.layer_manager.segments_layer
+        compositions_layer = self.dialog.layer_manager.compositions_layer
         segments_column_name = (
             self.dialog.ui.segments_column_combo.currentText()
         )
@@ -207,11 +108,8 @@ class GeometryOperations(QObject):
 
         if errors:
             self.error_dialog = ErrorDialog(
+                self.dialog,
                 errors,
-                segments_layer,
-                id_column_name,
-                compositions_layer,
-                segments_column_name,
             )
             self.dialog.close()
             self.error_dialog.refresh_errors()

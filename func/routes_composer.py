@@ -1,6 +1,7 @@
 from typing import cast
 from PyQt5.QtWidgets import QMessageBox
-from qgis.core import Qgis, QgsProject, QgsVectorLayer, QgsWkbTypes
+from qgis.core import Qgis, QgsProject, QgsVectorLayer
+from qgis.core.additions.qgsfunction import QgsFeatureRequest
 from qgis.utils import iface
 from qgis.PyQt.QtCore import QCoreApplication, QSettings
 
@@ -20,7 +21,7 @@ class RoutesComposer:
 
     def __init__(self):
         if RoutesComposer._instance is not None:
-            raise Exception("Cette classe est un singleton!")
+            raise Exception("Une instance de cette classe existe déjà.")
         self.project = QgsProject.instance()
         if not self.project:
             raise Exception(
@@ -28,7 +29,7 @@ class RoutesComposer:
                     "RoutesComposer", "Aucun projet QGIS n'est ouvert"
                 )
             )
-        self.project.layerRemoved.connect(self.on_layer_removed)
+        # self.project.layerRemoved.connect(self.on_layer_removed)
         self.settings = QSettings()
 
         self.segments_layer = self.get_segments_layer()
@@ -38,30 +39,103 @@ class RoutesComposer:
         )
         self.id_column_name, self.id_column_index = self.get_id_column_name()
 
-        if self.segments_layer is None or self.compositions_layer is None:
-            raise ValueError(
-                "Invalid layers: segments_layer or compositions_layer is None"
-            )
+        self.split_manager = split.SplitManager(self)
+        self.geom = geom_compo.GeomCompo(
+            self.segments_layer,
+            self.compositions_layer,
+            self.id_column_name,
+            self.segments_column_name,
+        )
 
-        self.split_manager = split.SplitManager(
-            self.segments_layer,
-            self.compositions_layer,
-            self.segments_column_name,
-            self.segments_column_index,
-            self.id_column_name,
-            self.id_column_index,
-        )
-        self.geom_compo = geom_compo.GeomCompo(
-            self.segments_layer,
-            self.compositions_layer,
-            self.segments_column_name,
-            self.id_column_name,
-        )
         self.is_connected = False
 
     @classmethod
     def destroy_instance(cls):
         cls._instance = None
+
+    def feature_added(self, fid):
+        """Fonction prinicpale. Traite l'ajout d'une nouvelle entité dans la couche segments."""
+        # Pendant l'enregistrement: fid >= 0.'
+        if fid >= 0:
+            return
+        if self.segments_layer is None or self.compositions_layer is None:
+            return
+
+        source_feature = self.segments_layer.getFeature(fid)
+        if not source_feature.isValid() and source_feature.fields().names():
+            return
+
+        segment_id = source_feature.attributes()[self.id_column_index]
+        if segment_id is None:
+            return
+
+        if self.split_manager.has_duplicate_segment_id(segment_id):
+
+            new_geometry = source_feature.geometry()
+            if not new_geometry or new_geometry.isEmpty():
+                return
+
+            original_feature = next(
+                self.segments_layer.getFeatures(
+                    f"{self.id_column_name} = {segment_id}"
+                ),
+                None,
+            )
+
+            if original_feature:
+                segments_lists_ids = (
+                    self.split_manager.get_compositions_list_segments(
+                        segment_id
+                    )
+                )
+                if not segments_lists_ids:
+                    QMessageBox.information(
+                        None,
+                        "RoutesComposer",
+                        f"Attention: Le segment {segment_id} n'est dans aucune composition",
+                    )
+                next_id = self.split_manager.get_next_id()
+                self.split_manager.update_segment_id(fid, next_id)
+
+                if segments_lists_ids:
+                    self.split_manager.update_compositions_segments(
+                        fid,
+                        segment_id,
+                        next_id,
+                        original_feature,
+                        source_feature,
+                        segments_lists_ids,
+                    )
+
+    def features_deleted(self, fids):
+        """Nettoie les compositions des segments supprimés."""
+        for fid in fids:
+            if fid >= 0:
+                return
+        if self.segments_layer is None or self.compositions_layer is None:
+            return
+
+        self.split_manager.clean_invalid_segments()
+
+    def geometry_changed(self, fid):
+        """Crée la géométrie des compositions lors du changement de la géométrie d'un segment"""
+        if self.segments_layer is None or self.compositions_layer is None:
+            return
+
+        source_feature = self.segments_layer.getFeature(fid)
+        if not source_feature.isValid():
+            return
+
+        segment_id = source_feature.attributes()[self.id_column_index]
+        if segment_id is None:
+            return
+
+        log(
+            f"Updating geometries for modified segment {segment_id}",
+            level="INFO",
+        )
+        self.geom.update_geometries_on_the_fly(segment_id)
+        self.compositions_layer.triggerRepaint()
 
     def connect(self):
         try:
@@ -166,123 +240,6 @@ class RoutesComposer:
                 level="WARNING",
             )
 
-    def feature_added(self, fid):
-        """Fonction prinicpale. Traite l'ajout d'une nouvelle entité dans la couche segments."""
-        # Pendant l'enregistrement: fid >= 0.'
-        if fid >= 0:
-            return
-        if self.segments_layer is None or self.compositions_layer is None:
-            return
-
-        source_feature = self.segments_layer.getFeature(fid)
-        if not source_feature.isValid() and source_feature.fields().names():
-            return
-
-        segment_id = source_feature.attributes()[self.id_column_index]
-        if segment_id is None:
-            return
-
-        if self.split_manager.has_duplicate_segment_id(segment_id):
-
-            new_geometry = source_feature.geometry()
-            if not new_geometry or new_geometry.isEmpty():
-                return
-
-            original_feature = next(
-                self.segments_layer.getFeatures(
-                    f"{self.id_column_name} = {segment_id}"
-                ),
-                None,
-            )
-
-            if original_feature:
-                segments_lists_ids = (
-                    self.split_manager.get_compositions_list_segments(
-                        segment_id
-                    )
-                )
-                if not segments_lists_ids:
-                    QMessageBox.information(
-                        None,
-                        "RoutesComposer",
-                        f"Attention: Le segment {segment_id} n'est dans aucune composition",
-                    )
-                next_id = self.split_manager.get_next_id()
-                self.split_manager.update_segment_id(fid, next_id)
-
-                if segments_lists_ids:
-                    self.split_manager.update_compositions_segments(
-                        fid,
-                        segment_id,
-                        next_id,
-                        original_feature,
-                        source_feature,
-                        segments_lists_ids,
-                    )
-
-    def features_deleted(self, fids):
-        """Nettoie les compositions des segments supprimés."""
-        log(f"fids = {fids}")
-        for fid in fids:
-            if fid >= 0:
-                return
-        if self.segments_layer is None or self.compositions_layer is None:
-            return
-
-        self.split_manager.clean_invalid_segments()
-
-    def geometry_changed(self, fid):
-        """Crée la géométrie des compositions lors du changement de la géométrie d'un segment"""
-        log(f"Geometry has changed for fid: '{fid}'", level="INFO")
-
-        if self.segments_layer is None or self.compositions_layer is None:
-            return
-        source_feature = self.segments_layer.getFeature(fid)
-        if not source_feature.isValid() and source_feature.fields().names():
-            return
-
-        segment_id = source_feature.attributes()[self.id_column_index]
-        if segment_id is None:
-            log("No segment id, return.")
-            return
-
-        log(f"With corresponding segment id: '{segment_id}'", level="INFO")
-
-        for composition in utils.get_features_list(self.compositions_layer):
-            segments_str = str(composition[self.segments_column_name])
-            if str(segment_id) in segments_str.split(","):
-                segment_ids = [
-                    int(id_str)
-                    for id_str in segments_str.split(",")
-                    if id_str.strip()
-                ]
-                log(segment_ids)
-                a = geom_compo.GeomCompo(
-                    self.segments_layer,
-                    self.compositions_layer,
-                    self.segments_column_name,
-                    self.id_column_name,
-                )
-                new_geometry = a.create_merged_geometry(segment_ids)
-
-                if new_geometry:
-                    # Mettre à jour la géométrie de la composition
-                    self.compositions_layer.startEditing()
-                    self.compositions_layer.changeGeometry(
-                        composition.id(), new_geometry[0]
-                    )
-                    log(
-                        f"Updated geometry for composition {composition.id()}",
-                        level="INFO",
-                    )
-                else:
-                    log(
-                        f"Failed to create geometry for composition {composition.id()}",
-                        level="WARNING",
-                    )
-
-        self.compositions_layer.triggerRepaint()
-
     def get_segments_layer(self):
         if not self.project:
             return
@@ -295,7 +252,7 @@ class RoutesComposer:
         self.segments_layer = cast(
             QgsVectorLayer, self.project.mapLayer(self.segments_layer_id)
         )
-        if not self.segments_layer.isValid():
+        if self.segments_layer is None:
             raise Exception(
                 QCoreApplication.translate(
                     "RoutesComposer",
@@ -326,7 +283,7 @@ class RoutesComposer:
         self.compositions_layer = cast(
             QgsVectorLayer, self.project.mapLayer(self.compositions_layer_id)
         )
-        if not self.compositions_layer.isValid():
+        if self.compositions_layer is None:
             raise Exception(
                 QCoreApplication.translate(
                     "RoutesComposer",
@@ -348,11 +305,12 @@ class RoutesComposer:
             "routes_composer/segments_column_name", "segments"
         )
         if self.compositions_layer is not None:
-            self.segments_column_index = (
+            self.segments_column_index = int(
                 self.compositions_layer.fields().indexOf(
                     self.segments_column_name
                 )
             )
+
             if self.segments_column_index == -1:
                 raise Exception(
                     QCoreApplication.translate(

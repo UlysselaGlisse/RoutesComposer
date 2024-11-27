@@ -145,7 +145,6 @@ class RoutesComposerDialog(QDialog):
             RoutesComposerDialog._instance = None
 
     def reset_ui_state(self):
-        log("r")
         self.ui.auto_start_checkbox.setChecked(False)
         self.ui.geom_checkbox.setChecked(False)
 

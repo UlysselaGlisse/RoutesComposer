@@ -33,10 +33,10 @@ class IDsBasket(QgsMapTool):
         self.label.setText("")
         self.label.setStyleSheet(
             """
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 5px;
-            border-radius: 3px;
-            color: black;
+            background-color: rgba(0, 0, 0, 0);
+            padding: 0;
+            border-radius: 0;
+            color: white;
         """
         )
         self.label.hide()
@@ -164,7 +164,6 @@ class IDsBasket(QgsMapTool):
         while unvisited:
             current_id = min(unvisited, key=unvisited.get)
             current_distance = unvisited[current_id]
-            log(f"current_distance: {current_distance}")
 
             if current_id == end_id:
                 break
@@ -175,7 +174,6 @@ class IDsBasket(QgsMapTool):
             for neighbor_id in self.get_connected_segments(current_id):
                 if neighbor_id in visited:
                     continue
-                log(f"neighbor: {neighbor_id}")
                 neighbor_feature = next(
                     self.layer.getFeatures(
                         QgsFeatureRequest().setFilterExpression(
@@ -271,8 +269,7 @@ class IDsBasket(QgsMapTool):
             return
         mousePos = e.pos()
 
-        # # TODO : ne marche pas: je pense que la classe ne sait pas où
-        # est la souris hors du canvas.
+        # # TODO : ne marche pas
         # if not mousePos:
         #     self.label.hide()
         #     return

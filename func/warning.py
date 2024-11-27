@@ -15,7 +15,6 @@ from PyQt5.QtCore import QVariant
 from qgis.utils import iface
 
 from . import utils
-from .utils import log
 
 error_layer = None
 
@@ -27,12 +26,14 @@ def verify_segments(
     Vérifie les segments présents dans les listes des compositions et la continuité des segments.
     """
     errors = []
+
     segments_geom_dict = {
         str(seg[id_column_name]): seg.geometry()
         for seg in utils.get_features_list(segments_layer)
     }
     compositions = utils.get_features_list(compositions_layer)
 
+    used_segment_ids = set()
     discontinuity_errors = defaultdict(list)
 
     for composition in compositions:
@@ -44,6 +45,7 @@ def verify_segments(
         ):
             continue
         segments_list = [seg.strip() for seg in str(segments_str).split(",")]
+        used_segment_ids.update(segments_list)
 
         for i, current_segment_id in enumerate(segments_list):
             # Pour tous les segments sauf le dernier de la liste (dont la coninuité est vérifié par celle du précédent).
@@ -92,10 +94,10 @@ def verify_segments(
                     distance_4 = current_points[0].distance(next_points[0])
 
                     if (
-                        distance_1 < 0.1
-                        or distance_2 < 0.1
-                        or distance_3 < 0.1
-                        or distance_4 < 0.1
+                        distance_1 < 0.001
+                        or distance_2 < 0.001
+                        or distance_3 < 0.001
+                        or distance_4 < 0.001
                     ):
                         pass
                     else:
@@ -112,6 +114,17 @@ def verify_segments(
                                 ),
                             }
                         )
+
+    unused_segment_ids = set(segments_geom_dict.keys()) - used_segment_ids
+    for segment_id in unused_segment_ids:
+        errors.append(
+            {
+                "composition_id": None,
+                "error_type": "unused_segment",
+                "segment_ids": (segment_id, None),
+                "unused_segment_id": segment_id,
+            }
+        )
 
     formatted_errors = []
 
@@ -135,119 +148,130 @@ def verify_segments(
                     "segment_ids": segment_ids,
                 }
             )
+        elif error["error_type"] == "unused_segment":
+            formatted_errors.append(
+                {
+                    "error_type": "unused_segment",
+                    "composition_id": None,
+                    "segment_ids": error["segment_ids"],
+                    "unused_segment_id": error["unused_segment_id"],
+                }
+            )
 
     return formatted_errors
 
 
-def highlight_errors(errors, segments_layer, id_column_name):
-    """
-    Crée une nouvelle couche temporaire avec les segments ayant des erreurs.
-    Fonctionnelle, mais non utilisée pour le moment.
-    """
-    error_layer_name = "Erreurs"
-    project = QgsProject.instance()
-    if not project:
-        return
+# def highlight_errors(errors, segments_layer, id_column_name):
+#     """
+#     Crée une nouvelle couche temporaire avec les segments ayant des erreurs.
+#     Fonctionnelle, mais non utilisée pour le moment.
+#     """
+#     error_layer_name = "Erreurs"
+#     project = QgsProject.instance()
+#     if not project:
+#         return
 
-    existing_layers = project.mapLayers().values()
-    error_layer = next(
-        (
-            layer
-            for layer in existing_layers
-            if layer.name() == error_layer_name
-        ),
-        None,
-    )
-    if error_layer is None:
-        error_layer = QgsVectorLayer(
-            "LineString?crs=" + segments_layer.crs().authid(),
-            "Erreurs",
-            "memory",
-        )
-        provider = error_layer.dataProvider()
+#     existing_layers = project.mapLayers().values()
+#     error_layer = next(
+#         (
+#             layer
+#             for layer in existing_layers
+#             if layer.name() == error_layer_name
+#         ),
+#         None,
+#     )
+#     if error_layer is None:
+#         error_layer = QgsVectorLayer(
+#             "LineString?crs=" + segments_layer.crs().authid(),
+#             "Erreurs",
+#             "memory",
+#         )
+#         provider = error_layer.dataProvider()
+#         if provider is None:
+#             return
+#         provider.addAttributes(
+#             [
+#                 QgsField("segment_id", QVariant.Int),
+#                 QgsField("error_type", QVariant.String),
+#                 QgsField("composition_id", QVariant.Int),
+#             ]
+#         )
+#         error_layer.updateFields()
 
-        provider.addAttributes(
-            [
-                QgsField("segment_id", QVariant.Int),
-                QgsField("error_type", QVariant.String),
-                QgsField("composition_id", QVariant.Int),
-            ]
-        )
-        error_layer.updateFields()
+#         symbol = QgsLineSymbol.createSimple({"color": "red", "width": "2"})
+#         if symbol is not None
+#         error_layer.renderer().setSymbol(symbol)
 
-        symbol = QgsLineSymbol.createSimple({"color": "red", "width": "2"})
-        error_layer.renderer().setSymbol(symbol)
+#         QgsProject.instance().addMapLayer(error_layer)
+#     else:
+#         error_layer.dataProvider().truncate()
 
-        QgsProject.instance().addMapLayer(error_layer)
-    else:
-        error_layer.dataProvider().truncate()
+#     features = []
+#     for error in errors:
+#         if error["error_type"] == "discontinuity":
+#             segment_id1 = int(error["segment_ids"][0])
+#             segment_id2 = int(error["segment_ids"][1])
 
-    features = []
-    for error in errors:
-        if error["error_type"] == "discontinuity":
-            segment_id1 = int(error["segment_ids"][0])
-            segment_id2 = int(error["segment_ids"][1])
+#             segment_id1_feature = next(
+#                 segments_layer.getFeatures(
+#                     QgsFeatureRequest().setFilterExpression(
+#                         f"\"{id_column_name}\" = '{segment_id1}'"
+#                     )
+#                 ),
+#                 None,
+#             )
+#             geom1 = (
+#                 segment_id1_feature.geometry()
+#                 if segment_id1_feature
+#                 else None
+#             )
 
-            segment_id1_feature = next(
-                segments_layer.getFeatures(
-                    QgsFeatureRequest().setFilterExpression(
-                        f"\"{id_column_name}\" = '{segment_id1}'"
-                    )
-                ),
-                None,
-            )
-            geom1 = (
-                segment_id1_feature.geometry()
-                if segment_id1_feature
-                else None
-            )
+#             segment_id2_feature = next(
+#                 segments_layer.getFeatures(
+#                     QgsFeatureRequest().setFilterExpression(
+#                         f"\"{id_column_name}\" = '{segment_id2}'"
+#                     )
+#                 ),
+#                 None,
+#             )
+#             geom2 = (
+#                 segment_id2_feature.geometry()
+#                 if segment_id2_feature
+#                 else None
+#             )
 
-            segment_id2_feature = next(
-                segments_layer.getFeatures(
-                    QgsFeatureRequest().setFilterExpression(
-                        f"\"{id_column_name}\" = '{segment_id2}'"
-                    )
-                ),
-                None,
-            )
-            geom2 = (
-                segment_id2_feature.geometry()
-                if segment_id2_feature
-                else None
-            )
+#             if (
+#                 geom1
+#                 and geom2
+#                 and geom1.isGeosValid()
+#                 and geom2.isGeosValid()
+#             ):
+#                 feat1 = QgsFeature()
+#                 feat1.setGeometry(geom1)
+#                 feat1.setAttributes(
+#                     [
+#                         segment_id1,
+#                         error["error_type"],
+#                         error["composition_id"],
+#                     ]
+#                 )
+#                 features.append(feat1)
 
-            if (
-                geom1
-                and geom2
-                and geom1.isGeosValid()
-                and geom2.isGeosValid()
-            ):
-                feat1 = QgsFeature()
-                feat1.setGeometry(geom1)
-                feat1.setAttributes(
-                    [
-                        segment_id1,
-                        error["error_type"],
-                        error["composition_id"],
-                    ]
-                )
-                features.append(feat1)
+#                 feat2 = QgsFeature()
+#                 feat2.setGeometry(geom2)
+#                 feat2.setAttributes(
+#                     [
+#                         segment_id2,
+#                         error["error_type"],
+#                         error["composition_id"],
+#                     ]
+#                 )
+#                 features.append(feat2)
 
-                feat2 = QgsFeature()
-                feat2.setGeometry(geom2)
-                feat2.setAttributes(
-                    [
-                        segment_id2,
-                        error["error_type"],
-                        error["composition_id"],
-                    ]
-                )
-                features.append(feat2)
+#     if features:
+#         error_layer.dataProvider().addFeatures(features)
+#         error_layer.updateExtents()
+#     else:
+#         print("Aucune nouvelle erreur à ajouter.")
 
-    if features:
-        error_layer.dataProvider().addFeatures(features)
-        error_layer.updateExtents()
-    else:
-        print("Aucune nouvelle erreur à ajouter.")
-
-    iface.mapCanvas().refresh()
+#     iface.mapCanvas().refresh()
