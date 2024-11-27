@@ -1,7 +1,7 @@
 from qgis.PyQt.QtCore import QObject, QSettings, QVariant
 from qgis.PyQt.QtWidgets import QMessageBox
 
-from ...attribute_linker import AttributeLinker
+from ...func.attribute_linker import AttributeLinker
 from ...func.utils import log
 
 

@@ -1,6 +1,6 @@
 """Functions for linking attributes."""
 
-from .func.utils import log
+from .utils import log
 from qgis.PyQt.QtWidgets import QMessageBox
 
 

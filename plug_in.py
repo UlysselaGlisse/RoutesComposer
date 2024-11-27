@@ -7,7 +7,7 @@ from qgis.PyQt.QtWidgets import QAction
 
 from . import config
 from .func.routes_composer import RoutesComposer
-from .list_constructor import IDsBasket
+from .func.list_constructor import IDsBasket
 from .ui.main_dialog.main import RoutesComposerDialog
 from .func.utils import log
 
