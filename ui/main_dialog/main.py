@@ -7,11 +7,11 @@ from qgis.PyQt.QtCore import QSettings, QTranslator
 from qgis.PyQt.QtWidgets import QDialog
 from qgis.utils import iface
 
-
 from ... import config
 from .advanced_options import AdvancedOptions
 from .event_handlers import EventHandlers
 from .geometry_operations import GeometryOperations
+from .info_dialog import InfoDialog
 from .layer_management import LayerManager
 from .ui_builder import UiBuilder
 
@@ -39,6 +39,7 @@ class RoutesComposerDialog(QDialog):
         self.initial_size = self.size()
 
         self.ui = UiBuilder(self)
+        self.info = InfoDialog(self)
         self.event_handlers = EventHandlers(self)
         self.layer_manager = LayerManager(self)
         self.geometry_ops = GeometryOperations(self)

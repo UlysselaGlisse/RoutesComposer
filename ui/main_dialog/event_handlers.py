@@ -9,7 +9,6 @@ from ...func.utils import log
 
 from ... import config
 from ...func.routes_composer import RoutesComposer
-from ..sub_dialog import InfoDialog
 
 
 class EventHandlers(QObject):
@@ -78,8 +77,7 @@ class EventHandlers(QObject):
                 routes_composer.disconnect_geom()
 
     def show_info(self):
-        info_dialog = InfoDialog()
-        info_dialog.exec_()
+        self.dialog.info.exec_()
 
     def cancel_process(self):
         config.cancel_request = True

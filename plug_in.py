@@ -172,9 +172,6 @@ class RoutesComposerTool:
 
     def show_dialog(self):
         """Affiche la fenêtre de dialogue"""
-        project = QgsProject.instance()
-        if not project:
-            return
         if self.dialog is None:
             self.dialog = RoutesComposerDialog(self.iface.mainWindow(), self)
         self.dialog.show()

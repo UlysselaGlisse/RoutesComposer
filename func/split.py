@@ -9,7 +9,7 @@ from qgis.core import (
 from qgis.PyQt.QtWidgets import QDialog
 from qgis.utils import iface
 
-from ..ui.sub_dialog import SingleSegmentDialog
+from ..ui.single_segment_dialog import SingleSegmentDialog
 from .utils import get_features_list, log
 
 
