@@ -1,39 +1,35 @@
 import re
+
+from PyQt5 import QtWidgets
 from qgis.core import (
-    QgsProject,
-    QgsFeatureRequest,
     QgsCoordinateTransform,
+    QgsFeatureRequest,
     QgsGeometry,
+    QgsProject,
 )
-from qgis.utils import iface
 from qgis.PyQt.QtWidgets import (
     QDialog,
-    QPushButton,
-    QVBoxLayout,
-    QLabel,
     QHBoxLayout,
+    QLabel,
     QMessageBox,
+    QPushButton,
     QTreeWidget,
     QTreeWidgetItem,
+    QVBoxLayout,
 )
-from PyQt5 import QtWidgets
+from qgis.utils import iface
+
 from ...func import warning
 
 
 class ErrorDialog(QDialog):
-    def __init__(
-        self,
-        dialog,
-        errors,
-        parent=None,
-    ):
+    def __init__(self, dialog, errors, parent=None):
         super().__init__(parent)
+
         self.dialog = dialog
         self.segments_layer = self.dialog.layer_manager.segments_layer
         self.compositions_layer = self.dialog.layer_manager.compositions_layer
-        self.segments_column_name = (
-            self.dialog.ui.segments_column_combo.currentText()
-        )
+        self.segments_column_name = self.dialog.ui.segments_column_combo.currentText()
         self.id_column_name = self.dialog.ui.id_column_combo.currentText()
 
         self.setWindowTitle(self.tr("Erreurs détectées"))
@@ -141,9 +137,7 @@ class ErrorDialog(QDialog):
             error_types[error_type].append(error)
 
         for error_type, error_list in error_types.items():
-            type_item = QTreeWidgetItem(
-                self.error_tree_widget, [self.tr(error_type)]
-            )
+            type_item = QTreeWidgetItem(self.error_tree_widget, [self.tr(error_type)])
             type_item.setExpanded(True)
             for error in error_list:
                 detail = self.format_error_detail(error)
@@ -186,9 +180,7 @@ class ErrorDialog(QDialog):
                 "Segment {unused_segment_id} n'est utilisé dans aucune composition."
             ).format(unused_segment_id=unused_segment_id)
 
-        return self.tr("Erreur inconnue. Détails: {details}").format(
-            details=str(error)
-        )
+        return self.tr("Erreur inconnue. Détails: {details}").format(details=str(error))
 
     def on_item_clicked(self, item):
         """Gérer le clic sur un élément de la liste d'erreurs."""
@@ -239,13 +231,9 @@ class ErrorDialog(QDialog):
                     )
                     transformed_geom = QgsGeometry(feature.geometry())
                     transformed_geom.transform(transform)
-                    iface.mapCanvas().setExtent(
-                        transformed_geom.boundingBox()
-                    )
+                    iface.mapCanvas().setExtent(transformed_geom.boundingBox())
                 else:
-                    iface.mapCanvas().setExtent(
-                        feature.geometry().boundingBox()
-                    )
+                    iface.mapCanvas().setExtent(feature.geometry().boundingBox())
 
                 iface.mapCanvas().refresh()
         else:

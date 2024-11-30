@@ -1,11 +1,11 @@
-from typing import cast
 from PyQt5.QtWidgets import QMessageBox
 from qgis.core import Qgis, QgsProject, QgsVectorLayer
+from qgis.PyQt.QtCore import QObject, QSettings, QTranslator
 from qgis.utils import iface
-from qgis.PyQt.QtCore import QSettings, QObject, QTranslator
+from typing_extensions import cast
 
 from .. import config
-from . import split, geom_compo
+from . import geom_compo, split
 from .utils import log
 
 
@@ -22,10 +22,13 @@ class RoutesComposer(QObject):
         super().__init__(parent)
         if RoutesComposer._instance is not None:
             raise Exception("Une instance de cette classe existe déjà.")
+
         self.project = QgsProject.instance()
         if not self.project:
             raise Exception(self.tr("Aucun projet QGIS n'est ouvert"))
-        # self.project.layerRemoved.connect(self.on_layer_removed)
+
+        self.project.layersWillBeRemoved.connect(self.on_layer_removed)
+
         self.settings = QSettings()
         self.translator = QTranslator()
 
@@ -48,29 +51,37 @@ class RoutesComposer(QObject):
 
     @classmethod
     def destroy_instance(cls):
+        log("r")
         cls._instance = None
 
-    def feature_added(self, fid):
+    def feature_added(self, feature_id):
         """Fonction prinicpale. Traite l'ajout d'une nouvelle entité dans la couche segments."""
         # Pendant l'enregistrement: fid >= 0.'
-        if fid >= 0:
+        log(feature_id)
+        if feature_id >= 0:
             return
+            log("feature_id >=0")
         if self.segments_layer is None or self.compositions_layer is None:
             return
+            log("layers are not goods")
 
-        source_feature = self.segments_layer.getFeature(fid)
+        source_feature = self.segments_layer.getFeature(feature_id)
         if not source_feature.isValid() and source_feature.fields().names():
             return
+            log("source_feature problem")
 
-        segment_id = source_feature.attributes()[self.id_column_index]
+        segment_id = int(source_feature.attributes()[self.id_column_index])
+        log(f"{segment_id}")
         if segment_id is None:
             return
+            log("no segment_id associate with feature_id")
 
         if self.split_manager.has_duplicate_segment_id(segment_id):
-
+            log("segment splited")
             new_geometry = source_feature.geometry()
             if not new_geometry or new_geometry.isEmpty():
                 return
+                log("segment has no geometry")
 
             original_feature = next(
                 self.segments_layer.getFeatures(
@@ -80,10 +91,8 @@ class RoutesComposer(QObject):
             )
 
             if original_feature:
-                segments_lists_ids = (
-                    self.split_manager.get_compositions_list_segments(
-                        segment_id
-                    )
+                segments_lists_ids = self.split_manager.get_compositions_list_segments(
+                    segment_id
                 )
                 if not segments_lists_ids:
                     QMessageBox.information(
@@ -92,17 +101,18 @@ class RoutesComposer(QObject):
                         f"Attention: Le segment {segment_id} n'est dans aucune composition",
                     )
                 next_id = self.split_manager.get_next_id()
-                self.split_manager.update_segment_id(fid, next_id)
+                self.split_manager.update_segment_id(feature_id, next_id)
 
                 if segments_lists_ids:
                     self.split_manager.update_compositions_segments(
-                        fid,
+                        feature_id,
                         segment_id,
                         next_id,
                         original_feature,
                         source_feature,
                         segments_lists_ids,
                     )
+        log("segment was not splited")
 
     def features_deleted(self, fids):
         """Nettoie les compositions des segments supprimés."""
@@ -122,10 +132,12 @@ class RoutesComposer(QObject):
         source_feature = self.segments_layer.getFeature(fid)
         if not source_feature.isValid():
             return
+        log(fid)
 
         segment_id = source_feature.attributes()[self.id_column_index]
         if segment_id is None:
             return
+        log(segment_id)
 
         log(
             f"Updating geometries for modified segment {segment_id}",
@@ -138,9 +150,7 @@ class RoutesComposer(QObject):
         try:
             if self.segments_layer is not None and not self.is_connected:
                 self.segments_layer.featureAdded.connect(self.feature_added)
-                self.segments_layer.featuresDeleted.connect(
-                    self.features_deleted
-                )
+                self.segments_layer.featuresDeleted.connect(self.features_deleted)
                 self.is_connected = True
                 config.script_running = True
 
@@ -165,12 +175,8 @@ class RoutesComposer(QObject):
     def disconnect_routes_composer(self):
         try:
             if self.segments_layer is not None and self.is_connected:
-                self.segments_layer.featureAdded.disconnect(
-                    self.feature_added
-                )
-                self.segments_layer.featuresDeleted.disconnect(
-                    self.features_deleted
-                )
+                self.segments_layer.featureAdded.disconnect(self.feature_added)
+                self.segments_layer.featuresDeleted.disconnect(self.features_deleted)
                 self.is_connected = False
 
                 self.segments_layer = None
@@ -208,9 +214,7 @@ class RoutesComposer(QObject):
             )
             if geom_on_fly:
                 if self.segments_layer is not None:
-                    self.segments_layer.geometryChanged.connect(
-                        self.geometry_changed
-                    )
+                    self.segments_layer.geometryChanged.connect(self.geometry_changed)
                     log("GeomOnFly has started")
         except TypeError:
             log(
@@ -223,9 +227,7 @@ class RoutesComposer(QObject):
             if self.segments_layer is None:
                 self.destroy_instance()
             else:
-                self.segments_layer.geometryChanged.disconnect(
-                    self.geometry_changed
-                )
+                self.segments_layer.geometryChanged.disconnect(self.geometry_changed)
 
             log("GeomOnFly has been stoped")
 
@@ -297,9 +299,7 @@ class RoutesComposer(QObject):
         )
         if self.compositions_layer is not None:
             self.segments_column_index = int(
-                self.compositions_layer.fields().indexOf(
-                    self.segments_column_name
-                )
+                self.compositions_layer.fields().indexOf(self.segments_column_name)
             )
 
             if self.segments_column_index == -1:
@@ -330,14 +330,18 @@ class RoutesComposer(QObject):
 
         return self.id_column_name, self.id_column_index
 
-    def on_layer_removed(self, layer_id):
-        if not self.project:
-            return
-        if not self.project.mapLayer(
-            self.segments_layer_id
-        ) or not self.project.mapLayer(self.compositions_layer_id):
-            from ..ui.main_dialog.main import RoutesComposerDialog
+    def on_layer_removed(self, layer_ids):
+        if self.is_connected:
+            for remove_layer_id in layer_ids:
+                if (
+                    remove_layer_id == self.compositions_layer_id
+                    or remove_layer_id == self.segments_layer_id
+                ):
+                    log("layer followed removed")
+                    from ..ui.main_dialog.main import RoutesComposerDialog
 
-            dialog = RoutesComposerDialog.get_instance()
-            if dialog:
-                dialog.event_handlers.stop_running_routes_composer()
+                    dialog = RoutesComposerDialog.get_instance()
+                    dialog.event_handlers.stop_running_routes_composer()
+
+                    if dialog.ui.geom_checkbox.isChecked():
+                        dialog.ui.geom_checkbox.setChecked(False)

@@ -2,17 +2,10 @@
 
 from collections import defaultdict
 from typing import cast
+
 from qgis.core import (
-    QgsFeature,
-    QgsFeatureRequest,
-    QgsField,
     QgsGeometry,
-    QgsLineSymbol,
-    QgsProject,
-    QgsVectorLayer,
 )
-from PyQt5.QtCore import QVariant
-from qgis.utils import iface
 
 from . import utils
 

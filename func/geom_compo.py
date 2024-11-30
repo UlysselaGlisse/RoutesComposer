@@ -1,8 +1,9 @@
 """Functions for creating geometries of the compositions."""
 
-from collections import defaultdict
 import math
+from collections import defaultdict
 from typing import List, Tuple
+
 from qgis.core import (
     QgsApplication,
     QgsFeature,
@@ -12,6 +13,7 @@ from qgis.core import (
     QgsProject,
     QgsVectorLayer,
 )
+
 from .. import config
 from ..func.utils import get_features_list, log
 
@@ -30,7 +32,6 @@ class GeomCompo:
         self.segments_column_name = segments_column_name
 
     def update_geometries_on_the_fly(self, segment_id):
-
         affected_compositions = []
         expr = (
             f"{self.segments_column_name} LIKE '%,{segment_id},%' OR "
@@ -48,9 +49,7 @@ class GeomCompo:
         for composition in affected_compositions:
             segments_str = str(composition[self.segments_column_name])
             segment_ids = [
-                int(id_str)
-                for id_str in segments_str.split(",")
-                if id_str.strip()
+                int(id_str) for id_str in segments_str.split(",") if id_str.strip()
             ]
             needed_segments.update(segment_ids)
 
@@ -65,14 +64,10 @@ class GeomCompo:
         for composition in affected_compositions:
             segments_str = str(composition[self.segments_column_name])
             segment_ids = [
-                int(id_str)
-                for id_str in segments_str.split(",")
-                if id_str.strip()
+                int(id_str) for id_str in segments_str.split(",") if id_str.strip()
             ]
 
-            new_geometry = self.create_merged_geometry(
-                segment_ids, segments_points
-            )
+            new_geometry = self.create_merged_geometry(segment_ids, segments_points)
             if new_geometry:
                 self.compositions_layer.changeGeometry(
                     composition.id(), new_geometry[0]
@@ -112,9 +107,7 @@ class GeomCompo:
                         self.handle_geometry_update(composition, new_geometry)
                     )
                 not_connected_segments.update(
-                    self.update_not_connected_segments(
-                        composition.id(), non_connected
-                    )
+                    self.update_not_connected_segments(composition.id(), non_connected)
                 )
 
             processed_count += 1
@@ -135,20 +128,16 @@ class GeomCompo:
             failed_compositions, not_connected_segments
         )
 
-    def is_geometric_layer(self, layer):
-        """Vérifie si une couche est géométrique."""
-        return layer.geometryType() != -1
-
     def points_are_equal(
         self, point1: QgsPoint, point2: QgsPoint, tolerance=1e-8
     ) -> bool:
-        return math.isclose(
-            point1.x(), point2.x(), abs_tol=tolerance
-        ) and math.isclose(point1.y(), point2.y(), abs_tol=tolerance)
+        return math.isclose(point1.x(), point2.x(), abs_tol=tolerance) and math.isclose(
+            point1.y(), point2.y(), abs_tol=tolerance
+        )
 
     def create_merged_geometry(
         self, segment_ids: List[int], segments_points: dict
-    ) -> Tuple[QgsGeometry, List[int]]:
+    ) -> Tuple[QgsGeometry, List[Tuple[int, int]]]:
         if not segment_ids:
             return QgsGeometry(), []
 
@@ -174,6 +163,7 @@ class GeomCompo:
                                 current_points,
                                 next_points,
                                 current_segment_id,
+                                segment_ids[i + 1],
                                 last_segment="no",
                             )
                         )
@@ -181,7 +171,7 @@ class GeomCompo:
                             result_points.extend(current_points[:-1])
                             if not_connected_segment:
                                 not_connected_segments.append(
-                                    current_segment_id
+                                    (current_segment_id, segment_ids[i + 1])
                                 )
 
                 else:
@@ -192,6 +182,7 @@ class GeomCompo:
                                 current_points,
                                 prev_points,
                                 current_segment_id,
+                                segment_ids[i - 1],
                                 last_segment="yes",
                             )
                         )
@@ -199,16 +190,14 @@ class GeomCompo:
                             result_points.extend(current_points)
                             if not_connected_segment:
                                 not_connected_segments.append(
-                                    current_segment_id
+                                    (current_segment_id, segment_ids[i - 1])
                                 )
 
             else:
                 result_points.extend(current_points)
 
         if result_points:
-            line_string = QgsLineString(
-                [QgsPoint(p.x(), p.y()) for p in result_points]
-            )
+            line_string = QgsLineString([QgsPoint(p.x(), p.y()) for p in result_points])
             return QgsGeometry(line_string), not_connected_segments
         else:
             log(
@@ -222,6 +211,7 @@ class GeomCompo:
         current_points,
         adjacent_points,
         current_segment_id,
+        adjacent_segment_id,
         last_segment="no",
     ):
         for p in [0, -1]:
@@ -240,12 +230,11 @@ class GeomCompo:
                     return current_points, []
 
         # si aucun point ne se touche, on renvoie la géométrie actuel.
-        return current_points, [current_segment_id]
+        return current_points, [current_segment_id, adjacent_segment_id]
 
     def create_new_layer(
         self,
     ):
-
         new_layer = QgsVectorLayer(
             "LineString?crs=" + self.segments_layer.crs().authid(),
             self.compositions_layer.name(),
@@ -326,11 +315,11 @@ class GeomCompo:
         return failed_compositions
 
     def update_not_connected_segments(self, composition_id, non_connected):
-        return {segment_id: [composition_id] for segment_id in non_connected}
+        if not non_connected:
+            return {}
+        return {tuple(segment_ids): [composition_id] for segment_ids in non_connected}
 
-    def _generate_error_messages(
-        self, failed_compositions, not_connected_segments
-    ):
+    def _generate_error_messages(self, failed_compositions, not_connected_segments):
         errors_messages = []
 
         if failed_compositions:
@@ -343,18 +332,13 @@ class GeomCompo:
             )
 
         if not_connected_segments:
-            for (
-                segment_id,
-                compositions_ids,
-            ) in not_connected_segments.items():
-                disconnected_ids = ", ".join(
-                    map(str, sorted(compositions_ids))
-                )
+            for segment_ids, compositions_ids in not_connected_segments.items():
+                disconnected_ids = ", ".join(map(str, sorted(compositions_ids)))
                 errors_messages.append(
                     {
                         "error_type": "discontinuity",
                         "composition_id": disconnected_ids,
-                        "segment_ids": (segment_id, segment_id),
+                        "segment_ids": segment_ids,
                     }
                 )
 

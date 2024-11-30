@@ -3,8 +3,9 @@
 import datetime
 import inspect
 import logging
-from functools import wraps
 import time
+from functools import wraps
+
 from .. import config
 
 
@@ -44,8 +45,7 @@ def get_features_list(layer, request=None, return_as="list"):
 
 def print_geometry_info(geometry, label):
     """Affiche les informations détaillées sur une géométrie."""
-    if not geometry or geometry.isEmpty():
-        print(f"{label}: Géométrie invalide ou vide")
+    if geometry.isNull():
         return
 
     points = geometry.asPolyline()
@@ -61,7 +61,7 @@ def print_geometry_info(geometry, label):
     )
 
 
-def log(message, level="INFO"):
+def log(message:str, level:str="INFO"):
     """Fonction pour gérer l'affichage des logs"""
     if config.logging_enabled is True:
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[

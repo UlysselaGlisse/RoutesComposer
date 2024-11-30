@@ -1,10 +1,12 @@
 """Main dialog class. Dialog that's open when clicking on the icon."""
 
 import os
+
 from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QSettings, QTranslator
 from qgis.PyQt.QtWidgets import QDialog
 from qgis.utils import iface
+
 
 from ... import config
 from .advanced_options import AdvancedOptions
@@ -41,13 +43,12 @@ class RoutesComposerDialog(QDialog):
         self.layer_manager = LayerManager(self)
         self.geometry_ops = GeometryOperations(self)
         self.advanced_options = AdvancedOptions(self)
+        self.translator = QTranslator()
 
         self.ui.init_ui()
         self.load_settings()
         self.setup_signals()
         self.update_ui_state()
-
-        self.translator = QTranslator()
 
     def load_styles(self):
         with open(
@@ -56,10 +57,20 @@ class RoutesComposerDialog(QDialog):
             return f.read()
 
     def load_settings(self):
-
         project = QgsProject.instance()
         if project:
             settings = QSettings()
+
+            self.saved_segments_layer_id = settings.value(
+                "routes_composer/segments_layer_id", ""
+            )
+            self.saved_compositions_layer_id = settings.value(
+                "routes_composer/compositions_layer_id", ""
+            )
+            self.saved_id_column = settings.value("routes_composer/id_column_name", "")
+            self.saved_segments_column = settings.value(
+                "routes_composer/segments_column_name", ""
+            )
 
             auto_start, _ = project.readBoolEntry(
                 "routes_composer", "auto_start", False
@@ -86,14 +97,10 @@ class RoutesComposerDialog(QDialog):
                     saved_segments_attr
                 )
                 if segments_attr_index >= 0:
-                    self.ui.segments_attr_combo.setCurrentIndex(
-                        segments_attr_index
-                    )
+                    self.ui.segments_attr_combo.setCurrentIndex(segments_attr_index)
             if saved_compositions_attr:
-                compositions_attr_index = (
-                    self.ui.compositions_attr_combo.findText(
-                        saved_compositions_attr
-                    )
+                compositions_attr_index = self.ui.compositions_attr_combo.findText(
+                    saved_compositions_attr
                 )
                 if compositions_attr_index >= 0:
                     self.ui.compositions_attr_combo.setCurrentIndex(
@@ -103,22 +110,34 @@ class RoutesComposerDialog(QDialog):
             self.ui.priority_mode_combo.setCurrentText(saved_priority_mode)
 
     def setup_signals(self):
+        # Layers
         self.ui.segments_combo.currentIndexChanged.connect(
             self.layer_manager.on_segments_layer_selected
         )
         self.ui.compositions_combo.currentIndexChanged.connect(
             self.layer_manager.on_compositions_layer_selected
         )
-        self.ui.segments_combo.currentIndexChanged.connect(
-            self.event_handlers.stop_running_routes_composer
+
+        # Routes composer
+        self.ui.start_button.clicked.connect(self.event_handlers.toggle_script)
+        self.ui.auto_start_checkbox.stateChanged.connect(
+            self.event_handlers.on_auto_start_check
         )
-        self.ui.compositions_combo.currentIndexChanged.connect(
-            self.event_handlers.stop_running_routes_composer
-        )
+
+        # Info
+        self.ui.info_button.clicked.connect(self.event_handlers.show_info)
+
+        # Geom
         self.ui.geom_checkbox.stateChanged.connect(
             self.event_handlers.on_geom_on_fly_check
         )
+        self.ui.check_errors_button.clicked.connect(self.geometry_ops.check_errors)
+        self.ui.create_or_update_geom_button.clicked.connect(
+            self.geometry_ops.create_geometries
+        )
+        self.ui.cancel_button.clicked.connect(self.event_handlers.cancel_process)
 
+        # Advanced options
         self.ui.segments_attr_combo.currentTextChanged.connect(
             self.advanced_options.on_segments_attr_selected
         )
@@ -128,13 +147,14 @@ class RoutesComposerDialog(QDialog):
         self.ui.priority_mode_combo.currentTextChanged.connect(
             self.advanced_options.on_priority_mode_selected
         )
+        self.ui.update_attributes_button.clicked.connect(
+            self.advanced_options.start_attribute_linking
+        )
 
     def update_ui_state(self):
         if config.script_running:
             self.ui.start_button.setText(self.tr("Arrêter"))
-            self.ui.status_label.setText(
-                self.tr("Status: En cours d'exécution")
-            )
+            self.ui.status_label.setText(self.tr("Status: En cours d'exécution"))
         else:
             self.ui.start_button.setText(self.tr("Démarrer"))
             self.ui.status_label.setText(self.tr("Status: Arrêté"))
@@ -172,19 +192,17 @@ class RoutesComposerDialog(QDialog):
     def showEvent(self, a0):
         if a0 is not None:
             super().showEvent(a0)
+            self.update_ui_state()
+
             self.ui.segments_combo.blockSignals(True)
             self.ui.compositions_combo.blockSignals(True)
             self.ui.segments_attr_combo.blockSignals(True)
             self.ui.compositions_attr_combo.blockSignals(True)
 
             self.layer_manager.refresh_layers_combo(self.ui.segments_combo)
-            self.layer_manager.refresh_layers_combo(
-                self.ui.compositions_combo
-            )
+            self.layer_manager.refresh_layers_combo(self.ui.compositions_combo)
 
-            self.layer_manager.populate_segments_layer_combo(
-                self.ui.segments_combo
-            )
+            self.layer_manager.populate_segments_layer_combo(self.ui.segments_combo)
             self.layer_manager.populate_compositions_layer_combo(
                 self.ui.compositions_combo
             )

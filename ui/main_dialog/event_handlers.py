@@ -1,13 +1,14 @@
 """Event handlers for RoutesComposerDialog."""
 
-from qgis.core import QgsProject, Qgis
+from qgis.core import Qgis, QgsProject
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.utils import iface
 
+from ...func.utils import log
+
 from ... import config
 from ...func.routes_composer import RoutesComposer
-
 from ..sub_dialog import InfoDialog
 
 
@@ -27,9 +28,9 @@ class EventHandlers(QObject):
                 if not routes_composer.is_connected:
                     routes_composer.connect()
 
+                self.dialog.update_ui_state()
                 if self.dialog.tool:
                     self.dialog.tool.update_icon()
-                    self.dialog.update_ui_state()
             else:
                 self.stop_running_routes_composer()
 
@@ -48,6 +49,7 @@ class EventHandlers(QObject):
             project.setDirty(True)
 
     def stop_running_routes_composer(self):
+        log("r")
         if self.dialog.ui.geom_checkbox.isChecked():
             self.dialog.ui.geom_checkbox.setChecked(False)
 
@@ -58,7 +60,8 @@ class EventHandlers(QObject):
 
             if self.dialog.tool:
                 self.dialog.tool.update_icon()
-                self.dialog.update_ui_state()
+
+        self.dialog.update_ui_state()
 
     def on_geom_on_fly_check(self, state):
         project = QgsProject.instance()
@@ -67,10 +70,7 @@ class EventHandlers(QObject):
             project.setDirty(True)
             geom_on_fly = bool(state)
 
-            if (
-                geom_on_fly
-                and self.dialog.layer_manager.check_layers_and_columns()
-            ):
+            if geom_on_fly and self.dialog.layer_manager.check_layers_and_columns():
                 routes_composer = RoutesComposer.get_instance()
                 routes_composer.connect_geom()
             else:
@@ -78,12 +78,10 @@ class EventHandlers(QObject):
                 routes_composer.disconnect_geom()
 
     def show_info(self):
-
         info_dialog = InfoDialog()
         info_dialog.exec_()
 
     def cancel_process(self):
-
         config.cancel_request = True
         self.dialog.ui.cancel_button.setEnabled(False)
         iface.messageBar().pushMessage(

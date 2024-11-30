@@ -1,7 +1,8 @@
 """Functions for linking attributes."""
 
-from .utils import log
 from qgis.PyQt.QtWidgets import QMessageBox
+
+from .utils import log
 
 
 class AttributeLinker:
@@ -31,12 +32,11 @@ class AttributeLinker:
 
     def stop(self):
         """UNUSE Arrête la liaison des attributs."""
-        try:
-            self.compositions_layer.attributeValueChanged.disconnect(
-                self.on_composition_changed
-            )
-        except:
-            pass
+
+        self.compositions_layer.attributeValueChanged.disconnect(
+            self.on_composition_changed
+        )
+
 
     def on_composition_changed(self, fid, idx, value):
         """UNUSE Appelé quand un attribut d'une composition change."""

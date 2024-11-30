@@ -1,15 +1,16 @@
 import os.path
 from typing import cast
+
 from qgis.core import QgsProject, QgsVectorLayer
-from qgis.PyQt.QtCore import QTimer, QSettings, QCoreApplication, QTranslator
+from qgis.PyQt.QtCore import QCoreApplication, QSettings, QTimer, QTranslator
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
 from . import config
-from .func.routes_composer import RoutesComposer
 from .func.list_constructor import IDsBasket
-from .ui.main_dialog.main import RoutesComposerDialog
+from .func.routes_composer import RoutesComposer
 from .func.utils import log
+from .ui.main_dialog.main import RoutesComposerDialog
 
 
 class RoutesComposerTool:
@@ -26,6 +27,9 @@ class RoutesComposerTool:
         project = QgsProject.instance()
         if project:
             project.readProject.connect(self.on_project_load)
+            project.layerRemoved.connect(self.update_icon)
+            self.current_project_id = project.fileName()
+
         locale = QSettings().value("locale/userLocale")[0:2]
         locale_path = os.path.join(
             os.path.dirname(__file__),
@@ -40,16 +44,10 @@ class RoutesComposerTool:
         self.iface.mapCanvas().mapToolSet.connect(self.deactivate_ids_basket)
 
     def initGui(self):
-        icon_path = os.path.join(
-            os.path.dirname(__file__), "ui", "icons", "icon.png"
-        )
+        icon_path = os.path.join(os.path.dirname(__file__), "ui", "icons", "icon.png")
         show_action = QAction(
             QIcon(icon_path),
-            (
-                QCoreApplication.translate(
-                    "RoutesManagerTool", "Ouvrir Routes Composer"
-                )
-            ),
+            (QCoreApplication.translate("RoutesManagerTool", "Ouvrir Routes Composer")),
             self.iface.mainWindow(),
         )
         show_action.triggered.connect(self.show_dialog)
@@ -111,9 +109,9 @@ class RoutesComposerTool:
             saved_compositions_layer_id = settings.value(
                 "routes_composer/compositions_layer_id", ""
             )
-            if not project.mapLayer(
-                saved_segments_layer_id
-            ) or not project.mapLayer(saved_compositions_layer_id):
+            if not project.mapLayer(saved_segments_layer_id) or not project.mapLayer(
+                saved_compositions_layer_id
+            ):
                 return False
 
             return True
@@ -123,18 +121,12 @@ class RoutesComposerTool:
         if not project:
             return
         settings = QSettings()
-        segments_layer_id = settings.value(
-            "routes_composer/segments_layer_id", ""
-        )
-        segments_layer = cast(
-            QgsVectorLayer, project.mapLayer(segments_layer_id)
-        )
+        segments_layer_id = settings.value("routes_composer/segments_layer_id", "")
+        segments_layer = cast(QgsVectorLayer, project.mapLayer(segments_layer_id))
         if segments_layer is None:
             return
 
-        id_column_name = settings.value(
-            "routes_composer/id_column_name", "id"
-        )
+        id_column_name = settings.value("routes_composer/id_column_name", "id")
         if id_column_name not in segments_layer.fields().names():
             return
 
@@ -150,20 +142,14 @@ class RoutesComposerTool:
             self.ids_basket_action.setChecked(False)
 
     def deactivate_ids_basket(self, tool):
-        # Vérifie si l'outil activé n'est pas IDsBasket
         if not isinstance(tool, IDsBasket):
             self.ids_basket_action.setChecked(False)
 
     def reset_plugin_state(self):
-        routes_composer = RoutesComposer.get_instance()
-        routes_composer.disconnect_routes_composer()
-        routes_composer.destroy_instance()
-
+        log("r")
         if self.dialog:
             self.dialog.reset_ui_state()
             self.dialog.close()
-            self.dialog = None
-            self.update_icon()
 
     def unload(self):
         """Supprime les éléments de l'interface"""
@@ -175,20 +161,20 @@ class RoutesComposerTool:
         del self.toolbar
 
     def update_icon(self):
+        log("r")
         icon_path = os.path.join(
             os.path.dirname(__file__),
             "ui",
             "icons",
-            (
-                "icon_run.png"
-                if config.script_running is True
-                else "icon_stop.png"
-            ),
+            ("icon_run.png" if config.script_running is True else "icon_stop.png"),
         )
         self.actions[0].setIcon(QIcon(icon_path))
 
     def show_dialog(self):
         """Affiche la fenêtre de dialogue"""
+        project = QgsProject.instance()
+        if not project:
+            return
         if self.dialog is None:
             self.dialog = RoutesComposerDialog(self.iface.mainWindow(), self)
         self.dialog.show()

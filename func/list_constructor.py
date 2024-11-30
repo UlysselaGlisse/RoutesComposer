@@ -11,14 +11,13 @@ from qgis.core import (
     QgsSpatialIndex,
 )
 from qgis.gui import QgsMapTool
-from qgis.PyQt.QtCore import Qt, QPoint
+from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QCursor
 from qgis.PyQt.QtWidgets import QLabel
 
 
 class IDsBasket(QgsMapTool):
     def __init__(self, canvas, layer, id_column_name):
-
         super().__init__(canvas)
         self.canvas = canvas
         self.layer = layer
@@ -101,9 +100,7 @@ class IDsBasket(QgsMapTool):
                     # Chercher le chemin entre le dernier point sélectionné et le nouveau
                     last_id = self.selected_ids[-1]
                     if last_id != feature_id:
-                        path = self.find_connected_segments(
-                            last_id, feature_id
-                        )
+                        path = self.find_connected_segments(last_id, feature_id)
                         for segment_id in path:
                             if segment_id not in self.selected_ids:
                                 self.selected_ids.append(segment_id)
@@ -161,7 +158,7 @@ class IDsBasket(QgsMapTool):
         visited = set()
 
         while unvisited:
-            current_id = min(unvisited, key=unvisited.get)
+            current_id = min(unvisited, key=lambda k: unvisited[k])
             current_distance = unvisited[current_id]
 
             if current_id == end_id:
@@ -237,7 +234,8 @@ class IDsBasket(QgsMapTool):
         if self.selected_ids:
             ids_text = ",".join(map(str, self.selected_ids))
             clipboard = QgsApplication.clipboard()
-            clipboard.setText(ids_text)
+            if clipboard:
+                clipboard.setText(ids_text)
 
     def update_label(self):
         if self.selected_ids:

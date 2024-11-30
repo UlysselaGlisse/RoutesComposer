@@ -9,8 +9,8 @@ from qgis.core import (
 from qgis.PyQt.QtWidgets import QDialog
 from qgis.utils import iface
 
-from .utils import log, get_features_list
 from ..ui.sub_dialog import SingleSegmentDialog
+from .utils import get_features_list, log
 
 
 class SplitManager:
@@ -19,6 +19,7 @@ class SplitManager:
 
     def get_compositions_list_segments(self, segment_id: int) -> list:
         """Récupère toutes les listes de segments contenant l'id du segment divisé."""
+        log("r")
         if not segment_id:
             return []
 
@@ -38,23 +39,18 @@ class SplitManager:
         )
 
         for composition in compositions:
-            segments_list_str = composition[
-                self.routes_composer.segments_column_name
-            ]
+            segments_list_str = composition[self.routes_composer.segments_column_name]
 
             if not segments_list_str:
                 continue
 
             try:
                 segments_list_ids = [
-                    int(id.strip())
-                    for id in str(segments_list_str).split(",")
+                    int(id.strip()) for id in str(segments_list_str).split(",")
                 ]
                 if int(segment_id) in segments_list_ids:
                     log(f"Segment find in composition: {composition.id()}")
-                    segments_lists_ids.append(
-                        (composition.id(), segments_list_ids)
-                    )
+                    segments_lists_ids.append((composition.id(), segments_list_ids))
 
             except Exception as e:
                 log(
@@ -73,6 +69,7 @@ class SplitManager:
         new_feature: QgsFeature,
         segment_lists_ids: list,
     ) -> None:
+        log("r")
         """Met à jour les compositions après division d'un segment."""
 
         self.routes_composer.compositions_layer.startEditing()
@@ -87,8 +84,9 @@ class SplitManager:
                 if len(segments_list) > 1:
                     last_segment = old_index == len(segments_list) - 1
                     segment_geom, is_new_geom = (
-                        new_geom if last_segment else original_geom
-                    ), (True if last_segment else False)
+                        (new_geom if last_segment else original_geom),
+                        (True if last_segment else False),
+                    )
 
                     is_correctly_oriented = self.check_segment_orientation(
                         segment_geom, is_new_geom, segments_list, old_index
@@ -118,9 +116,7 @@ class SplitManager:
                     )
 
                 else:
-                    self.process_single_segment_composition(
-                        fid, old_id, new_id
-                    )
+                    self.process_single_segment_composition(fid, old_id, new_id)
 
                 self.routes_composer.compositions_layer.triggerRepaint()
 
@@ -136,6 +132,7 @@ class SplitManager:
         segments_list: list,
         old_index: int,
     ) -> bool:
+        log("r")
         """Vérifie si un segment est orienté correctement par rapport aux segments adjacents."""
         if is_new_geom:
             adjacent_id = segments_list[old_index - 1]
@@ -158,11 +155,9 @@ class SplitManager:
 
         return True
 
-    def process_single_segment_composition(
-        self, fid: int, old_id: int, new_id: int
-    ):
+    def process_single_segment_composition(self, fid: int, old_id: int, new_id: int):
         """Gère le cas d'une composition d'un seul segment."""
-
+        log("r")
         dialog = SingleSegmentDialog(old_id=old_id, new_id=new_id)
         dialog.current_segments = [old_id, new_id]
         result = dialog.exec_()
@@ -177,9 +172,7 @@ class SplitManager:
 
             if composition:
                 try:
-                    new_segments_str = ",".join(
-                        map(str, dialog.current_segments)
-                    )
+                    new_segments_str = ",".join(map(str, dialog.current_segments))
                     self.routes_composer.compositions_layer.startEditing()
                     self.routes_composer.compositions_layer.changeAttributeValue(
                         composition.id(),
@@ -207,22 +200,18 @@ class SplitManager:
             return None
 
     def clean_invalid_segments(self) -> None:
+        log("r")
         """Supprime les références aux segments qui n'existent plus dans la table segments."""
-
         valid_segments_ids = {
             str(f[self.routes_composer.id_column_name])
             for f in get_features_list(self.routes_composer.segments_layer)
             if f["id"] is not None
         }
-        compositions = get_features_list(
-            self.routes_composer.compositions_layer
-        )
+        compositions = get_features_list(self.routes_composer.compositions_layer)
 
         self.routes_composer.compositions_layer.startEditing()
         for composition in compositions:
-            segments_list_str = composition[
-                self.routes_composer.segments_column_name
-            ]
+            segments_list_str = composition[self.routes_composer.segments_column_name]
             if (
                 segments_list_str is None
                 or str(segments_list_str).upper() == "NULL"
@@ -249,18 +238,17 @@ class SplitManager:
                 )
 
     def has_duplicate_segment_id(self, segment_id: int) -> bool:
+        log("r")
         """Vérifie si un id de segments existe plusieurs fois. Si oui, il s'agit d'un segment divisé."""
-
         expression = f"{self.routes_composer.id_column_name} = '{segment_id}'"
         request = QgsFeatureRequest().setFilterExpression(expression)
         request.setLimit(2)
 
-        segments = get_features_list(
-            self.routes_composer.segments_layer, request
-        )
+        segments = get_features_list(self.routes_composer.segments_layer, request)
         return len(segments) > 1
 
     def update_segment_id(self, fid: int, next_id: int) -> None:
+        log("r")
         """Met à jour l'id des segments divisés."""
         self.routes_composer.segments_layer.startEditing()
         self.routes_composer.segments_layer.changeAttributeValue(
@@ -269,6 +257,7 @@ class SplitManager:
         self.routes_composer.segments_layer.triggerRepaint()
 
     def get_next_id(self) -> int:
+        log("r")
         """Retourne le dernier id disponible."""
         next_id = int(
             self.routes_composer.segments_layer.maximumValue(

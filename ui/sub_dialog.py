@@ -1,23 +1,10 @@
-import re
-from qgis.core import (
-    QgsProject,
-    QgsFeatureRequest,
-    QgsCoordinateTransform,
-    QgsGeometry,
-)
-from qgis.utils import iface
 from qgis.PyQt.QtWidgets import (
     QDialog,
+    QHBoxLayout,
+    QLabel,
     QPushButton,
     QVBoxLayout,
-    QLabel,
-    QHBoxLayout,
-    QMessageBox,
-    QTreeWidget,
-    QTreeWidgetItem,
 )
-from PyQt5 import QtWidgets
-from ..func import warning
 
 
 class InfoDialog(QDialog):

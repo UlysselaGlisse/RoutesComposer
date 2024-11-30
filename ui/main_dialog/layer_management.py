@@ -1,16 +1,18 @@
 """Layer and field management for RoutesComposerDialog."""
 
 from typing import cast
+
 from qgis.core import QgsProject, QgsVectorLayer, QgsWkbTypes
 from qgis.PyQt.QtCore import (
+    QCoreApplication,
     QObject,
     QSettings,
     Qt,
     QVariant,
-    QCoreApplication,
 )
 from qgis.PyQt.QtWidgets import QMessageBox
-from ...func.utils import log, get_features_list
+
+from ...func.utils import get_features_list, log
 
 
 class LayerManager(QObject):
@@ -38,12 +40,7 @@ class LayerManager(QObject):
                         )
 
     def populate_segments_layer_combo(self, combo):
-        settings = QSettings()
-        saved_segments_layer_id = settings.value(
-            "routes_composer/segments_layer_id", ""
-        )
-
-        segments_index = combo.findData(saved_segments_layer_id)
+        segments_index = combo.findData(self.dialog.saved_segments_layer_id)
         if segments_index >= 0:
             combo.setCurrentIndex(segments_index)
         else:
@@ -56,12 +53,7 @@ class LayerManager(QObject):
         self.dialog.ui.id_column_combo.blockSignals(False)
 
     def populate_compositions_layer_combo(self, combo):
-        settings = QSettings()
-        saved_compositions_layer_id = settings.value(
-            "routes_composer/compositions_layer_id", ""
-        )
-
-        compositions_index = combo.findData(saved_compositions_layer_id)
+        compositions_index = combo.findData(self.dialog.saved_compositions_layer_id)
         if compositions_index >= 0:
             combo.setCurrentIndex(compositions_index)
         else:
@@ -80,22 +72,15 @@ class LayerManager(QObject):
             field_names = [field.name() for field in segments_layer.fields()]
             self.dialog.ui.id_column_combo.addItems(field_names)
 
-            settings = QSettings()
-            saved_id_column = settings.value(
-                "routes_composer/id_column_name", ""
-            )
-
             saved_index = self.dialog.ui.id_column_combo.findText(
-                saved_id_column
+                self.dialog.saved_id_column
             )
             if saved_index >= 0:
                 self.dialog.ui.id_column_combo.setCurrentIndex(saved_index)
             else:
                 default_index = self.dialog.ui.id_column_combo.findText("id")
                 if default_index >= 0:
-                    self.dialog.ui.id_column_combo.setCurrentIndex(
-                        default_index
-                    )
+                    self.dialog.ui.id_column_combo.setCurrentIndex(default_index)
                 elif self.dialog.ui.id_column_combo.count() > 0:
                     self.dialog.ui.id_column_combo.setCurrentIndex(0)
 
@@ -103,31 +88,20 @@ class LayerManager(QObject):
         self.dialog.ui.segments_column_combo.clear()
 
         if compositions_layer:
-            field_names = [
-                field.name() for field in compositions_layer.fields()
-            ]
+            field_names = [field.name() for field in compositions_layer.fields()]
             self.dialog.ui.segments_column_combo.addItems(field_names)
 
-            settings = QSettings()
-            saved_segments_column = settings.value(
-                "routes_composer/segments_column_name", ""
-            )
-
             saved_index = self.dialog.ui.segments_column_combo.findText(
-                saved_segments_column
+                self.dialog.saved_segments_column
             )
             if saved_index >= 0:
-                self.dialog.ui.segments_column_combo.setCurrentIndex(
-                    saved_index
-                )
+                self.dialog.ui.segments_column_combo.setCurrentIndex(saved_index)
             else:
                 default_index = self.dialog.ui.segments_column_combo.findText(
                     "segments"
                 )
                 if default_index >= 0:
-                    self.dialog.ui.segments_column_combo.setCurrentIndex(
-                        default_index
-                    )
+                    self.dialog.ui.segments_column_combo.setCurrentIndex(default_index)
                 elif self.dialog.ui.segments_column_combo.count() > 0:
                     self.dialog.ui.segments_column_combo.setCurrentIndex(0)
 
@@ -136,9 +110,7 @@ class LayerManager(QObject):
 
         project = QgsProject.instance()
         if project:
-            self.segments_layer = cast(
-                QgsVectorLayer, project.mapLayer(segments_id)
-            )
+            self.segments_layer = cast(QgsVectorLayer, project.mapLayer(segments_id))
             if self.segments_layer is not None:
                 log(f"Segments layer selected: {self.segments_layer.name()}")
                 self.check_segments_layer(message_type="warning")
@@ -156,10 +128,8 @@ class LayerManager(QObject):
                 QgsVectorLayer, project.mapLayer(compositions_id)
             )
             if self.compositions_layer is not None:
-                log(
-                    f"Compositions layer selected: {self.compositions_layer.name()}"
-                )
-            if self.check_compositions_layer():
+                log(f"Compositions layer selected: {self.compositions_layer.name()}")
+                self.check_compositions_layer(message_type="warning")
                 self.populate_segments_column_combo(self.compositions_layer)
                 self.dialog.advanced_options.update_compositions_attr_combo(
                     self.compositions_layer
@@ -167,6 +137,9 @@ class LayerManager(QObject):
 
     def check_layers_and_columns(self):
         if not self.check_segments_layer(message_type="box"):
+            return False
+
+        if not self.check_compositions_layer(message_type="box"):
             return False
 
         if not self.is_id_column_valid():
@@ -185,40 +158,33 @@ class LayerManager(QObject):
             settings = QSettings()
 
             segments_id = self.dialog.ui.segments_combo.currentData()
-            settings.setValue(
-                "routes_composer/segments_layer_id", segments_id
-            )
+            settings.setValue("routes_composer/segments_layer_id", segments_id)
 
             compositions_id = self.dialog.ui.compositions_combo.currentData()
-            settings.setValue(
-                "routes_composer/compositions_layer_id", compositions_id
-            )
+            settings.setValue("routes_composer/compositions_layer_id", compositions_id)
 
             id_column = self.dialog.ui.id_column_combo.currentText()
             settings.setValue("routes_composer/id_column_name", id_column)
 
-            segments_column = (
-                self.dialog.ui.segments_column_combo.currentText()
-            )
-            settings.setValue(
-                "routes_composer/segments_column_name", segments_column
-            )
+            segments_column = self.dialog.ui.segments_column_combo.currentText()
+            settings.setValue("routes_composer/segments_column_name", segments_column)
 
             project.setDirty(True)
 
     def check_segments_layer(self, message_type="box"):
         if not isinstance(self.segments_layer, QgsVectorLayer):
-            raise Exception(
-                QCoreApplication.translate(
-                    "RoutesComposer",
+            QMessageBox.warning(
+                self.dialog,
+                self.tr("Attention"),
+                self.tr(
                     "La couche de segments n'est pas une couche vectorielle valide",
-                )
+                ),
             )
             return False
 
         if (
             self.segments_layer.geometryType() != QgsWkbTypes.LineGeometry  # type: ignore
-        ):  # ignore
+        ):
             if message_type == "box":
                 QMessageBox.warning(
                     self.dialog,
@@ -266,21 +232,50 @@ class LayerManager(QObject):
 
         return True
 
-    def check_compositions_layer(self):
+    def check_compositions_layer(self, message_type="box"):
         if not isinstance(self.compositions_layer, QgsVectorLayer):
+            raise Exception(
+                QCoreApplication.translate(
+                    "RoutesComposer",
+                    "La couche des compositions n'est pas une couche vectorielle valide",
+                )
+            )
             return False
-
         if self.compositions_layer.isSpatial():
+            if (
+                self.compositions_layer.geometryType() != QgsWkbTypes.LineGeometry  # type: ignore
+            ):
+                if message_type == "box":
+                    QMessageBox.warning(
+                        self.dialog,
+                        self.tr("Attention"),
+                        self.tr(
+                            "Veuillez sélectionnez une couche compositions de type LineString ou sans géométrie"
+                        ),
+                    )
+                    return False
 
-            self.dialog.ui.geom_checkbox.setVisible(True)
+                elif message_type == "warning":
+                    self.dialog.ui.compositions_warning_label.setText(
+                        self.tr(
+                            "Attention: la géométrie de la couche de compositions doit être de type LineString"
+                        )
+                    )
+                    self.dialog.ui.compositions_warning_label.setVisible(True)
+                    return False
+            else:
+                self.dialog.ui.compositions_warning_label.setVisible(False)
 
-            self.dialog.ui.create_or_update_geom_button.setText(
-                self.tr("Mettre à jour les géométries")
-            )
-            self.dialog.ui.create_or_update_geom_button.clicked.disconnect()
-            self.dialog.ui.create_or_update_geom_button.clicked.connect(
-                self.dialog.geometry_ops.update_geometries
-            )
+                self.dialog.ui.geom_checkbox.setVisible(True)
+
+                self.dialog.ui.create_or_update_geom_button.setText(
+                    self.tr("Mettre à jour les géométries")
+                )
+                self.dialog.ui.create_or_update_geom_button.clicked.disconnect()
+                self.dialog.ui.create_or_update_geom_button.clicked.connect(
+                    self.dialog.geometry_ops.update_geometries
+                )
+
         else:
             self.dialog.ui.geom_checkbox.setVisible(False)
             self.dialog.ui.create_or_update_geom_button.setText(
@@ -297,21 +292,14 @@ class LayerManager(QObject):
         if self.compositions_layer is None:
             return False
 
-        segments_column_name = (
-            self.dialog.ui.segments_column_combo.currentText()
-        )
+        segments_column_name = self.dialog.ui.segments_column_combo.currentText()
         if not segments_column_name:
             return False
 
-        if (
-            segments_column_name
-            not in self.compositions_layer.fields().names()
-        ):
+        if segments_column_name not in self.compositions_layer.fields().names():
             return False
 
-        segment_field = self.compositions_layer.fields().field(
-            segments_column_name
-        )
+        segment_field = self.compositions_layer.fields().field(segments_column_name)
 
         if segment_field.type() != QVariant.String:
             QMessageBox.warning(
