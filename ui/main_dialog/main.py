@@ -40,6 +40,7 @@ class RoutesComposerDialog(QDialog):
 
         self.ui = UiBuilder(self)
         self.info = InfoDialog(self)
+        self.layer_manager = LayerManager(self)
         self.event_handlers = EventHandlers(self)
         self.geometry_ops = GeometryOperations(self)
         self.advanced_options = AdvancedOptions(self)
