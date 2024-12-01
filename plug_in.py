@@ -146,7 +146,6 @@ class RoutesComposerTool:
             self.ids_basket_action.setChecked(False)
 
     def reset_plugin_state(self):
-        log("r")
         if self.dialog:
             self.dialog.reset_ui_state()
             self.dialog.close()
