@@ -127,7 +127,6 @@ class IDsBasket(QgsMapTool):
             self.restore_last_removed_segment()
 
     def remove_last_segment(self):
-        """Supprime le dernier segment sélectionné."""
         if self.selected_ids:
             last_id = self.selected_ids.pop()
             self.removed_ids.append(last_id)
@@ -137,7 +136,6 @@ class IDsBasket(QgsMapTool):
             self.update_label()
 
     def restore_last_removed_segment(self):
-        """Restaure le dernier segment supprimé."""
         if self.removed_ids:
             last_removed_id = self.removed_ids.pop()
             self.selected_ids.append(last_removed_id)
@@ -230,7 +228,6 @@ class IDsBasket(QgsMapTool):
         return connected
 
     def copy_ids_to_clipboard(self):
-        """Copie la liste des IDs dans le presse-papiers"""
         if self.selected_ids:
             ids_text = ",".join(map(str, self.selected_ids))
             clipboard = QgsApplication.clipboard()

@@ -37,20 +37,14 @@ class AttributeLinker:
             self.on_composition_changed
         )
 
-
     def on_composition_changed(self, fid, idx, value):
         """UNUSE Appelé quand un attribut d'une composition change."""
-        # Vérifie si c'est bien le champ qu'on suit qui a changé
-        if (
-            self.compositions_layer.fields()[idx].name()
-            != self.compositions_attr
-        ):
+        if self.compositions_layer.fields()[idx].name() != self.compositions_attr:
             return
 
         self.update_segments_attr_values()
 
     def update_segments_attr_values(self):
-        """Met à jour l'attribut de segments."""
         try:
             segments_to_update = {}
 
@@ -64,9 +58,7 @@ class AttributeLinker:
                     continue
 
                 segment_ids = [
-                    int(id_str)
-                    for id_str in segments_list.split(",")
-                    if id_str.strip()
+                    int(id_str) for id_str in segments_list.split(",") if id_str.strip()
                 ]
 
                 for segment_id in segment_ids:
@@ -79,9 +71,7 @@ class AttributeLinker:
                         # Conversion explicite en nombres pour la comparaison,
                         # car sinon 0 n'est pas pris en compte.'
                         value_num = float(value) if value else 0
-                        current_value_num = (
-                            float(current_value) if current_value else 0
-                        )
+                        current_value_num = float(current_value) if current_value else 0
 
                         if self.priority_mode == "min_value":
                             segments_to_update[segment_id] = (

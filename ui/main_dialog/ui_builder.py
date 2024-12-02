@@ -244,7 +244,7 @@ class UiBuilder(QObject):
         self.dialog.adjustSize()
 
     def get_start_button_style(self):
-        # TODO: Mettre le css dans le fichier styles, je n'y suis pas arrivé pour l'instant.
+        # TODO: Mettre le css dans le fichier styles css.
         if not config.script_running:
             return """
                 QPushButton {

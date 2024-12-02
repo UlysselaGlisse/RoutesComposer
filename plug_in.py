@@ -28,7 +28,6 @@ class RoutesComposerTool:
         if project:
             project.readProject.connect(self.on_project_load)
             project.layerRemoved.connect(self.update_icon)
-            self.current_project_id = project.fileName()
 
         locale = QSettings().value("locale/userLocale")[0:2]
         locale_path = os.path.join(
@@ -151,7 +150,6 @@ class RoutesComposerTool:
             self.dialog.close()
 
     def unload(self):
-        """Supprime les éléments de l'interface"""
         for action in self.actions:
             self.iface.removeToolBarIcon(action)
             self.iface.removePluginMenu(self.menu, action)
@@ -160,7 +158,6 @@ class RoutesComposerTool:
         del self.toolbar
 
     def update_icon(self):
-        log("r")
         icon_path = os.path.join(
             os.path.dirname(__file__),
             "ui",
@@ -170,7 +167,6 @@ class RoutesComposerTool:
         self.actions[0].setIcon(QIcon(icon_path))
 
     def show_dialog(self):
-        """Affiche la fenêtre de dialogue"""
         if self.dialog is None:
             self.dialog = RoutesComposerDialog(self.iface.mainWindow(), self)
         self.dialog.show()

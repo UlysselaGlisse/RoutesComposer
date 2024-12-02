@@ -39,7 +39,6 @@ def get_features_list(layer, request=None, return_as="list"):
     if return_as == "set":
         return set(features)
 
-    # Par défaut, retourne une liste
     return features
 
 
@@ -61,12 +60,10 @@ def print_geometry_info(geometry, label):
     )
 
 
-def log(message:str, level:str="INFO"):
+def log(message: str, level: str = "INFO"):
     """Fonction pour gérer l'affichage des logs"""
     if config.logging_enabled is True:
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[
-            :-3
-        ]
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
         current_frame = inspect.currentframe()
 

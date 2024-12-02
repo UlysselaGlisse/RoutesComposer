@@ -51,37 +51,28 @@ class RoutesComposer(QObject):
 
     @classmethod
     def destroy_instance(cls):
-        log("r")
         cls._instance = None
 
     def feature_added(self, feature_id):
         """Fonction prinicpale. Traite l'ajout d'une nouvelle entité dans la couche segments."""
         # Pendant l'enregistrement: fid >= 0.'
-        log(feature_id)
         if feature_id >= 0:
             return
-            log("feature_id >=0")
         if self.segments_layer is None or self.compositions_layer is None:
             return
-            log("layers are not goods")
 
         source_feature = self.segments_layer.getFeature(feature_id)
         if not source_feature.isValid() and source_feature.fields().names():
             return
-            log("source_feature problem")
 
         segment_id = int(source_feature.attributes()[self.id_column_index])
-        log(f"{segment_id}")
         if segment_id is None:
             return
-            log("no segment_id associate with feature_id")
 
         if self.split_manager.has_duplicate_segment_id(segment_id):
-            log("segment splited")
             new_geometry = source_feature.geometry()
             if not new_geometry or new_geometry.isEmpty():
                 return
-                log("segment has no geometry")
 
             original_feature = next(
                 self.segments_layer.getFeatures(
@@ -112,7 +103,6 @@ class RoutesComposer(QObject):
                         source_feature,
                         segments_lists_ids,
                     )
-        log("segment was not splited")
 
     def features_deleted(self, fids):
         """Nettoie les compositions des segments supprimés."""
@@ -132,12 +122,10 @@ class RoutesComposer(QObject):
         source_feature = self.segments_layer.getFeature(fid)
         if not source_feature.isValid():
             return
-        log(fid)
 
         segment_id = source_feature.attributes()[self.id_column_index]
         if segment_id is None:
             return
-        log(segment_id)
 
         log(
             f"Updating geometries for modified segment {segment_id}",

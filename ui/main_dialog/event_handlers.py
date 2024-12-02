@@ -48,7 +48,6 @@ class EventHandlers(QObject):
             project.setDirty(True)
 
     def stop_running_routes_composer(self):
-        log("r")
         if self.dialog.ui.geom_checkbox.isChecked():
             self.dialog.ui.geom_checkbox.setChecked(False)
 

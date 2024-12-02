@@ -38,10 +38,8 @@ class ErrorDialog(QDialog):
 
         self.setModal(False)
         self.setup_ui()
-        # self.refresh_errors()
 
     def setup_ui(self):
-        """Configure the UI elements for the ErrorDialog."""
         layout = QVBoxLayout()
 
         header_layout = QHBoxLayout()
@@ -49,7 +47,6 @@ class ErrorDialog(QDialog):
         label = QLabel(self.tr("Détails des erreurs détectées :"))
         header_layout.addWidget(label)
 
-        # Bouton d'actualisation
         refresh_button = QPushButton()
         refresh_button.setIcon(
             QtWidgets.QApplication.style().standardIcon(  # type: ignore
@@ -67,7 +64,6 @@ class ErrorDialog(QDialog):
         self.error_tree_widget.setHeaderLabels(
             [self.tr("Type d'erreur"), self.tr("Détails")]
         )
-        # self.error_tree_widget.setColumnWidth(0, 100)
 
         layout.addWidget(self.error_tree_widget)
 
@@ -78,7 +74,6 @@ class ErrorDialog(QDialog):
         self.setStyleSheet(self.get_stylesheet())
 
     def refresh_errors(self):
-        """Méthode pour rafraîchir la liste d'erreurs."""
         errors = warning.verify_segments(
             self.segments_layer,
             self.compositions_layer,
@@ -146,7 +141,6 @@ class ErrorDialog(QDialog):
         self.error_tree_widget.resizeColumnToContents(0)
 
     def format_error_detail(self, error):
-        """Format error details for display."""
         error_type = error.get("error_type")
         composition_id = error.get("composition_id", "N/A")
         segment_id1, segment_id2 = error.get("segment_ids", (None, None))
@@ -183,7 +177,6 @@ class ErrorDialog(QDialog):
         return self.tr("Erreur inconnue. Détails: {details}").format(details=str(error))
 
     def on_item_clicked(self, item):
-        """Gérer le clic sur un élément de la liste d'erreurs."""
         if not item.parent():
             return
 
@@ -209,7 +202,6 @@ class ErrorDialog(QDialog):
                 self.zoom_to_segment(unused_segment_id)
 
     def zoom_to_segment(self, segment_id):
-        """Zoomer sur le segment spécifié dans la carte QGIS."""
         feature = next(
             self.segments_layer.getFeatures(
                 QgsFeatureRequest().setFilterExpression(
