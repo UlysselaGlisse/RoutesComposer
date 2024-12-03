@@ -18,7 +18,8 @@ In the video above, you can see a set of segments on the map and a list of segme
 
 You will be able to directly create the geometries of compositions from the plugin interface, update them if your layer already has them, and refresh them with each modification of the segment geometries.
 
-![RoutesComposer](https://github.com/user-attachments/assets/33897f19-8f54-49e9-b7ea-8a9dd685000d)
+
+![Main_dialog](https://github.com/user-attachments/assets/82146abb-d07f-45f1-a74f-90a00c19ee88)
 
 ## Selection
 
