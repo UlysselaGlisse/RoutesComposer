@@ -19,5 +19,5 @@ about=This Qgis plugin allows you to create routes between two points from a
 repository=https://github.com/UlysselaGlisse/RoutesComposer
 category=Vector
 icon=ui/icons/icon.png
-experimental=False
-deprecated=False
+tracker=https://github.com/UlysselaGlisse/RoutesComposer/issues
+homepage=https://github.com/UlysselaGlisse/RoutesComposer
