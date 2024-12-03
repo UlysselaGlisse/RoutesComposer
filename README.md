@@ -14,7 +14,7 @@ https://github.com/user-attachments/assets/82e68484-61c9-49c2-8f8e-dd5668f01f40
 
 In the video above, you can see a set of segments on the map and a list of segments at the bottom of the screen. When segment 2516 is divided, a new segment is created, and the lists of segments are automatically updated.
 
-## Creating Geometries and Errors:
+## Creating Geometries and Check Errors:
 
 You will be able to directly create the geometries of compositions from the plugin interface, update them if your layer already has them, and refresh them with each modification of the segment geometries.
 
