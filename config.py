@@ -1,3 +1,3 @@
-logging_enabled = True
+logging_enabled = False
 script_running = False
 cancel_request = False

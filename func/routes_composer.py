@@ -103,6 +103,7 @@ class RoutesComposer(QObject):
                         source_feature,
                         segments_lists_ids,
                     )
+                    self.geometry_changed(feature_id)
 
     def features_deleted(self, fids):
         """Nettoie les compositions des segments supprimés."""
@@ -134,11 +135,33 @@ class RoutesComposer(QObject):
         self.geom.update_geometries_on_the_fly(segment_id)
         self.compositions_layer.triggerRepaint()
 
+    def feature_added_on_compo_layer(self, fid):
+        if self.segments_layer is None or self.compositions_layer is None:
+            return
+
+        source_feature = self.compositions_layer.getFeature(fid)
+        if not source_feature.isValid():
+            return
+
+        segments_str = source_feature[self.segments_column_name]
+        if not segments_str:
+            return
+
+        segments_list = [seg.strip() for seg in str(segments_str).split(",")]
+        if not segments_list:
+            return
+
+        segment_id = int(segments_list[0])
+        self.geom.update_geometries_on_the_fly(segment_id)
+        self.compositions_layer.triggerRepaint()
+
+
     def connect(self):
         try:
-            if self.segments_layer is not None and not self.is_connected:
+            if self.segments_layer is not None and self.compositions_layer is not None and not self.is_connected:
                 self.segments_layer.featureAdded.connect(self.feature_added)
                 self.segments_layer.featuresDeleted.connect(self.features_deleted)
+                self.compositions_layer.featureAdded.connect(self.feature_added_on_compo_layer)
                 self.is_connected = True
                 config.script_running = True
 

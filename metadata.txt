@@ -1,14 +1,18 @@
 [general]
 name=RoutesComposer
 description=Composer of roads from network of segments.
+    This plugin assists you in creating routes from a network of segments, automatically updating the compositions of split or merged segments and providing a tool to select segments ids directly on the map.
 version=1.1
 qgisMinimumVersion=3.0
 author=Ulysse Descamps
 email=ulysse38250@gmail.com
-about=This Qgis plugin allows you to create routes between two points from a
-    vector network. The most obvious example of a network is that of roads: department road 42 is both a single road and consists of dozens of different sections.
+about=
+    This Qgis plugin allows you to create routes between two points from a vector
+    network. The most obvious example of a network is that of roads: national road 42 is both a single road and consists of dozens of different sections.
 
-    The sections are segments in the plugin, while the department road corresponds to a composition. All geographical work is done on the segments. Compositions only have attributes and a list containing the identifiers of the segments.
+    The sections are segments in the plugin, while the national road corresponds to a composition.
+
+    All geographical work is done on the segments. Compositions only have attributes and a list containing the identifiers of the segments.
 
     The first function of this plugin is to assist when dividing a segment. If the segment is part of one or more compositions, it can be cumbersome to find in which ones and at what location. The plugin takes care of this for you.
 

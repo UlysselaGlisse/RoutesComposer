@@ -29,12 +29,7 @@ https://github.com/user-attachments/assets/e7506320-665e-49fe-bef8-5ba32d06b17d
 
 # Installation
 
-* Download this [file](https://github.com/UlysselaGlisse/RoutesComposer/releases/download/v1.1/RoutesComposer.zip).
-* In QGIS > Plugins > Install from ZIP.
-* Choose the zipped file.
-* Install the Plugin.
-
-*If the plugin does not appear, go to Plugins > Installed > Check the plugin icon.*
+Go to the plugin extension menu of Qgis and search for RoutesComposer.
 
 ---
 
@@ -54,11 +49,14 @@ https://github.com/user-attachments/assets/e7506320-665e-49fe-bef8-5ba32d06b17d
 
 #### Segment Basket
 * Click on the icon ![icon](ui/icons/ids_basket.png).
-* A small box will appear next to the cursor.
 * Click on the segments you are interested in. The box will fill up.
 * If you want to remove the last added segment, press Z, E to restore it.
-* To empty the box, right-click.
-* Segments are copied to the clipboard with each addition. You just have to paste them where needed.
+* When you have all the segments desired, right-click, the attribute form will open with the segments attribute column fill up.
+
+#### Geometries of compositions
+* When you want to export you'r work, you can open the RoutesComposer's dialog and click on Create Geometries. That will create a new layer with the geometries of all the compositions.
+* If you want to work next with a compositions layer with geometries, you can erase you'r old compositions layer with the new one by save the new layer at the path of the old one.
+* You can now click in the dialog on Allow geometry creation on the fly, and every time that a geometry of segments layer is changed, the compositions one will be changed.
 
 # Trial
 If you simply want to try this plugin, you will find an example GeoPackage in the etc/ folder. Open it and give it a try.

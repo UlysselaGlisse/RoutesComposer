@@ -124,6 +124,20 @@ class RoutesComposerTool:
         segments_layer = cast(QgsVectorLayer, project.mapLayer(segments_layer_id))
         if segments_layer is None:
             return
+        compositions_layer_id = settings.value(
+            "routes_composer/compositions_layer_id", ""
+        )
+        compositions_layer = cast(
+            QgsVectorLayer, project.mapLayer(compositions_layer_id)
+        )
+        if compositions_layer is None:
+            return
+
+        segments_column_name = settings.value(
+            "routes_composer/segments_column_name", "segments"
+        )
+        if segments_column_name not in compositions_layer.fields().names():
+            return
 
         id_column_name = settings.value("routes_composer/id_column_name", "id")
         if id_column_name not in segments_layer.fields().names():
@@ -131,7 +145,13 @@ class RoutesComposerTool:
 
         if segments_layer.isValid():
             canvas = self.iface.mapCanvas()
-            tool = IDsBasket(canvas, segments_layer, id_column_name)
+            tool = IDsBasket(
+                canvas,
+                segments_layer,
+                compositions_layer,
+                id_column_name,
+                segments_column_name,
+            )
             canvas.setMapTool(tool)
 
     def toggle_ids_basket(self):

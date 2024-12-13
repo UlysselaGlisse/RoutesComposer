@@ -8,6 +8,7 @@ from ... import config
 from ...func.geom_compo import GeomCompo
 from ...func.warning import verify_segments
 from .errors_dialog import ErrorDialog
+from ...func.utils import log
 
 
 class GeometryOperations(QObject):
@@ -31,6 +32,7 @@ class GeometryOperations(QObject):
             errors_messages = geom_compo.update_compositions_geometries(
                 self.dialog.ui.progress_bar, mode="new"
             )
+
             self.cleanup_after_operation(errors_messages)
 
     def update_geometries(self):
@@ -48,6 +50,7 @@ class GeometryOperations(QObject):
             errors_messages = geom_compo.update_compositions_geometries(
                 self.dialog.ui.progress_bar, mode="update"
             )
+            log(errors_messages)
             self.cleanup_after_operation(errors_messages)
 
     def setup_progress_bar(self, compositions_layer):

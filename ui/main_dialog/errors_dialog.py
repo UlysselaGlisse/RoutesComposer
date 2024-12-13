@@ -47,6 +47,7 @@ class ErrorDialog(QDialog):
         label = QLabel(self.tr("Détails des erreurs détectées :"))
         header_layout.addWidget(label)
 
+
         refresh_button = QPushButton()
         refresh_button.setIcon(
             QtWidgets.QApplication.style().standardIcon(  # type: ignore
@@ -59,6 +60,11 @@ class ErrorDialog(QDialog):
         header_layout.addWidget(refresh_button)
 
         layout.addLayout(header_layout)
+
+        info_label = QLabel(self.tr("L'id des compositions est celui du fournisseur de données."))
+        info_label.setStyleSheet("font-style: italic; font-weight: normal;")
+        info_label.setContentsMargins(0, 0, 0, 10)
+        layout.addWidget(info_label)
 
         self.error_tree_widget = QTreeWidget()
         self.error_tree_widget.setHeaderLabels(
@@ -143,7 +149,6 @@ class ErrorDialog(QDialog):
     def format_error_detail(self, error):
         error_type = error.get("error_type")
         composition_id = error.get("composition_id", "N/A")
-        segment_id1, segment_id2 = error.get("segment_ids", (None, None))
 
         if error_type == "failed_compositions":
             return self.tr(
@@ -151,6 +156,7 @@ class ErrorDialog(QDialog):
             ).format(composition_id=composition_id)
 
         elif error_type == "discontinuity":
+            segment_id1, segment_id2 = error.get("segment_ids", (None, None))
             return self.tr(
                 "Compositions: {composition_ids}. Entre les segments: {segment_id1}, {segment_id2}."
             ).format(
@@ -173,6 +179,23 @@ class ErrorDialog(QDialog):
             return self.tr(
                 "Segment {unused_segment_id} n'est utilisé dans aucune composition."
             ).format(unused_segment_id=unused_segment_id)
+
+        elif error_type == "empty_segments_list":
+            return self.tr(
+                "Composition : {composition_id}. Liste de segments vide.."
+            ).format(
+                composition_id=composition_id
+            )
+        elif error_type == "invalid_segment_id":
+            invalid_segment_id = error.get("invalid_segment_id")
+            segment_list = error.get("segment_list")
+            return self.tr(
+                "Composition : {composition_id}. Dans la liste: {segment_list}, l'id: '{invalid_segment_id}' est invalide."
+            ).format(
+                composition_id=composition_id,
+                segment_list=segment_list,
+                invalid_segment_id=invalid_segment_id,
+            )
 
         return self.tr("Erreur inconnue. Détails: {details}").format(details=str(error))
 

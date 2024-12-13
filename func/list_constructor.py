@@ -9,19 +9,38 @@ from qgis.core import (
     QgsProject,
     QgsRectangle,
     QgsSpatialIndex,
+    QgsVectorLayerUtils,
 )
-from qgis.gui import QgsMapTool
+from qgis.gui import (
+    QgsAttributeDialog,
+    QgsAttributeEditorContext,
+    QgsMapTool,
+)
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QCursor
 from qgis.PyQt.QtWidgets import QLabel
+from qgis.utils import iface
+
+from .geom_compo import GeomCompo
+from .utils import log
 
 
 class IDsBasket(QgsMapTool):
-    def __init__(self, canvas, layer, id_column_name):
+    def __init__(
+        self,
+        canvas,
+        segments_layer,
+        compositions_layer,
+        id_column_name,
+        segments_column_name,
+    ):
         super().__init__(canvas)
-        self.canvas = canvas
-        self.layer = layer
+        if canvas:
+            self.canvas = canvas
+        self.segments_layer = segments_layer
+        self.compositions_layer = compositions_layer
         self.id_column_name = id_column_name
+        self.segment_column_name = segments_column_name
         self.selected_ids = []
         self.removed_ids = []
         self.canvas = canvas
@@ -43,27 +62,54 @@ class IDsBasket(QgsMapTool):
         if not project:
             return
         self.crs_project = project.crs()
-        self.crs_layer = self.layer.crs()
+        self.crs_segments_layer = self.segments_layer.crs()
 
         self.transform = QgsCoordinateTransform(
-            self.crs_project, self.crs_layer, QgsProject.instance()
+            self.crs_project, self.crs_segments_layer, QgsProject.instance()
         )
 
         self.spatial_index = QgsSpatialIndex()
-        for feature in self.layer.getFeatures():
+        for feature in self.segments_layer.getFeatures():
             self.spatial_index.addFeature(feature)
 
         self.connectivity_cache = {}
+
+    def open_attribute_form(self):
+        log("r")
+        self.compositions_layer.startEditing()
+        feature = QgsVectorLayerUtils.createFeature(self.compositions_layer)
+
+        if self.selected_ids:
+            if self.segment_column_name != -1:
+                ids_text = ",".join(map(str, self.selected_ids))
+                feature.setAttribute(self.segment_column_name, ids_text)
+
+        dialog = QgsAttributeDialog(
+            self.compositions_layer, feature, True, iface.mainWindow(), True
+        )
+        dialog.setMode(QgsAttributeEditorContext.AddFeatureMode)  # type: ignore
+
+        if dialog.show() == 1:
+            new_feature = dialog.feature()
+
+            if new_feature:
+                log("r")
+                self.compositions_layer.addFeature(new_feature)
+                self.compositions_layer.commitChanges()
+
+        self.selected_ids.clear()
+        self.segments_layer.removeSelection()
+        self.update_label()
 
     def canvasReleaseEvent(self, e):
         if not e:
             return
         if e.button() == Qt.RightButton:  # type: ignore
-            self.selected_ids.clear()
-            self.layer.removeSelection()
-            self.update_label()
-
-            return
+            if self.selected_ids:
+                self.open_attribute_form()
+                return
+            else:
+                return
 
         if e.button() == Qt.LeftButton:  # type: ignore
             click_point = self.toMapCoordinates(e.pos())
@@ -83,7 +129,7 @@ class IDsBasket(QgsMapTool):
             closest_feature = None
             min_distance = float("inf")
 
-            for feature in self.layer.getFeatures(request):
+            for feature in self.segments_layer.getFeatures(request):
                 distance = feature.geometry().distance(
                     QgsGeometry.fromPointXY(QgsPointXY(transformed_point))
                 )
@@ -107,7 +153,6 @@ class IDsBasket(QgsMapTool):
                         if feature_id not in self.selected_ids:
                             self.selected_ids.append(feature_id)
 
-                self.copy_ids_to_clipboard()
                 self.update_label()
                 self.highlight_selected_segments()
 
@@ -116,7 +161,7 @@ class IDsBasket(QgsMapTool):
 
         expr = f"\"{self.id_column_name}\" IN ({','.join(map(str, self.selected_ids))})"
 
-        self.layer.selectByExpression(expr)
+        self.segments_layer.selectByExpression(expr)
 
     def keyPressEvent(self, e):
         if not e:
@@ -130,8 +175,7 @@ class IDsBasket(QgsMapTool):
         if self.selected_ids:
             last_id = self.selected_ids.pop()
             self.removed_ids.append(last_id)
-            self.layer.removeSelection()
-            self.copy_ids_to_clipboard()
+            self.segments_layer.removeSelection()
             self.highlight_selected_segments()
             self.update_label()
 
@@ -139,7 +183,6 @@ class IDsBasket(QgsMapTool):
         if self.removed_ids:
             last_removed_id = self.removed_ids.pop()
             self.selected_ids.append(last_removed_id)
-            self.copy_ids_to_clipboard()
             self.highlight_selected_segments()
             self.update_label()
 
@@ -169,7 +212,7 @@ class IDsBasket(QgsMapTool):
                 if neighbor_id in visited:
                     continue
                 neighbor_feature = next(
-                    self.layer.getFeatures(
+                    self.segments_layer.getFeatures(
                         QgsFeatureRequest().setFilterExpression(
                             f'"{self.id_column_name}" = {neighbor_id}'
                         )
@@ -206,7 +249,7 @@ class IDsBasket(QgsMapTool):
         request = QgsFeatureRequest().setFilterExpression(
             f'"{self.id_column_name}" = {segment_id}'
         )
-        current_feature = next(self.layer.getFeatures(request))
+        current_feature = next(self.segments_layer.getFeatures(request))
         current_geom = current_feature.geometry()
 
         bbox = current_geom.boundingBox()
@@ -215,7 +258,7 @@ class IDsBasket(QgsMapTool):
         candidates = self.spatial_index.intersects(bbox)
 
         request = QgsFeatureRequest().setFilterFids(candidates)
-        for feature in self.layer.getFeatures(request):
+        for feature in self.segments_layer.getFeatures(request):
             if feature[self.id_column_name] == segment_id:
                 continue
 
@@ -226,13 +269,6 @@ class IDsBasket(QgsMapTool):
 
         self.connectivity_cache[segment_id] = connected
         return connected
-
-    def copy_ids_to_clipboard(self):
-        if self.selected_ids:
-            ids_text = ",".join(map(str, self.selected_ids))
-            clipboard = QgsApplication.clipboard()
-            if clipboard:
-                clipboard.setText(ids_text)
 
     def update_label(self):
         if self.selected_ids:
@@ -269,8 +305,7 @@ class IDsBasket(QgsMapTool):
         #     return
 
         labelPos = mousePos + QPoint(20, 0)
-
-        if labelPos.x() + self.label.width() > self.canvas.width():
+        if labelPos.x() + self.label.width() > self.canvas.width():  # type: ignore
             labelPos.setX(mousePos.x() - self.label.width() - 5)
 
         self.label.move(labelPos)
@@ -279,5 +314,5 @@ class IDsBasket(QgsMapTool):
     def deactivate(self):
         self.label.hide()
         self.selected_ids = []
-        self.layer.removeSelection()
+        self.segments_layer.removeSelection()
         super().deactivate()

@@ -5,6 +5,7 @@ from qgis.core import (
     QgsFeature,
     QgsFeatureRequest,
     QgsGeometry,
+    QgsVectorLayerUtils,
 )
 from qgis.PyQt.QtWidgets import QDialog
 from qgis.utils import iface
