@@ -54,7 +54,7 @@ class RoutesComposer(QObject):
         cls._instance = None
 
     def feature_added(self, feature_id):
-        """Fonction prinicpale. Traite l'ajout d'une nouvelle entité dans la couche segments."""
+        """Traite l'ajout d'une nouvelle entité dans la couche segments."""
         # Pendant l'enregistrement: fid >= 0.'
         if feature_id >= 0:
             return
@@ -107,9 +107,6 @@ class RoutesComposer(QObject):
 
     def features_deleted(self, fids):
         """Nettoie les compositions des segments supprimés."""
-        for fid in fids:
-            if fid >= 0:
-                return
         if self.segments_layer is None or self.compositions_layer is None:
             return
 

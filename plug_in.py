@@ -59,7 +59,7 @@ class RoutesComposerTool:
         self.ids_basket_action = QAction(
             QIcon(icon_path),
             QCoreApplication.translate(
-                "RoutesManagerTool", "Ouvrir le panier à segments"
+                "RoutesManagerTool", "Sélectionner des entités sur la carte et ouvrir le formulaire d'attributs."
             ),
             self.iface.mainWindow(),
         )
@@ -69,7 +69,6 @@ class RoutesComposerTool:
         self.actions.append(self.ids_basket_action)
 
     def on_project_load(self):
-        # self.reset_plugin_state()
         project = QgsProject.instance()
         if project:
             auto_start, _ = project.readBoolEntry(

@@ -80,7 +80,7 @@ class ErrorDialog(QDialog):
         self.setStyleSheet(self.get_stylesheet())
 
     def refresh_errors(self):
-        errors = warning.verify_segments(
+        errors = warning.verify_compositions(
             self.segments_layer,
             self.compositions_layer,
             self.segments_column_name,

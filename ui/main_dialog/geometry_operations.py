@@ -6,7 +6,7 @@ from qgis.core import QgsProject
 
 from ... import config
 from ...func.geom_compo import GeomCompo
-from ...func.warning import verify_segments
+from ...func.warning import verify_compositions
 from .errors_dialog import ErrorDialog
 from ...func.utils import log
 
@@ -81,7 +81,7 @@ class GeometryOperations(QObject):
 
     def check_errors(self):
         if self.dialog.layer_manager.check_layers_and_columns():
-            errors = verify_segments(
+            errors = verify_compositions(
                 self.dialog.layer_manager.segments_layer,
                 self.dialog.layer_manager.compositions_layer,
                 self.dialog.ui.segments_column_combo.currentText(),

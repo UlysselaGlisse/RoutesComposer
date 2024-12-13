@@ -12,7 +12,7 @@ from . import utils
 error_layer = None
 
 
-def verify_segments(
+def verify_compositions(
     segments_layer, compositions_layer, segments_column_name, id_column_name
 ):
     """
