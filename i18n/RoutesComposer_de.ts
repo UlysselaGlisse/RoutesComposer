@@ -32,69 +32,84 @@
         <translation type="obsolete">Schließen</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="149"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="154"/>
         <source>Les géométries pour les compositions suivantes n&apos;ont pas pu être créées : {composition_id}.</source>
         <translation>Die Geometrien für die folgenden Kompositionen konnten nicht erstellt werden: {composition_id}.</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="232"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="255"/>
         <source>Erreur</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="232"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="255"/>
         <source>Segment {segment_id} non trouvé.</source>
         <translation>Segment {segment_id} nicht gefunden.</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="56"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="57"/>
         <source>Rafraîchir les erreurs</source>
         <translation>Fehler aktualisieren</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="64"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="70"/>
         <source>Type d&apos;erreur</source>
         <translation>Art des Fehlers</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="64"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="70"/>
         <source>Détails</source>
         <translation>Details</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="154"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="160"/>
         <source>Compositions: {composition_ids}. Entre les segments: {segment_id1}, {segment_id2}.</source>
         <translation>Compositions: {composition_ids}. Between segments: {segment_id1}, {segment_id2}.</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="164"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="170"/>
         <source>Composition : {composition_id}. Segment: {missing_segment_id}.</source>
         <translation>Composition : {composition_id}. Segment: {missing_segment_id}.</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="177"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="200"/>
         <source>Erreur inconnue. Détails: {details}</source>
         <translation>Unbekannter Fehler. Details: {details}</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="186"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="209"/>
         <source>discontinuity</source>
         <translation>Diskontinuität</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="192"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="215"/>
         <source>missing_segment</source>
         <translation>fehlendes_segment</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="173"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="179"/>
         <source>Segment {unused_segment_id} n&apos;est utilisé dans aucune composition.</source>
         <translation>Segment {unused_segment_id} wird in keiner Komposition verwendet.</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="198"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="221"/>
         <source>unused_segment</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="64"/>
+        <source>L&apos;id des compositions est celui du fournisseur de données.</source>
+        <translation>Die ID der Kompositionen ist die des Datenlieferanten.</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="184"/>
+        <source>Composition : {composition_id}. Liste de segments vide..</source>
+        <translation>Komposition: {composition_id}. Leere Segmentliste.</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="192"/>
+        <source>Composition : {composition_id}. Dans la liste: {segment_list}, l&apos;id: &apos;{invalid_segment_id}&apos; est invalide.</source>
+        <translation>Komposition: {composition_id}. In der Liste: {segment_list}, ist die ID: &apos;{invalid_segment_id}&apos; ungültig.</translation>
     </message>
 </context>
 <context>
@@ -163,22 +178,22 @@
         <translation type="obsolete">Bitte wählen Sie die Schichten, Segmente und Kompositionen sowie die Attribute aus.</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/geometry_operations.py" line="97"/>
+        <location filename="../ui/main_dialog/geometry_operations.py" line="100"/>
         <source>Aucune erreur</source>
         <translation>Keine Fehler</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/geometry_operations.py" line="97"/>
+        <location filename="../ui/main_dialog/geometry_operations.py" line="100"/>
         <source>Aucune erreur détectée.</source>
         <translation>Keine Fehler erkannt.</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/geometry_operations.py" line="73"/>
+        <location filename="../ui/main_dialog/geometry_operations.py" line="76"/>
         <source>Création des géométries</source>
         <translation>Erstellung der Geometrien</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/geometry_operations.py" line="73"/>
+        <location filename="../ui/main_dialog/geometry_operations.py" line="76"/>
         <source>Aucune erreur détectée durant la création des géométries.</source>
         <translation>Keine Fehler während der Erstellung der Geometrien festgestellt.</translation>
     </message>
@@ -268,6 +283,24 @@ Diese erscheinen in der Python-Konsole von QGIS.</translation>
     </message>
 </context>
 <context>
+    <name>LayerConfig</name>
+    <message>
+        <location filename="../layers_config.py" line="31"/>
+        <source>La couche de segments n&apos;est pas une couche vectorielle valide</source>
+        <translation>Die Segmentebene ist keine gültige Vektorebene</translation>
+    </message>
+    <message>
+        <location filename="../layers_config.py" line="50"/>
+        <source>La couche de compositions n&apos;est pas une couche vectorielle valide</source>
+        <translation>Die Kompositionsschicht ist keine gültige Vektorschicht</translation>
+    </message>
+    <message>
+        <location filename="../layers_config.py" line="87"/>
+        <source>Le champ &apos;{segments_column_name}&apos; n&apos;existe pas dans la couche compositions</source>
+        <translation>Das Feld &apos;{segments_column_name}&apos; existiert nicht in der Kompositionsebene</translation>
+    </message>
+</context>
+<context>
     <name>LayerManager</name>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="87"/>
@@ -340,22 +373,22 @@ Diese erscheinen in der Python-Konsole von QGIS.</translation>
     <message>
         <location filename="../layers.py" line="43"/>
         <source>La couche de segments n&apos;est pas une couche vectorielle valide</source>
-        <translation>Die Segmentebene ist keine gültige Vektorebene</translation>
+        <translation type="obsolete">Die Segmentebene ist keine gültige Vektorebene</translation>
     </message>
     <message>
         <location filename="../layers.py" line="56"/>
         <source>La couche de compositions n&apos;est pas une couche vectorielle valide</source>
-        <translation>Die Kompositionsschicht ist keine gültige Vektorschicht</translation>
+        <translation type="obsolete">Die Kompositionsschicht ist keine gültige Vektorschicht</translation>
     </message>
     <message>
         <location filename="../layers.py" line="73"/>
         <source>Le champ &apos;{segments_column_name}&apos; n&apos;existe pas dans la couche compositions</source>
-        <translation>Das Feld &apos;{segments_column_name}&apos; existiert nicht in der Kompositionsschicht</translation>
+        <translation type="obsolete">Das Feld &apos;{segments_column_name}&apos; existiert nicht in der Kompositionsschicht</translation>
     </message>
     <message>
         <location filename="../layers.py" line="91"/>
         <source>Le champ {self.id_column_name} n&apos;a pas été trouvé dans la couche segments</source>
-        <translation>Das Feld {self.id_column_name} wurde in der Schicht Segmente nicht gefunden</translation>
+        <translation type="obsolete">Das Feld {self.id_column_name} wurde in der Schicht Segmente nicht gefunden</translation>
     </message>
 </context>
 <context>
@@ -366,17 +399,17 @@ Diese erscheinen in der Python-Konsole von QGIS.</translation>
         <translation type="obsolete">Das Feld &apos;id&apos; wurde in der Schicht Segmente nicht gefunden</translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="146"/>
+        <location filename="../func/routes_composer.py" line="166"/>
         <source>Le suivi par RoutesComposer a démarré</source>
         <translation>Die Überwachung durch RoutesComposer hat begonnen</translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="189"/>
+        <location filename="../func/routes_composer.py" line="209"/>
         <source>Erreur</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="179"/>
+        <location filename="../func/routes_composer.py" line="199"/>
         <source>Le suivi par RoutesComposer est arrêté</source>
         <translation>Die Überwachung durch RoutesComposer ist gestoppt</translation>
     </message>
@@ -386,32 +419,32 @@ Diese erscheinen in der Python-Konsole von QGIS.</translation>
         <translation>Kein QGIS-Projekt ist geöffnet</translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="241"/>
+        <location filename="../func/routes_composer.py" line="261"/>
         <source>Veuillez sélectionner une couche de segments valide</source>
         <translation>Bitte wählen Sie eine gültige Segmentebene aus</translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="249"/>
+        <location filename="../func/routes_composer.py" line="269"/>
         <source>La couche de segments n&apos;est pas une couche vectorielle valide</source>
         <translation>Die Segmentebene ist keine gültige Vektorebene</translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="270"/>
+        <location filename="../func/routes_composer.py" line="290"/>
         <source>Veuillez sélectionner une couche de compositions valide</source>
         <translation>Bitte wählen Sie eine gültige Kompositionsschicht aus</translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="276"/>
+        <location filename="../func/routes_composer.py" line="296"/>
         <source>La couche de compositions n&apos;est pas une couche vectorielle valide</source>
         <translation>Die Kompositionsschicht ist keine gültige Vektorschicht</translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="313"/>
+        <location filename="../func/routes_composer.py" line="333"/>
         <source>Le champ {self.id_column_name} n&apos;a pas été trouvé dans la couche segments</source>
         <translation>Das Feld {self.id_column_name} wurde in der Schicht Segmente nicht gefunden</translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="294"/>
+        <location filename="../func/routes_composer.py" line="314"/>
         <source>Le champ &apos;{segments_column_name}&apos; n&apos;existe pas dans la couche compositions</source>
         <translation></translation>
     </message>
@@ -615,12 +648,17 @@ Diese erscheinen in der Python-Konsole von QGIS.</translation>
     <message>
         <location filename="../plug_in.py" line="59"/>
         <source>Ouvrir le panier à segments</source>
-        <translation>Öffnen Sie den Segmentkorb</translation>
+        <translation type="obsolete">Öffnen Sie den Segmentkorb</translation>
     </message>
     <message>
         <location filename="../plug_in.py" line="47"/>
         <source>Ouvrir Routes Composer</source>
         <translation>Route Komponist öffnen</translation>
+    </message>
+    <message>
+        <location filename="../plug_in.py" line="59"/>
+        <source>Sélectionner des entités sur la carte et ouvrir le formulaire d&apos;attributs.</source>
+        <translation>Objekte auf der Karte auswählen und das Attributformular öffnen.</translation>
     </message>
 </context>
 <context>

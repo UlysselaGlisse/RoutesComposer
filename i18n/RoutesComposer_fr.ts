@@ -17,7 +17,7 @@
 <context>
     <name>ErrorDialog</name>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="232"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="255"/>
         <source>Erreur</source>
         <translation>Erreur</translation>
     </message>
@@ -32,63 +32,78 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="56"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="57"/>
         <source>Rafraîchir les erreurs</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="64"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="70"/>
         <source>Type d&apos;erreur</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="64"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="70"/>
         <source>Détails</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="149"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="154"/>
         <source>Les géométries pour les compositions suivantes n&apos;ont pas pu être créées : {composition_id}.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="154"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="160"/>
         <source>Compositions: {composition_ids}. Entre les segments: {segment_id1}, {segment_id2}.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="164"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="170"/>
         <source>Composition : {composition_id}. Segment: {missing_segment_id}.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="177"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="200"/>
         <source>Erreur inconnue. Détails: {details}</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="186"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="209"/>
         <source>discontinuity</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="192"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="215"/>
         <source>missing_segment</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="232"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="255"/>
         <source>Segment {segment_id} non trouvé.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="173"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="179"/>
         <source>Segment {unused_segment_id} n&apos;est utilisé dans aucune composition.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/errors_dialog.py" line="198"/>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="221"/>
         <source>unused_segment</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="64"/>
+        <source>L&apos;id des compositions est celui du fournisseur de données.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="184"/>
+        <source>Composition : {composition_id}. Liste de segments vide..</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/errors_dialog.py" line="192"/>
+        <source>Composition : {composition_id}. Dans la liste: {segment_list}, l&apos;id: &apos;{invalid_segment_id}&apos; est invalide.</source>
         <translation></translation>
     </message>
 </context>
@@ -153,22 +168,22 @@
         <translation type="obsolete">Le champ {segments_column_name} n&apos;existe pas dans la couche des compositions.</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/geometry_operations.py" line="97"/>
+        <location filename="../ui/main_dialog/geometry_operations.py" line="100"/>
         <source>Aucune erreur</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/geometry_operations.py" line="97"/>
+        <location filename="../ui/main_dialog/geometry_operations.py" line="100"/>
         <source>Aucune erreur détectée.</source>
         <translation>Aucune erreur détectée.</translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/geometry_operations.py" line="73"/>
+        <location filename="../ui/main_dialog/geometry_operations.py" line="76"/>
         <source>Création des géométries</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/main_dialog/geometry_operations.py" line="73"/>
+        <location filename="../ui/main_dialog/geometry_operations.py" line="76"/>
         <source>Aucune erreur détectée durant la création des géométries.</source>
         <translation></translation>
     </message>
@@ -196,6 +211,24 @@
                 Vous pouvez appuyer sur &lt;b&gt;z&lt;/b&gt; pour retirer le dernier segment ajouté à la liste et sur &lt;b&gt;e&lt;/b&gt; pour le rétablir.&lt;/li&gt;
         &lt;/ol&gt;
         </source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>LayerConfig</name>
+    <message>
+        <location filename="../layers_config.py" line="31"/>
+        <source>La couche de segments n&apos;est pas une couche vectorielle valide</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../layers_config.py" line="50"/>
+        <source>La couche de compositions n&apos;est pas une couche vectorielle valide</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../layers_config.py" line="87"/>
+        <source>Le champ &apos;{segments_column_name}&apos; n&apos;existe pas dans la couche compositions</source>
         <translation></translation>
     </message>
 </context>
@@ -268,32 +301,9 @@
     </message>
 </context>
 <context>
-    <name>LayersHandlers</name>
-    <message>
-        <location filename="../layers.py" line="43"/>
-        <source>La couche de segments n&apos;est pas une couche vectorielle valide</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../layers.py" line="56"/>
-        <source>La couche de compositions n&apos;est pas une couche vectorielle valide</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../layers.py" line="73"/>
-        <source>Le champ &apos;{segments_column_name}&apos; n&apos;existe pas dans la couche compositions</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../layers.py" line="91"/>
-        <source>Le champ {self.id_column_name} n&apos;a pas été trouvé dans la couche segments</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>RoutesComposer</name>
     <message>
-        <location filename="../func/routes_composer.py" line="189"/>
+        <location filename="../func/routes_composer.py" line="209"/>
         <source>Erreur</source>
         <translation>Erreur</translation>
     </message>
@@ -303,42 +313,42 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="146"/>
+        <location filename="../func/routes_composer.py" line="166"/>
         <source>Le suivi par RoutesComposer a démarré</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="179"/>
+        <location filename="../func/routes_composer.py" line="199"/>
         <source>Le suivi par RoutesComposer est arrêté</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="241"/>
+        <location filename="../func/routes_composer.py" line="261"/>
         <source>Veuillez sélectionner une couche de segments valide</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="249"/>
+        <location filename="../func/routes_composer.py" line="269"/>
         <source>La couche de segments n&apos;est pas une couche vectorielle valide</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="270"/>
+        <location filename="../func/routes_composer.py" line="290"/>
         <source>Veuillez sélectionner une couche de compositions valide</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="276"/>
+        <location filename="../func/routes_composer.py" line="296"/>
         <source>La couche de compositions n&apos;est pas une couche vectorielle valide</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="294"/>
+        <location filename="../func/routes_composer.py" line="314"/>
         <source>Le champ &apos;{segments_column_name}&apos; n&apos;existe pas dans la couche compositions</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../func/routes_composer.py" line="313"/>
+        <location filename="../func/routes_composer.py" line="333"/>
         <source>Le champ {self.id_column_name} n&apos;a pas été trouvé dans la couche segments</source>
         <translation></translation>
     </message>
@@ -489,13 +499,13 @@
 <context>
     <name>RoutesManagerTool</name>
     <message>
-        <location filename="../plug_in.py" line="59"/>
-        <source>Ouvrir le panier à segments</source>
+        <location filename="../plug_in.py" line="47"/>
+        <source>Ouvrir Routes Composer</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../plug_in.py" line="47"/>
-        <source>Ouvrir Routes Composer</source>
+        <location filename="../plug_in.py" line="59"/>
+        <source>Sélectionner des entités sur la carte et ouvrir le formulaire d&apos;attributs.</source>
         <translation></translation>
     </message>
 </context>
