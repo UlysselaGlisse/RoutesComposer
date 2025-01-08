@@ -2,7 +2,7 @@
 name=RoutesComposer
 description=Composer of roads from network of segments.
     This plugin assists you in creating routes from a network of segments, automatically updating the compositions of split or merged segments and providing a tool to select segments ids directly on the map.
-version=1.1
+version=1.2
 qgisMinimumVersion=3.0
 author=Ulysse Descamps
 email=ulysse38250@gmail.com
