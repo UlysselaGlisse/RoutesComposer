@@ -18,7 +18,7 @@ from qgis.gui import (
 )
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QCursor
-from qgis.PyQt.QtWidgets import QLabel
+from qgis.PyQt.QtWidgets import QLabel, QApplication
 from qgis.utils import iface
 
 from .geom_compo import GeomCompo
@@ -106,8 +106,19 @@ class IDsBasket(QgsMapTool):
             return
         if e.button() == Qt.RightButton:  # type: ignore
             if self.selected_ids:
-                self.open_attribute_form()
-                return
+                modifiers = QgsApplication.keyboardModifiers()
+                if modifiers == Qt.ShiftModifier:
+                    ids_text = ",".join(map(str, self.selected_ids))
+                    clipboard = QApplication.clipboard()
+                    clipboard.setText(ids_text)
+
+                    self.selected_ids.clear()
+                    self.segments_layer.removeSelection()
+                    self.update_label()
+                    return
+                else:
+                    self.open_attribute_form()
+                    return
             else:
                 return
 
