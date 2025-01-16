@@ -115,51 +115,56 @@ class IDsBasket(QgsMapTool):
             click_point = self.toMapCoordinates(e.pos())
             transformed_point = self.transform.transform(click_point)
 
-            search_radius = 80
-            search_rectangle = QgsRectangle(
-                transformed_point.x() - search_radius,
-                transformed_point.y() - search_radius,
-                transformed_point.x() + search_radius,
-                transformed_point.y() + search_radius,
-            )
+            modifiers = QgsApplication.keyboardModifiers()
+            if modifiers == Qt.KeyboardModifier.AltModifier:
+                self.select_composition_segments(transformed_point)
 
-            request = QgsFeatureRequest()
-            request.setFilterRect(search_rectangle)
-
-            closest_feature = None
-            min_distance = float("inf")
-
-            for feature in self.segments_layer.getFeatures(request):
-                distance = feature.geometry().distance(
-                    QgsGeometry.fromPointXY(QgsPointXY(transformed_point))
+            else:
+                search_radius = 80
+                search_rectangle = QgsRectangle(
+                    transformed_point.x() - search_radius,
+                    transformed_point.y() - search_radius,
+                    transformed_point.x() + search_radius,
+                    transformed_point.y() + search_radius,
                 )
-                if distance <= search_radius and distance < min_distance:
-                    min_distance = distance
-                    closest_feature = feature
 
-            if closest_feature:
-                feature_id = int(closest_feature[self.id_column_name])
+                request = QgsFeatureRequest()
+                request.setFilterRect(search_rectangle)
 
-                if not self.selected_ids:
-                    self.selected_ids.append(feature_id)
-                else:
-                    # Chercher le chemin entre le dernier point sélectionné et le nouveau
-                    last_id = self.selected_ids[-1]
-                    if last_id != feature_id:
-                        path = self.find_connected_segments(last_id, feature_id)
-                        for segment_id in path:
-                            if segment_id not in self.selected_ids:
-                                self.selected_ids.append(segment_id)
-                        if feature_id not in self.selected_ids:
-                            self.selected_ids.append(feature_id)
+                closest_feature = None
+                min_distance = float("inf")
 
-                self.update_label()
-                self.highlight_selected_segments()
+                for feature in self.segments_layer.getFeatures(request):
+                    distance = feature.geometry().distance(
+                        QgsGeometry.fromPointXY(QgsPointXY(transformed_point))
+                    )
+                    if distance <= search_radius and distance < min_distance:
+                        min_distance = distance
+                        closest_feature = feature
+
+                if closest_feature:
+                    feature_id = int(closest_feature[self.id_column_name])
+
+                    if not self.selected_ids:
+                        self.selected_ids.append(feature_id)
+                    else:
+                        # Chercher le chemin entre le dernier point sélectionné et le nouveau
+                        last_id = self.selected_ids[-1]
+                        if last_id != feature_id:
+                            path = self.find_connected_segments(last_id, feature_id)
+                            for segment_id in path:
+                                if segment_id not in self.selected_ids:
+                                    self.selected_ids.append(segment_id)
+                            if feature_id not in self.selected_ids:
+                                self.selected_ids.append(feature_id)
+
+                    self.update_label()
+                    self.highlight_selected_segments()
 
     def highlight_selected_segments(self):
         """Met en surbrillance (sélection de qgis) les segments sélectionnés"""
 
-        expr = f"\"{self.id_column_name}\" IN ({','.join(map(str, self.selected_ids))})"
+        expr = f'"{self.id_column_name}" IN ({",".join(map(str, self.selected_ids))})'
 
         self.segments_layer.selectByExpression(expr)
 
@@ -170,6 +175,10 @@ class IDsBasket(QgsMapTool):
             self.remove_last_segment()
         elif e.key() == Qt.Key_E:  # type: ignore
             self.restore_last_removed_segment()
+        elif e.key() == Qt.Key_Q:
+            self.deactivate()
+        elif e.key() == Qt.Key_A and e.button() == Qt.LeftButton:
+            print("yolo")
 
     def remove_last_segment(self):
         if self.selected_ids:
@@ -313,6 +322,9 @@ class IDsBasket(QgsMapTool):
 
     def deactivate(self):
         self.label.hide()
+        self.label.deleteLater()
         self.selected_ids = []
+        self.removed_ids = []
         self.segments_layer.removeSelection()
+        self.canvas.unsetMapTool(self)
         super().deactivate()
