@@ -16,9 +16,17 @@ Ce qui marche:
 
 ## GeomCompo
 
+## Warning
+* Créer champs erreur dans compositions
+
 ## Panier à segments
+* Masquer label
+
+## Segments_belonging
+* Faire mise-à-jour lors d'événements que sur les segments touchés.
 
 ## ui
+* Connexion/déconnexion segments_belonging.
 
 ## Config
 * Ajouter possibilité d'activer / désactiver les pop-up signalant :
