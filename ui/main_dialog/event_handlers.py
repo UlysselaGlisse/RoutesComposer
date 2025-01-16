@@ -75,6 +75,12 @@ class EventHandlers(QObject):
                 routes_composer = RoutesComposer.get_instance()
                 routes_composer.disconnect_geom()
 
+    def on_belonging_check(self, state):
+        project = QgsProject.instance()
+        if project:
+            project.writeEntry("routes_composer", "belonging", bool(state))
+            project.setDirty(True)
+
     def show_info(self):
         self.dialog.info.exec_()
 

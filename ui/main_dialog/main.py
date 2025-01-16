@@ -110,6 +110,9 @@ class RoutesComposerDialog(QDialog):
 
             self.ui.priority_mode_combo.setCurrentText(saved_priority_mode)
 
+            belonging, _ = project.readBoolEntry("routes_composer", "belonging", False)
+            self.ui.update_belonging_segments_checkbox.setChecked(belonging)
+
     def setup_signals(self):
         # Layers
         self.ui.segments_combo.currentIndexChanged.connect(
@@ -148,8 +151,12 @@ class RoutesComposerDialog(QDialog):
         self.ui.priority_mode_combo.currentTextChanged.connect(
             self.advanced_options.on_priority_mode_selected
         )
+        # Appartenance des segments
         self.ui.belonging_segments_button.clicked.connect(
             self.advanced_options.create_or_update_belonging_column
+        )
+        self.ui.update_belonging_segments_checkbox.stateChanged.connect(
+            self.event_handlers.on_belonging_check
         )
 
     def update_ui_state(self):

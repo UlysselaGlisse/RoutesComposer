@@ -5,7 +5,7 @@ from qgis.utils import iface
 from typing_extensions import cast
 
 from .. import config
-from . import geom_compo, split
+from . import geom_compo, split, segments_belonging
 from .utils import log
 
 
@@ -133,6 +133,7 @@ class RoutesComposer(QObject):
         self.compositions_layer.triggerRepaint()
 
     def feature_added_on_compo_layer(self, fid):
+        log(fid)
         if self.segments_layer is None or self.compositions_layer is None:
             return
 
@@ -152,6 +153,65 @@ class RoutesComposer(QObject):
         self.geom.update_geometries_on_the_fly(segment_id)
         self.compositions_layer.triggerRepaint()
 
+        if not self.project:
+            return
+        belonging, _ = self.project.readBoolEntry("routes_composer", "belonging", False)
+
+        if belonging:
+            self.belong = segments_belonging.SegmentsBelonging(
+                self.segments_layer,
+                self.compositions_layer,
+                self.id_column_name,
+                self.segments_column_name,
+            )
+            self.belong.create_or_update_belonging_column()
+            self.segments_layer.updateFields()
+            self.segments_layer.triggerRepaint()
+
+    def features_changed_on_compo_layer(self, fids):
+        log(fids)
+        """Met à jour l'attribut compositions quand une composition est modifiée"""
+        if self.segments_layer is None or self.compositions_layer is None:
+            return
+
+        if not self.project:
+            return
+        belonging, _ = self.project.readBoolEntry("routes_composer", "belonging", False)
+        log(belonging)
+        if belonging:
+            self.belong = segments_belonging.SegmentsBelonging(
+                self.segments_layer,
+                self.compositions_layer,
+                self.id_column_name,
+                self.segments_column_name,
+            )
+
+            self.belong.create_or_update_belonging_column()
+            self.segments_layer.updateFields()
+            self.segments_layer.triggerRepaint()
+
+    def features_deleted_on_compo_layer(self, fids):
+        log(fids)
+        """Met à jour l'attribut compositions quand une composition est supprimée"""
+        if self.segments_layer is None or self.compositions_layer is None:
+            return
+
+        if not self.project:
+            return
+        belonging, _ = self.project.readBoolEntry("routes_composer", "belonging", False)
+        log(belonging)
+
+        if belonging:
+            self.belong = segments_belonging.SegmentsBelonging(
+                self.segments_layer,
+                self.compositions_layer,
+                self.id_column_name,
+                self.segments_column_name,
+            )
+            self.belong.create_or_update_belonging_column()
+            self.segments_layer.updateFields()
+            self.segments_layer.triggerRepaint()
+
     def connect(self):
         try:
             if (
@@ -164,6 +224,13 @@ class RoutesComposer(QObject):
                 self.compositions_layer.featureAdded.connect(
                     self.feature_added_on_compo_layer
                 )
+                self.compositions_layer.attributeValueChanged.connect(
+                    self.features_changed_on_compo_layer
+                )
+                self.compositions_layer.featuresDeleted.connect(
+                    self.features_deleted_on_compo_layer
+                )
+
                 self.is_connected = True
                 config.script_running = True
 
@@ -190,6 +257,13 @@ class RoutesComposer(QObject):
             if self.segments_layer is not None and self.is_connected:
                 self.segments_layer.featureAdded.disconnect(self.feature_added)
                 self.segments_layer.featuresDeleted.disconnect(self.features_deleted)
+                self.compositions_layer.attributeValueChanged.disconnect(
+                    self.features_changed_on_compo_layer
+                )
+                self.compositions_layer.featuresDeleted.disconnect(
+                    self.features_deleted_on_compo_layer
+                )
+
                 self.is_connected = False
 
                 self.segments_layer = None

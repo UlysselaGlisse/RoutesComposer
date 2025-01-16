@@ -59,7 +59,8 @@ class RoutesComposerTool:
         self.ids_basket_action = QAction(
             QIcon(icon_path),
             QCoreApplication.translate(
-                "RoutesManagerTool", "Sélectionner des entités sur la carte et ouvrir le formulaire d'attributs."
+                "RoutesManagerTool",
+                "Sélectionner des entités sur la carte et ouvrir le formulaire d'attributs.",
             ),
             self.iface.mainWindow(),
         )
@@ -87,6 +88,8 @@ class RoutesComposerTool:
             geom_on_fly, _ = project.readBoolEntry(
                 "routes_composer", "geom_on_fly", False
             )
+            belonging, _ = project.readBoolEntry("routes_composer", "belonging", False)
+
             if self.checks_layers():
                 if auto_start:
                     routes_composer = RoutesComposer.get_instance()

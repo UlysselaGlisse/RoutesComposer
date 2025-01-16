@@ -45,6 +45,7 @@ class SegmentsBelonging:
                 for seg_id in segments_list:
                     if seg_id not in self.segment_appartenances:
                         self.segment_appartenances[seg_id] = []
+
                     self.segment_appartenances[seg_id].append(str(comp_id))
 
     def create_or_update_belonging_column(self):
