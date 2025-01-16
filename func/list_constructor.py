@@ -161,6 +161,38 @@ class IDsBasket(QgsMapTool):
                     self.update_label()
                     self.highlight_selected_segments()
 
+    def select_composition_segments(self, point):
+        """Sélectionne tous les segments d'une composition"""
+        search_radius = 80
+        search_rectangle = QgsRectangle(
+            point.x() - search_radius,
+            point.y() - search_radius,
+            point.x() + search_radius,
+            point.y() + search_radius,
+        )
+
+        request = QgsFeatureRequest()
+        request.setFilterRect(search_rectangle)
+
+        closest_composition = None
+        min_distance = float("inf")
+
+        for feature in self.compositions_layer.getFeatures(request):
+            distance = feature.geometry().distance(
+                QgsGeometry.fromPointXY(QgsPointXY(point))
+            )
+            if distance <= search_radius and distance < min_distance:
+                min_distance = distance
+                closest_composition = feature
+
+        if closest_composition:
+            segments_str = closest_composition[self.segment_column_name]
+            if segments_str:
+                segment_ids = [int(id_) for id_ in segments_str.split(",")]
+                self.selected_ids = segment_ids
+                self.highlight_selected_segments()
+                self.update_label()
+
     def highlight_selected_segments(self):
         """Met en surbrillance (sélection de qgis) les segments sélectionnés"""
 
@@ -177,8 +209,6 @@ class IDsBasket(QgsMapTool):
             self.restore_last_removed_segment()
         elif e.key() == Qt.Key_Q:
             self.deactivate()
-        elif e.key() == Qt.Key_A and e.button() == Qt.LeftButton:
-            print("yolo")
 
     def remove_last_segment(self):
         if self.selected_ids:
