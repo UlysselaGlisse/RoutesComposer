@@ -170,6 +170,10 @@ class UiBuilder(QObject):
         self.advanced_options_container.layout().addWidget(  # type: ignore
             self.advanced_group
         )
+
+        self.belonging_group = self.create_belonging_group()
+        self.advanced_options_container.layout().addWidget(self.belonging_group)
+
         self.advanced_options_container.setVisible(False)
 
     def create_advanced_group(self):
@@ -193,12 +197,41 @@ class UiBuilder(QObject):
         self.update_attributes_button = QPushButton(
             self.tr("Mettre à jour les attributs")
         )
-        self.update_attributes_button.setProperty("class", "update-button")
+        self.update_attributes_button.setProperty("class", "action-button")
 
         advanced_layout.addWidget(self.update_attributes_button)
-
         advanced_group.setLayout(advanced_layout)
+
+        advanced_layout.addWidget(advanced_group)
+
         return advanced_group
+
+    def create_belonging_group(self):
+        belonging_group = QGroupBox(self.tr("Appartenance des segments"))
+        belonging_group.setToolTip(
+            self.tr(
+                "Crée un nouveau champ dans la couche des segments <br> avec l'id des compositions dans lequel chaque segment est utilisé."
+            )
+        )
+
+        belonging_layout = QVBoxLayout()
+
+        # Boutons pour mettre à jour l'appartenance des segments
+        self.belonging_segments_button = QPushButton(
+            self.tr("Créer le champ 'Appartenance' dans la couche des segments")
+        )
+        self.belonging_segments_button.setProperty("class", "action-button")
+        belonging_layout.addWidget(self.belonging_segments_button)
+
+        # Ajout de la case à cocher "Mettre à jour le champ appartenance des segments en continu"
+        self.update_belonging_segments_checkbox = QCheckBox(
+            self.tr("Mettre à jour le champ appartenance des segments en continue")
+        )
+        belonging_layout.addWidget(self.update_belonging_segments_checkbox)
+
+        belonging_group.setLayout(belonging_layout)
+
+        return belonging_group
 
     def create_attributes_layout(self):
         attributes_layout = QVBoxLayout()

@@ -1,7 +1,9 @@
+from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QObject, QSettings, QVariant
 from qgis.PyQt.QtWidgets import QMessageBox
 
 from ...func.attribute_linker import AttributeLinker
+from ...func.segments_belonging import SegmentsBelonging
 from ...func.utils import log
 
 
@@ -9,6 +11,19 @@ class AdvancedOptions(QObject):
     def __init__(self, dialog):
         super().__init__(dialog)
         self.dialog = dialog
+
+    def create_or_update_belonging_column(self):
+        project = QgsProject.instance()
+        if not project:
+            return
+        if self.dialog.layer_manager.check_layers_and_columns():
+            belong = SegmentsBelonging(
+                self.dialog.layer_manager.segments_layer,
+                self.dialog.layer_manager.compositions_layer,
+                self.dialog.ui.id_column_combo.currentText(),
+                self.dialog.ui.segments_column_combo.currentText(),
+            )
+            belong.create_or_update_belonging_column()
 
     def update_segments_attr_combo(self, segments_layer):
         self.dialog.ui.segments_attr_combo.clear()
@@ -18,25 +33,17 @@ class AdvancedOptions(QObject):
 
             settings = QSettings()
             layer_id = segments_layer.id()
-            saved_attr = settings.value(
-                f"routes_composer/segments_attr_{layer_id}", ""
-            )
+            saved_attr = settings.value(f"routes_composer/segments_attr_{layer_id}", "")
 
             if saved_attr:
-                saved_index = self.dialog.ui.segments_attr_combo.findText(
-                    saved_attr
-                )
+                saved_index = self.dialog.ui.segments_attr_combo.findText(saved_attr)
                 if saved_index >= 0:
-                    self.dialog.ui.segments_attr_combo.setCurrentIndex(
-                        saved_index
-                    )
+                    self.dialog.ui.segments_attr_combo.setCurrentIndex(saved_index)
 
     def update_compositions_attr_combo(self, compositions_layer):
         self.dialog.ui.compositions_attr_combo.clear()
         if compositions_layer:
-            field_names = [
-                field.name() for field in compositions_layer.fields()
-            ]
+            field_names = [field.name() for field in compositions_layer.fields()]
             self.dialog.ui.compositions_attr_combo.addItems(field_names)
 
             settings = QSettings()
@@ -51,9 +58,7 @@ class AdvancedOptions(QObject):
                     saved_attr
                 )
                 if saved_index >= 0:
-                    self.dialog.ui.compositions_attr_combo.setCurrentIndex(
-                        saved_index
-                    )
+                    self.dialog.ui.compositions_attr_combo.setCurrentIndex(saved_index)
 
     def on_segments_attr_selected(self):
         if self.dialog.ui.segments_attr_combo.currentText():
@@ -65,10 +70,8 @@ class AdvancedOptions(QObject):
                     f"routes_composer/segments_attr_{layer.id()}",
                     selected_attr,
                 )
-                field_index = (
-                    self.dialog.layer_manager.segments_layer.fields().indexOf(
-                        selected_attr
-                    )
+                field_index = self.dialog.layer_manager.segments_layer.fields().indexOf(
+                    selected_attr
                 )
                 if field_index != -1:
                     field_type = (
@@ -77,15 +80,11 @@ class AdvancedOptions(QObject):
                         .type()
                     )
                     if field_type == QVariant.String:
-                        self.dialog.ui.priority_mode_combo.setCurrentText(
-                            "none"
-                        )
+                        self.dialog.ui.priority_mode_combo.setCurrentText("none")
 
     def on_compositions_attr_selected(self):
         if self.dialog.ui.compositions_attr_combo.currentText():
-            selected_attr = (
-                self.dialog.ui.compositions_attr_combo.currentText()
-            )
+            selected_attr = self.dialog.ui.compositions_attr_combo.currentText()
             layer = self.dialog.layer_manager.compositions_layer
             if layer:
                 settings = QSettings()
@@ -93,8 +92,10 @@ class AdvancedOptions(QObject):
                     f"routes_composer/compositions_attr_{layer.id()}",
                     selected_attr,
                 )
-                field_index = self.dialog.layer_manager.compositions_layer.fields().indexOf(
-                    selected_attr
+                field_index = (
+                    self.dialog.layer_manager.compositions_layer.fields().indexOf(
+                        selected_attr
+                    )
                 )
                 if field_index != -1:
                     field_type = (
@@ -103,18 +104,12 @@ class AdvancedOptions(QObject):
                         .type()
                     )
                     if field_type == QVariant.String:
-                        self.dialog.ui.priority_mode_combo.setCurrentText(
-                            "none"
-                        )
+                        self.dialog.ui.priority_mode_combo.setCurrentText("none")
 
     def on_priority_mode_selected(self):
-        selected_priority_mode = (
-            self.dialog.ui.priority_mode_combo.currentText()
-        )
+        selected_priority_mode = self.dialog.ui.priority_mode_combo.currentText()
         settings = QSettings()
-        settings.setValue(
-            "routes_composer/priority_mode", selected_priority_mode
-        )
+        settings.setValue("routes_composer/priority_mode", selected_priority_mode)
         log(f"Priority mode selected: {selected_priority_mode}")
 
     def start_attribute_linking(self):

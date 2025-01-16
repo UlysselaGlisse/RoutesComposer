@@ -60,16 +60,3 @@
 .cancel-button:hover {
     background-color: #da190b;
 }
-
-/* Style pour le bouton Mettre à jour les attributs */
-.update-button {
-    background-color: #f6f6f6;
-    color: #333;
-    padding: 5px;
-    border-radius: 3px;
-    border: 1px solid #ccc;
-}
-
-.update-button:hover {
-    background-color: #e6e6e6;
-}

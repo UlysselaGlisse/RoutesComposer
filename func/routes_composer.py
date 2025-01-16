@@ -152,13 +152,18 @@ class RoutesComposer(QObject):
         self.geom.update_geometries_on_the_fly(segment_id)
         self.compositions_layer.triggerRepaint()
 
-
     def connect(self):
         try:
-            if self.segments_layer is not None and self.compositions_layer is not None and not self.is_connected:
+            if (
+                self.segments_layer is not None
+                and self.compositions_layer is not None
+                and not self.is_connected
+            ):
                 self.segments_layer.featureAdded.connect(self.feature_added)
                 self.segments_layer.featuresDeleted.connect(self.features_deleted)
-                self.compositions_layer.featureAdded.connect(self.feature_added_on_compo_layer)
+                self.compositions_layer.featureAdded.connect(
+                    self.feature_added_on_compo_layer
+                )
                 self.is_connected = True
                 config.script_running = True
 
