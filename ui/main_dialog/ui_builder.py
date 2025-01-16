@@ -216,14 +216,12 @@ class UiBuilder(QObject):
 
         belonging_layout = QVBoxLayout()
 
-        # Boutons pour mettre à jour l'appartenance des segments
         self.belonging_segments_button = QPushButton(
-            self.tr("Créer le champ 'Appartenance' dans la couche des segments")
+            self.tr("Créer/Mettre à jour le champ 'compositions' dans segments")
         )
         self.belonging_segments_button.setProperty("class", "action-button")
         belonging_layout.addWidget(self.belonging_segments_button)
 
-        # Ajout de la case à cocher "Mettre à jour le champ appartenance des segments en continu"
         self.update_belonging_segments_checkbox = QCheckBox(
             self.tr("Mettre à jour le champ appartenance des segments en continue")
         )
