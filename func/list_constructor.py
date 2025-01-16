@@ -21,9 +21,6 @@ from qgis.PyQt.QtGui import QCursor
 from qgis.PyQt.QtWidgets import QLabel, QApplication
 from qgis.utils import iface
 
-from .geom_compo import GeomCompo
-from .utils import log
-
 
 class IDsBasket(QgsMapTool):
     def __init__(
@@ -41,6 +38,7 @@ class IDsBasket(QgsMapTool):
         self.compositions_layer = compositions_layer
         self.id_column_name = id_column_name
         self.segment_column_name = segments_column_name
+
         self.selected_ids = []
         self.removed_ids = []
         self.canvas = canvas
@@ -75,7 +73,6 @@ class IDsBasket(QgsMapTool):
         self.connectivity_cache = {}
 
     def open_attribute_form(self):
-        log("r")
         self.compositions_layer.startEditing()
         feature = QgsVectorLayerUtils.createFeature(self.compositions_layer)
 
@@ -93,7 +90,6 @@ class IDsBasket(QgsMapTool):
             new_feature = dialog.feature()
 
             if new_feature:
-                log("r")
                 self.compositions_layer.addFeature(new_feature)
                 self.compositions_layer.commitChanges()
 
