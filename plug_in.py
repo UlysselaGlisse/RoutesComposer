@@ -94,6 +94,8 @@ class RoutesComposerTool:
                     self.main_events_handler.connect_routes_composer()
                 if geom_on_fly:
                     self.main_events_handler.connect_geom_on_fly()
+                if belonging:
+                    self.main_events_handler.connect_belonging()
 
             self.update_icon()
 
