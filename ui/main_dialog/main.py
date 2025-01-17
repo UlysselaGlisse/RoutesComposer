@@ -7,13 +7,13 @@ from qgis.PyQt.QtCore import QSettings, QTranslator
 from qgis.PyQt.QtWidgets import QDialog
 from qgis.utils import iface
 
-from ... import config
 from .advanced_options import AdvancedOptions
 from .event_handlers import EventHandlers
 from .geometry_operations import GeometryOperations
 from .info_dialog import InfoDialog
 from .layer_management import LayerManager
 from .ui_builder import UiBuilder
+from ...main_events_handler import MainEventsHandlers
 
 
 def show_dialog():
@@ -45,6 +45,7 @@ class RoutesComposerDialog(QDialog):
         self.geometry_ops = GeometryOperations(self)
         self.advanced_options = AdvancedOptions(self)
         self.translator = QTranslator()
+
 
         self.ui.init_ui()
         self.load_settings()
@@ -160,7 +161,7 @@ class RoutesComposerDialog(QDialog):
         )
 
     def update_ui_state(self):
-        if config.script_running:
+        if MainEventsHandlers.routes_composer_connected:
             self.ui.start_button.setText(self.tr("Arrêter"))
             self.ui.status_label.setText(self.tr("Status: En cours d'exécution"))
         else:

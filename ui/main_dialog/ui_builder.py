@@ -12,8 +12,7 @@ from qgis.PyQt.QtWidgets import (
     QVBoxLayout,
 )
 
-from ... import config
-
+from ...main_events_handler import MainEventsHandlers
 
 class UiBuilder(QObject):
     def __init__(self, dialog):
@@ -276,7 +275,7 @@ class UiBuilder(QObject):
 
     def get_start_button_style(self):
         # TODO: Mettre le css dans le fichier styles css.
-        if not config.script_running:
+        if not MainEventsHandlers.routes_composer_connected:
             return """
                 QPushButton {
                     background-color: #4CAF50;

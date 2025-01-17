@@ -232,7 +232,6 @@ class RoutesComposer(QObject):
                 )
 
                 self.is_connected = True
-                config.script_running = True
 
                 log("Script has started", level="INFO")
                 iface.messageBar().pushMessage(
@@ -272,7 +271,7 @@ class RoutesComposer(QObject):
                 self.segments_column_index = None
                 self.id_column_name = None
                 self.id_column_index = None
-                config.script_running = False
+                # config.script_running = False
 
                 log("Script has been stopped.", level="INFO")
                 iface.messageBar().pushMessage(

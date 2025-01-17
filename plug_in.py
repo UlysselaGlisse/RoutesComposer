@@ -6,11 +6,10 @@ from qgis.PyQt.QtCore import QCoreApplication, QSettings, QTimer, QTranslator
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
-from . import config
 from .func.list_constructor import IDsBasket
-from .func.routes_composer import RoutesComposer
 from .func.utils import log
 from .ui.main_dialog.main import RoutesComposerDialog
+from .main_events_handler import MainEventsHandlers
 
 
 class RoutesComposerTool:
@@ -22,7 +21,7 @@ class RoutesComposerTool:
         self.toolbar = self.iface.addToolBar("Routes Composer")
         self.toolbar.setObjectName("RoutesComposerToolbar")
         self.project_loaded = False
-        self.script_running = config.script_running
+        self.main_events_handler = MainEventsHandlers()
         self.iface = iface
         project = QgsProject.instance()
         if project:
@@ -92,11 +91,9 @@ class RoutesComposerTool:
 
             if self.checks_layers():
                 if auto_start:
-                    routes_composer = RoutesComposer.get_instance()
-                    routes_composer.connect()
+                    self.main_events_handler.get_routes_composer_instance()
                 if geom_on_fly:
-                    routes_composer = RoutesComposer.get_instance()
-                    routes_composer.connect_geom()
+                    self.main_events_handler.connect_geom_on_fly()
 
             self.update_icon()
 
@@ -184,8 +181,10 @@ class RoutesComposerTool:
             os.path.dirname(__file__),
             "ui",
             "icons",
-            ("icon_run.png" if config.script_running is True else "icon_stop.png"),
+            ("icon_run.png" if MainEventsHandlers.routes_composer_connected is True else "icon_stop.png"),
         )
+        #     ("icon_run.png" if config.script_running is True else "icon_stop.png"),
+        # )
         self.actions[0].setIcon(QIcon(icon_path))
 
     def show_dialog(self):

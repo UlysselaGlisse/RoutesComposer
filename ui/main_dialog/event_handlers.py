@@ -8,24 +8,22 @@ from qgis.utils import iface
 from ...func.utils import log
 
 from ... import config
-from ...func.routes_composer import RoutesComposer
-
+from ...main_events_handler import MainEventsHandlers
 
 class EventHandlers(QObject):
     def __init__(self, dialog):
         super().__init__(dialog)
         self.dialog = dialog
+        self.main_events_handler = MainEventsHandlers()
 
     def toggle_script(self):
         try:
-            if not config.script_running:
+            if not MainEventsHandlers.routes_composer_connected:
                 if not self.dialog.layer_manager.check_layers_and_columns():
                     return
                 self.dialog.layer_manager.save_selected_layers_and_columns()
 
-                routes_composer = RoutesComposer.get_instance()
-                if not routes_composer.is_connected:
-                    routes_composer.connect()
+                self.main_events_handler.get_routes_composer_instance()
 
                 self.dialog.update_ui_state()
                 if self.dialog.tool:
@@ -48,16 +46,13 @@ class EventHandlers(QObject):
             project.setDirty(True)
 
     def stop_running_routes_composer(self):
+
+        self.main_events_handler.erase_routes_composer_instance()
+
         if self.dialog.ui.geom_checkbox.isChecked():
             self.dialog.ui.geom_checkbox.setChecked(False)
-
-        routes_composer = RoutesComposer.get_instance()
-        if routes_composer.is_connected:
-            routes_composer.disconnect_routes_composer()
-            routes_composer.destroy_instance()
-
-            if self.dialog.tool:
-                self.dialog.tool.update_icon()
+        if self.dialog.tool:
+            self.dialog.tool.update_icon()
 
         self.dialog.update_ui_state()
 
@@ -69,11 +64,10 @@ class EventHandlers(QObject):
             geom_on_fly = bool(state)
 
             if geom_on_fly and self.dialog.layer_manager.check_layers_and_columns():
-                routes_composer = RoutesComposer.get_instance()
-                routes_composer.connect_geom()
-            else:
-                routes_composer = RoutesComposer.get_instance()
-                routes_composer.disconnect_geom()
+                self.main_events_handler.connect_geom_on_fly()
+
+            elif not geom_on_fly:
+                self.main_events_handler.disconnect_geom_on_fly()
 
     def on_belonging_check(self, state):
         project = QgsProject.instance()
