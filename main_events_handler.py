@@ -4,22 +4,22 @@ from .func.routes_composer import RoutesComposer
 class MainEventsHandlers:
     routes_composer_connected = False
     geom_on_fly_connected = False
+    belonging_connected = False
 
     def __init__(self):
         self.settings = QSettings()
 
-    def get_routes_composer_instance(self):
+    def connect_routes_composer(self):
         routes_composer = RoutesComposer.get_instance()
-        if not routes_composer.is_connected:
-            routes_composer.connect()
+        if not routes_composer.routes_composer_connected:
+            routes_composer.connect_routes_composer()
 
             MainEventsHandlers.routes_composer_connected = True
 
-    def erase_routes_composer_instance(self):
+    def disconnect_routes_composer(self):
         routes_composer = RoutesComposer.get_instance()
-        if routes_composer.is_connected:
+        if routes_composer.routes_composer_connected:
             routes_composer.disconnect_routes_composer()
-            routes_composer.destroy_instance()
 
             MainEventsHandlers.routes_composer_connected = False
 
@@ -34,3 +34,15 @@ class MainEventsHandlers:
         routes_composer.disconnect_geom()
 
         MainEventsHandlers.geom_on_fly_connected = False
+
+    def connect_belonging(self):
+        routes_composer = RoutesComposer.get_instance()
+        routes_composer.connect_belonging()
+
+        MainEventsHandlers.belonging_connected = True
+
+    def disconnect_belonging(self):
+        routes_composer = RoutesComposer.get_instance()
+        routes_composer.disconnect_belonging()
+
+        MainEventsHandlers.belonging_connected = False

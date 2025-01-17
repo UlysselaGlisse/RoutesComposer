@@ -23,7 +23,7 @@ class EventHandlers(QObject):
                     return
                 self.dialog.layer_manager.save_selected_layers_and_columns()
 
-                self.main_events_handler.get_routes_composer_instance()
+                self.main_events_handler.connect_routes_composer()
 
                 self.dialog.update_ui_state()
                 if self.dialog.tool:
@@ -46,11 +46,14 @@ class EventHandlers(QObject):
             project.setDirty(True)
 
     def stop_running_routes_composer(self):
-
-        self.main_events_handler.erase_routes_composer_instance()
+        self.main_events_handler.disconnect_routes_composer()
 
         if self.dialog.ui.geom_checkbox.isChecked():
             self.dialog.ui.geom_checkbox.setChecked(False)
+
+        if self.dialog.ui.update_belonging_segments_checkbox.isChecked():
+            self.dialog.ui.update_belonging_segments_checkbox.setChecked(False)
+
         if self.dialog.tool:
             self.dialog.tool.update_icon()
 
@@ -74,6 +77,12 @@ class EventHandlers(QObject):
         if project:
             project.writeEntry("routes_composer", "belonging", bool(state))
             project.setDirty(True)
+            belonging = bool(state)
+
+            if belonging and self.dialog.layer_manager.check_layers_and_columns():
+                self.main_events_handler.connect_belonging()
+            elif not belonging:
+                self.main_events_handler.disconnect_belonging()
 
     def show_info(self):
         self.dialog.info.exec_()

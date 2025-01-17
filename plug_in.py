@@ -91,7 +91,7 @@ class RoutesComposerTool:
 
             if self.checks_layers():
                 if auto_start:
-                    self.main_events_handler.get_routes_composer_instance()
+                    self.main_events_handler.connect_routes_composer()
                 if geom_on_fly:
                     self.main_events_handler.connect_geom_on_fly()
 
