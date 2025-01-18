@@ -58,6 +58,8 @@ class RoutesComposer(QObject):
         self.comp_feature_deleted_connected = False
         self.comp_attr_value_changed_connected = False
 
+        self.is_splitting = False
+
     @classmethod
     def destroy_instance(cls):
         cls._instance = None
@@ -176,10 +178,14 @@ class RoutesComposer(QObject):
             self.segments_layer.updateFields()
             self.segments_layer.triggerRepaint()
 
-    def features_changed_on_compo_layer(self, fid):
+    def features_changed_on_compo_layer(self, fid, idx):
         log(fid)
         if self.segments_layer is None or self.compositions_layer is None:
             return
+
+        if idx != self.segments_column_index:
+            return
+
         source_feature = self.compositions_layer.getFeature(fid)
         if not source_feature.isValid():
             return
@@ -197,7 +203,9 @@ class RoutesComposer(QObject):
             self.geom.update_geometries_on_the_fly(segment_id)
             self.compositions_layer.triggerRepaint()
 
-        if self.belonging_connected:
+        log(f"is_splitting: {self.is_splitting}")
+        if self.belonging_connected and not self.is_splitting:
+
             self.belong = segments_belonging.SegmentsBelonging(
                 self.segments_layer,
                 self.compositions_layer,

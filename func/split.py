@@ -77,6 +77,7 @@ class SplitManager:
 
         for composition_id, segments_list in segment_lists_ids:
             try:
+                self.routes_composer.is_splitting = True
                 old_index = segments_list.index(int(old_id))
 
                 if len(segments_list) > 1:
@@ -121,6 +122,8 @@ class SplitManager:
                 raise Exception(
                     f"Erreur lors de la mise-à-jour automatique de la liste des segments {e}."
                 )
+            finally:
+                self.routes_composer.is_splitting = False
 
     def check_segment_orientation(
         self,
