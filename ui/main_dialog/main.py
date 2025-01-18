@@ -13,6 +13,7 @@ from .geometry_operations import GeometryOperations
 from .info_dialog import InfoDialog
 from .layer_management import LayerManager
 from .ui_builder import UiBuilder
+from .config import PluginOptionsWidget
 from ...main_events_handler import MainEventsHandlers
 
 
@@ -44,6 +45,7 @@ class RoutesComposerDialog(QDialog):
         self.event_handlers = EventHandlers(self)
         self.geometry_ops = GeometryOperations(self)
         self.advanced_options = AdvancedOptions(self)
+        self.config = PluginOptionsWidget(self)
         self.translator = QTranslator()
 
 
@@ -159,6 +161,8 @@ class RoutesComposerDialog(QDialog):
         self.ui.update_belonging_segments_checkbox.stateChanged.connect(
             self.event_handlers.on_belonging_check
         )
+
+        self.ui.settings_button.clicked.connect(self.event_handlers.show_config)
 
     def update_ui_state(self):
         if MainEventsHandlers.routes_composer_connected:

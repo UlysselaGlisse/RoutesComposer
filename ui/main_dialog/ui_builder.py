@@ -1,6 +1,8 @@
 """Construct ui for main dialog"""
+import os
 
 from qgis.PyQt.QtCore import QObject, Qt
+from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -10,6 +12,7 @@ from qgis.PyQt.QtWidgets import (
     QProgressBar,
     QPushButton,
     QVBoxLayout,
+    QToolButton
 )
 
 from ...main_events_handler import MainEventsHandlers
@@ -20,19 +23,40 @@ class UiBuilder(QObject):
         self.dialog = dialog
 
     def init_ui(self):
-        layout = QVBoxLayout()
+        main_layout = QVBoxLayout()
 
-        self.create_layer_configuration_group(layout)
-        self.create_status_section(layout)
-        self.create_control_buttons(layout)
-        self.create_action_buttons(layout)
-        self.create_advanced_options_toggle(layout)
+        self.create_header_layout(main_layout)
 
-        self.dialog.setLayout(layout)
+        self.create_layer_configuration_group(main_layout)
+        self.create_status_section(main_layout)
+        self.create_control_buttons(main_layout)
+        self.create_action_buttons(main_layout)
+        self.create_advanced_options_toggle(main_layout)
+
+        self.dialog.setLayout(main_layout)
         self.dialog.setStyleSheet(self.dialog.load_styles())
 
+    def create_header_layout(self, layout):
+        header_layout = QHBoxLayout()
+
+        self.configuration_label = QLabel(self.tr("Configuration des couches"))
+        self.configuration_label.setStyleSheet("font-weight: bold;")
+        header_layout.addWidget(self.configuration_label, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        # Create settings button
+        header_layout.addStretch()
+
+        self.settings_button = QToolButton()
+        icon_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "icons", "icon_gear.png")
+        self.settings_button.setIcon(QIcon(icon_path))
+        self.settings_button.setToolTip(self.tr("Réglages et configurations"))
+
+        header_layout.addWidget(self.settings_button)
+
+        layout.addLayout(header_layout)
+
     def create_layer_configuration_group(self, layout):
-        layers_group = QGroupBox(self.tr("Configuration des couches"))
+        layers_group = QGroupBox()
         layers_layout = QVBoxLayout()
         max_combo_width = 200
 

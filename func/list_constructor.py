@@ -1,5 +1,6 @@
 """Create ui and features to list_constructor by cliking on canvas."""
 
+from PyQt5.QtCore import QSettings
 from qgis.core import (
     QgsApplication,
     QgsCoordinateTransform,
@@ -18,7 +19,7 @@ from qgis.gui import (
 )
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QCursor
-from qgis.PyQt.QtWidgets import QLabel, QApplication
+from qgis.PyQt.QtWidgets import QApplication, QLabel
 from qgis.utils import iface
 
 
@@ -30,6 +31,7 @@ class IDsBasket(QgsMapTool):
         compositions_layer,
         id_column_name,
         segments_column_name,
+        options_widget=None
     ):
         super().__init__(canvas)
         if canvas:
@@ -349,6 +351,12 @@ class IDsBasket(QgsMapTool):
         # if not mousePos:
         #     self.label.hide()
         #     return
+
+        settings = QSettings()
+        show_label = settings.value(
+            "routes_composer/ids_basket_label_hide", "True") == "True"
+        if not show_label:
+            return
 
         labelPos = mousePos + QPoint(20, 0)
         if labelPos.x() + self.label.width() > self.canvas.width():  # type: ignore

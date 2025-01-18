@@ -1,5 +1,7 @@
-from qgis.core import QgsField
 from PyQt5.QtCore import QVariant
+from qgis.core import QgsField
+
+from .utils import log
 
 
 class SegmentsBelonging:
@@ -15,8 +17,9 @@ class SegmentsBelonging:
         self.id_column_name = id_column_name
         self.segments_column_name = segments_column_name
 
-        self.segment_appartenances = {}
         self.belonging_column = "compositions"
+
+        self.segment_appartenances = {}
 
     def create_belonging_column(self):
         fields = self.segments_layer.fields()
@@ -34,14 +37,12 @@ class SegmentsBelonging:
             comp_id = str(int(composition["id"]))
             segments_str = composition[self.segments_column_name]
 
-            # Conversion de la chaîne de segments en liste
             if segments_str:
                 segments_list = [
                     int(id_str)
                     for id_str in segments_str.split(",")
                     if id_str.strip().isdigit()
                 ]
-                # Mise à jour du dictionnaire des appartenances
                 for seg_id in segments_list:
                     if seg_id not in self.segment_appartenances:
                         self.segment_appartenances[seg_id] = []
@@ -53,17 +54,26 @@ class SegmentsBelonging:
             self.create_belonging_column()
             self.dictionary_creation()
 
-            attr_idx = self.segments_layer.fields().indexOf(self.belonging_column)
             updates = {}
+            attr_idx = self.segments_layer.fields().indexOf(self.belonging_column)
+            self.segments_layer.startEditing()
 
             for segment in self.segments_layer.getFeatures():
                 seg_id = segment["id"]
                 appartenance_str = ",".join(
                     self.segment_appartenances.get(seg_id, ["0"])
                 )
-                updates[segment.id()] = {attr_idx: appartenance_str}
 
-            self.segments_layer.dataProvider().changeAttributeValues(updates)
+                # On ne peut mettre à jour via le data provider des entités non enregistrées.
+                if segment.id() >= 0:
+                    updates[segment.id()] = {attr_idx: appartenance_str}
+                else:
+                    self.segments_layer.changeAttributeValue(
+                        segment.id(), attr_idx, appartenance_str
+                    )
+
+            if updates:
+                self.segments_layer.dataProvider().changeAttributeValues(updates)
 
         except Exception as e:
             self.segments_layer.rollBack()

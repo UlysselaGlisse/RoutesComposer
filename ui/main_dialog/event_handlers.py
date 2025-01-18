@@ -87,6 +87,10 @@ class EventHandlers(QObject):
     def show_info(self):
         self.dialog.info.exec_()
 
+    def show_config(self):
+        self.dialog.config.load_options()
+        self.dialog.config.exec_()
+
     def cancel_process(self):
         config.cancel_request = True
         self.dialog.ui.cancel_button.setEnabled(False)

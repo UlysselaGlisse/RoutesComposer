@@ -33,7 +33,6 @@ Ce qui marche:
   - qu'il s'agit d'un seul segment
   - que le segment n'appartient à aucune composition
 * Ajouter possibilité activer/désactiver la boîte flottante à côté du curseur de panier à segments.
-* Ajouter possibilité choisir entre l'ouverture du formulaire d'attribut / copier dans le presse papier.
 
 ## Advances Options
 * Permettre de créer des liens permanent avec les attributs.
