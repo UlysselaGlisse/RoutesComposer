@@ -20,19 +20,14 @@ Ce qui marche:
 * Créer champs erreur dans compositions
 
 ## Panier à segments
-* Masquer label
 
 ## Segments_belonging
-* Faire mise-à-jour lors d'événements que sur les segments touchés.
 
 ## ui
-* Connexion/déconnexion segments_belonging.
+* La colonne sélectionnée n'est pas rechargée lors de la réouverture du dialogue.
+* Sélectionner couche dont le nom comporte le mot segments ou compositions.
 
 ## Config
-* Ajouter possibilité d'activer / désactiver les pop-up signalant :
-  - qu'il s'agit d'un seul segment
-  - que le segment n'appartient à aucune composition
-* Ajouter possibilité activer/désactiver la boîte flottante à côté du curseur de panier à segments.
 
 ## Advances Options
 * Permettre de créer des liens permanent avec les attributs.

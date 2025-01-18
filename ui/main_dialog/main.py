@@ -7,6 +7,7 @@ from qgis.PyQt.QtCore import QSettings, QTranslator
 from qgis.PyQt.QtWidgets import QDialog
 from qgis.utils import iface
 
+from ...func.utils import log
 from ...main_events_handler import MainEventsHandlers
 from .advanced_options import AdvancedOptions
 from .event_handlers import EventHandlers
@@ -36,7 +37,7 @@ class RoutesComposerDialog(QDialog):
         super().__init__(parent)
         self.tool = tool
         self.setWindowTitle(self.tr("Compositeur de Routes"))
-        self.setMinimumWidth(400)
+        self.setMinimumWidth(600)
         self.initial_size = self.size()
 
         self.ui = UiBuilder(self)
@@ -65,12 +66,6 @@ class RoutesComposerDialog(QDialog):
         if project:
             settings = QSettings()
 
-            self.saved_segments_layer_id = settings.value(
-                "routes_composer/segments_layer_id", ""
-            )
-            self.saved_compositions_layer_id = settings.value(
-                "routes_composer/compositions_layer_id", ""
-            )
             self.saved_id_column = settings.value("routes_composer/id_column_name", "")
             self.saved_segments_column = settings.value(
                 "routes_composer/segments_column_name", ""
@@ -211,8 +206,6 @@ class RoutesComposerDialog(QDialog):
             self.ui.compositions_combo.blockSignals(True)
             self.ui.segments_attr_combo.blockSignals(True)
             self.ui.compositions_attr_combo.blockSignals(True)
-            self.ui.id_column_combo.blockSignals(True)
-            self.ui.segments_column_combo.blockSignals(True)
 
             self.layer_manager.refresh_layers_combo(self.ui.segments_combo)
             self.layer_manager.refresh_layers_combo(self.ui.compositions_combo)
@@ -232,5 +225,3 @@ class RoutesComposerDialog(QDialog):
             self.ui.compositions_combo.blockSignals(False)
             self.ui.segments_attr_combo.blockSignals(False)
             self.ui.compositions_attr_combo.blockSignals(False)
-            self.ui.id_column_combo.blockSignals(True)
-            self.ui.segments_column_combo.blockSignals(True)

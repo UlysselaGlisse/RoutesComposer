@@ -21,7 +21,9 @@ class InfoDialog(QDialog):
 
                 <h4>Sélectionnez les couches :</h4>
                 <p>
-                Les couches sélectionnées ne peuvent avoir pour identifiant unique la colonne 'id'<br>choisie pour routes composer. Pour un gpkg, il faudra typiquement<br>avoir une colonne 'fid' et une colonne 'id'.<br>
+                Les couches sélectionnées ne peuvent avoir pour identifiant unique la colonne 'id'<br>
+                choisie pour routes composer. Pour un gpkg, il faudra typiquement avoir une colonne 'fid'<br>
+                et une colonne 'id'.<br>
                 <br>
                     - Une couche segments avec un champ 'id' qui sera utilisé pour faire vos compositions.<br>
                     - Une couche compositions avec un champ dans lequel vous entrez les listes de segments<br> (sans espaces et séparées par une virgule, par exemple 1,2,3).
