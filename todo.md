@@ -24,7 +24,6 @@ Ce qui marche:
 ## Segments_belonging
 
 ## ui
-* La colonne sélectionnée n'est pas rechargée lors de la réouverture du dialogue.
 * Sélectionner couche dont le nom comporte le mot segments ou compositions.
 
 ## Config

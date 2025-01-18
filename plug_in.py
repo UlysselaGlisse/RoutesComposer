@@ -59,7 +59,15 @@ class RoutesComposerTool:
             QIcon(icon_path),
             QCoreApplication.translate(
                 "RoutesManagerTool",
-                "Sélectionner des entités sur la carte et ouvrir le formulaire d'attributs.",
+                """
+                Sélectionner des entités sur la carte et ouvrir le formulaire d'attributs<br>
+                <br>
+                <b>z</b> : retire le dernier segment<br>
+                <b>r</b> : le rétabli<br>
+                <b>e</b> : efface la liste<br>
+                <b>alt + clique</b> : sélectionne tous les segments d'une composition<br>
+                <b>shift + clique-droit</b> : n'ouvre pas le formulaire et copie la liste dans le presse-papier
+                """,
             ),
             self.iface.mainWindow(),
         )

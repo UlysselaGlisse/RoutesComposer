@@ -214,10 +214,19 @@ class IDsBasket(QgsMapTool):
             return
         if e.key() == Qt.Key_Z:  # type: ignore
             self.remove_last_segment()
-        elif e.key() == Qt.Key_E:  # type: ignore
+        elif e.key() == Qt.Key_R:  # type: ignore
             self.restore_last_removed_segment()
-        elif e.key() == Qt.Key_Q:
+        elif e.key() == Qt.Key_E: # type: ignore
+            self.clear_selection()
+        elif e.key() == Qt.Key_Q: # type: ignore
             self.deactivate()
+
+    def clear_selection(self):
+        """Vide la liste des segments sélectionnés"""
+        self.selected_ids.clear()
+        self.removed_ids.clear()
+        self.segments_layer.removeSelection()
+        self.update_label()
 
     def remove_last_segment(self):
         if self.selected_ids:

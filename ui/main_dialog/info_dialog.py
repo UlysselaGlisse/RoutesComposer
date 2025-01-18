@@ -40,7 +40,8 @@ class InfoDialog(QDialog):
                 <h4>Raccourcis:</h4>
                 <ul>
                     - <b>z</b> pour retirer le dernier segment de la liste<br>
-                    - <b>e</b> pour le rétablir<br>
+                    - <b>r</b> pour le rétablir<br>
+                    - <b>e</b> pour vider la liste<br>
                     - <b>alt + clique-gauche</b> pour sélectionner tous les segments d'une composition<br>
                     - <b>shift + clique-droit</b> pour copier la sélection dans le presse papier<br>
                 </ul>
