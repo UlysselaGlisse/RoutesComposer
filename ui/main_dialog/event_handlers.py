@@ -5,10 +5,9 @@ from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.utils import iface
 
-from ...func.utils import log
-
 from ... import config
 from ...main_events_handler import MainEventsHandlers
+
 
 class EventHandlers(QObject):
     def __init__(self, dialog):
@@ -88,8 +87,8 @@ class EventHandlers(QObject):
         self.dialog.info.exec_()
 
     def show_config(self):
-        self.dialog.config.load_options()
-        self.dialog.config.exec_()
+        self.dialog.options.load_options()
+        self.dialog.options.exec_()
 
     def cancel_process(self):
         config.cancel_request = True
