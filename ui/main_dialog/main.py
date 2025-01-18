@@ -211,6 +211,8 @@ class RoutesComposerDialog(QDialog):
             self.ui.compositions_combo.blockSignals(True)
             self.ui.segments_attr_combo.blockSignals(True)
             self.ui.compositions_attr_combo.blockSignals(True)
+            self.ui.id_column_combo.blockSignals(True)
+            self.ui.segments_column_combo.blockSignals(True)
 
             self.layer_manager.refresh_layers_combo(self.ui.segments_combo)
             self.layer_manager.refresh_layers_combo(self.ui.compositions_combo)
@@ -219,8 +221,16 @@ class RoutesComposerDialog(QDialog):
             self.layer_manager.populate_compositions_layer_combo(
                 self.ui.compositions_combo
             )
+            if self.layer_manager.segments_layer is not None:
+                self.layer_manager.populate_id_column_combo(self.layer_manager.segments_layer)
+
+            if self.layer_manager.compositions_layer is not None:
+                self.layer_manager.populate_segments_column_combo(self.layer_manager.compositions_layer)
+
 
             self.ui.segments_combo.blockSignals(False)
             self.ui.compositions_combo.blockSignals(False)
             self.ui.segments_attr_combo.blockSignals(False)
             self.ui.compositions_attr_combo.blockSignals(False)
+            self.ui.id_column_combo.blockSignals(True)
+            self.ui.segments_column_combo.blockSignals(True)

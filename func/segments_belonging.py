@@ -34,6 +34,7 @@ class SegmentsBelonging:
     def dictionary_creation(self):
         self.compositions_layer.startEditing()
         for composition in self.compositions_layer.getFeatures():
+            # TO DO: Je choisis arbitrairement la colonne 'id'. Il faudra peut-être laisser le choix.
             comp_id = str(int(composition["id"]))
             segments_str = composition[self.segments_column_name]
 
@@ -59,7 +60,7 @@ class SegmentsBelonging:
             self.segments_layer.startEditing()
 
             for segment in self.segments_layer.getFeatures():
-                seg_id = segment["id"]
+                seg_id = segment[self.id_column_name]
                 appartenance_str = ",".join(
                     self.segment_appartenances.get(seg_id, ["0"])
                 )

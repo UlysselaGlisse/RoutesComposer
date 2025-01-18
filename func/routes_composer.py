@@ -145,13 +145,13 @@ class RoutesComposer(QObject):
         self.compositions_layer.triggerRepaint()
 
     def feature_added_on_compo_layer(self, fid):
-        log(fid)
         if self.segments_layer is None or self.compositions_layer is None :
             return
 
         source_feature = self.compositions_layer.getFeature(fid)
         if not source_feature.isValid():
             return
+        log(f"New compositions feature added with id: {source_feature['id']}")
 
         if self.routes_composer_connected:
 
@@ -179,7 +179,6 @@ class RoutesComposer(QObject):
             self.segments_layer.triggerRepaint()
 
     def features_changed_on_compo_layer(self, fid, idx):
-        log(fid)
         if self.segments_layer is None or self.compositions_layer is None:
             return
 
@@ -189,6 +188,7 @@ class RoutesComposer(QObject):
         source_feature = self.compositions_layer.getFeature(fid)
         if not source_feature.isValid():
             return
+        log(f"Feature modified on composition: {source_feature['id']}")
 
         if self.routes_composer_connected:
             segments_str = source_feature[self.segments_column_name]
@@ -203,9 +203,7 @@ class RoutesComposer(QObject):
             self.geom.update_geometries_on_the_fly(segment_id)
             self.compositions_layer.triggerRepaint()
 
-        log(f"is_splitting: {self.is_splitting}")
         if self.belonging_connected and not self.is_splitting:
-
             self.belong = segments_belonging.SegmentsBelonging(
                 self.segments_layer,
                 self.compositions_layer,
@@ -217,9 +215,9 @@ class RoutesComposer(QObject):
             self.segments_layer.triggerRepaint()
 
     def features_deleted_on_compo_layer(self, fids):
-        log(fids)
         if self.segments_layer is None or self.compositions_layer is None :
             return
+        log(f"Features removed from compositions: {fids}")
 
         if self.belonging_connected:
             self.belong = segments_belonging.SegmentsBelonging(

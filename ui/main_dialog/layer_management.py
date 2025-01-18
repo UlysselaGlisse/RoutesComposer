@@ -218,6 +218,22 @@ class LayerManager(QObject):
         if id_column_name not in self.segments_layer.fields().names():
             return False
 
+        # Vérifier que ce n'est pas l'identifiant unique de la couche
+        if self.segments_layer.primaryKeyAttributes():
+            pk_field_names = [
+                self.segments_layer.fields().field(pk_index).name()
+                for pk_index in self.segments_layer.primaryKeyAttributes()
+            ]
+            if id_column_name in pk_field_names:
+                QMessageBox.warning(
+                    self.dialog,
+                    self.tr("Erreur de validation"),
+                    self.tr(
+                        "La colonne 'id' ne peut pas être l'identifiant unique de la couche 'segments'."
+                    ),
+                )
+                return False
+
         id_field = self.segments_layer.fields().field(id_column_name)
 
         if id_field.type() not in (QVariant.Int, QVariant.LongLong):
