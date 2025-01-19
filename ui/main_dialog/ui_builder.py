@@ -211,24 +211,72 @@ class UiBuilder(QObject):
                 "1, 2 et 3 sera mis à jour pour devenir 8."
             )
         )
-        advanced_layout = QVBoxLayout()
+        button_layout = QHBoxLayout()
+        self.linked_layout = QVBoxLayout()
+
+        self.linked_layout_group = QGroupBox(self.tr("Liaisons enregistrées"))
+        self.linked_layout_group.setLayout(self.linked_layout)
+        self.linked_layout_group.setVisible(False)
 
         self.compositions_attr_combo = QComboBox()
         self.segments_attr_combo = QComboBox()
         self.priority_mode_combo = self.create_priority_mode_combo()
 
+        advanced_layout = QVBoxLayout()
         advanced_layout.addLayout(self.create_attributes_layout())
+
+        self.save_linkage_button = QPushButton(self.tr("Enregistrer la liaison"))
+        self.save_linkage_button.setProperty("class", "action-button")
+        self.save_linkage_button.clicked.connect(self.save_linkage)
+
         self.update_attributes_button = QPushButton(
             self.tr("Mettre à jour les attributs")
         )
         self.update_attributes_button.setProperty("class", "action-button")
 
-        advanced_layout.addWidget(self.update_attributes_button)
+        button_layout.addWidget(self.save_linkage_button)
+        button_layout.addWidget(self.update_attributes_button)
+
+        advanced_layout.addLayout(button_layout)
+        advanced_layout.addWidget(self.linked_layout_group)
+
         advanced_group.setLayout(advanced_layout)
 
-        advanced_layout.addWidget(advanced_group)
 
         return advanced_group
+
+    def save_linkage(self):
+        compositions_attr = self.compositions_attr_combo.currentText()
+        segments_attr = self.segments_attr_combo.currentText()
+        priority_mode = self.priority_mode_combo.currentText()
+
+        composition_layer_name = self.compositions_combo.currentText()
+        segment_layer_name = self.segments_combo.currentText()
+
+        linkage_layout = QHBoxLayout()
+
+        linkage_label = QLabel(f"{composition_layer_name}: {compositions_attr} -> {segment_layer_name}: {segments_attr} (priorité: {priority_mode})")
+        linkage_layout.addWidget(linkage_label)
+
+        delete_button = QPushButton("✖")
+        delete_button.setFixedSize(20, 20)
+        delete_button.clicked.connect(lambda: self.remove_linkage(linkage_layout))
+
+        linkage_layout.addWidget(delete_button)
+
+        self.linked_layout.addLayout(linkage_layout)
+        self.linked_layout_group.setVisible(True)
+
+    def remove_linkage(self, layout):
+        self.linked_layout.removeItem(layout)
+        for i in range(layout.count()):
+            widget = layout.itemAt(i).widget()
+            if widget:
+                widget.deleteLater()
+        layout.deleteLater()
+
+        if self.linked_layout.count() == 0:
+            self.linked_layout_group.setVisible(False)
 
     def create_belonging_group(self):
         belonging_group = QGroupBox(self.tr("Appartenance des segments"))
