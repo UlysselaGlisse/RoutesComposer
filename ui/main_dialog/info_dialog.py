@@ -37,13 +37,14 @@ class InfoDialog(QDialog):
                     - Clique-droit. Le formulaire d'ajout d'une entité s'ouvre.
                 </p>
 
-                <h4>Raccourcis:</h4>
+                <h5>Raccourcis:</h5>
                 <ul>
                     - <b>z</b> pour retirer le dernier segment de la liste<br>
                     - <b>r</b> pour le rétablir<br>
                     - <b>e</b> pour vider la liste<br>
                     - <b>alt + clique-gauche</b> pour sélectionner tous les segments d'une composition<br>
                     - <b>shift + clique-droit</b> pour copier la sélection dans le presse papier<br>
+                    - <b>b</b> quitte l'outil
                 </ul>
             </div>
             """

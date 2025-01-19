@@ -11,11 +11,12 @@ from qgis.PyQt.QtWidgets import (
     QLabel,
     QProgressBar,
     QPushButton,
+    QToolButton,
     QVBoxLayout,
-    QToolButton
 )
 
 from ...main_events_handler import MainEventsHandlers
+
 
 class UiBuilder(QObject):
     def __init__(self, dialog):

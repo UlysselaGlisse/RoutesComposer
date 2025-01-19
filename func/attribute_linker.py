@@ -45,6 +45,7 @@ class AttributeLinker:
         self.update_segments_attr_values()
 
     def update_segments_attr_values(self):
+        log("r")
         try:
             segments_to_update = {}
 

@@ -149,6 +149,8 @@ class RoutesComposerDialog(QDialog):
         self.ui.priority_mode_combo.currentTextChanged.connect(
             self.advanced_options.on_priority_mode_selected
         )
+        self.ui.update_attributes_button.clicked.connect(self.advanced_options.start_attribute_linking)
+
         # Appartenance des segments
         self.ui.belonging_segments_button.clicked.connect(
             self.advanced_options.create_or_update_belonging_column

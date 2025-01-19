@@ -8,8 +8,8 @@ from qgis.PyQt.QtWidgets import QAction
 
 from .func.list_constructor import IDsBasket
 from .func.utils import log
-from .ui.main_dialog.main import RoutesComposerDialog
 from .main_events_handler import MainEventsHandlers
+from .ui.main_dialog.main import RoutesComposerDialog
 
 
 class RoutesComposerTool:
@@ -62,11 +62,12 @@ class RoutesComposerTool:
                 """
                 Sélectionner des entités sur la carte et ouvrir le formulaire d'attributs<br>
                 <br>
-                <b>z</b> : retire le dernier segment<br>
+                <b>z</b> : retire le dernier segment du panier<br>
                 <b>r</b> : le rétabli<br>
-                <b>e</b> : efface la liste<br>
+                <b>e</b> : vide la panier<br>
                 <b>alt + clique</b> : sélectionne tous les segments d'une composition<br>
-                <b>shift + clique-droit</b> : n'ouvre pas le formulaire et copie la liste dans le presse-papier
+                <b>shift + clique-droit</b> : copie la liste dans le presse-papier<br>
+                <b>q</b> : quitte l'outil
                 """,
             ),
             self.iface.mainWindow(),
@@ -193,8 +194,6 @@ class RoutesComposerTool:
             "icons",
             ("icon_run.png" if MainEventsHandlers.routes_composer_connected is True else "icon_stop.png"),
         )
-        #     ("icon_run.png" if config.script_running is True else "icon_stop.png"),
-        # )
         self.actions[0].setIcon(QIcon(icon_path))
 
     def show_dialog(self):
