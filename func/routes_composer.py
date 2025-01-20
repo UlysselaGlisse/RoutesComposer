@@ -217,26 +217,24 @@ class RoutesComposer(QObject):
             self.segments_layer.updateFields()
             self.segments_layer.triggerRepaint()
 
-        log(self.attribute_linker_connected)
-        if self.attribute_linker_connected:
-                settings = QSettings()
-                saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
-                field_name = self.compositions_layer.fields()[idx].name()
+        settings = QSettings()
+        saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
+        field_name = self.compositions_layer.fields()[idx].name()
 
-                log(f"Liens sauvegardés: {saved_linkages}")
-                for linkage in saved_linkages:
-                    if field_name == linkage['compositions_attr']:
-                        attribute_linker = AttributeLinker(
-                            self.segments_layer,
-                            self.compositions_layer,
-                            linkage['segments_attr'],
-                            linkage['compositions_attr'],
-                            self.id_column_name,
-                            self.segments_column_name,
-                            linkage['priority_mode']
-                        )
-                        attribute_linker.update_segments_attr_values()
-
+        if saved_linkages:
+            log(f"Liens sauvegardés: {saved_linkages}")
+            for linkage in saved_linkages:
+                # if field_name == linkage['compositions_attr']:
+                attribute_linker = AttributeLinker(
+                    self.segments_layer,
+                    self.compositions_layer,
+                    linkage['segments_attr'],
+                    linkage['compositions_attr'],
+                    self.id_column_name,
+                    self.segments_column_name,
+                    linkage['priority_mode']
+                )
+                attribute_linker.update_segments_attr_values()
 
     def features_deleted_on_compo_layer(self, fids):
         if self.segments_layer is None or self.compositions_layer is None :
@@ -290,16 +288,16 @@ class RoutesComposer(QObject):
                     ),
                     level=Qgis.MessageLevel.Info,
                 )
-                settings = QSettings()
-                saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
-                log(saved_linkages)
-                for linkage in saved_linkages:
-                    self.connect_attribute_linker(
-                        linkage['compositions_attr'],
-                        linkage['segments_attr'],
-                        linkage['priority_mode']
-                    )
-                    log(f"Linkage activated for attributes")
+                # settings = QSettings()
+                # saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
+                # if saved_linkages:
+                #     for linkage in saved_linkages:
+                #         self.connect_attribute_linker(
+                #             linkage['compositions_attr'],
+                #             linkage['segments_attr'],
+                #             linkage['priority_mode']
+                #         )
+                #         log(f"Linkage activated for attributes")
                 return True
 
         except Exception as e:
@@ -329,15 +327,6 @@ class RoutesComposer(QObject):
                 if self.compositions_layer is not None and self.comp_attr_value_changed_connected:
                     self.compositions_layer.attributeValueChanged.disconnect(self.features_changed_on_compo_layer)
                     self.comp_attr_value_changed_connected = False
-
-                settings = QSettings()
-                saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
-                for linkage in saved_linkages:
-                    self.disconnect_attribute_linker(
-                        linkage['compositions_attr'],
-                        linkage['segments_attr'],
-                        linkage['priority_mode']
-                    )
 
                 self.routes_composer_connected = False
 
@@ -471,55 +460,55 @@ class RoutesComposer(QObject):
             )
             return False
 
-    def connect_attribute_linker(self, compositions_attr, segments_attr, priority_mode):
-        try:
-            if (
-                self.segments_layer is not None
-                and self.compositions_layer is not None
-            ):
-                if not self.comp_attr_value_changed_connected:
-                    self.compositions_layer.attributeValueChanged.connect(
-                        self.features_changed_on_compo_layer
-                    )
-                    self.comp_attr_value_changed_connected = True
+    # def connect_attribute_linker(self, compositions_attr, segments_attr, priority_mode):
+    #     try:
+    #         if (
+    #             self.segments_layer is not None
+    #             and self.compositions_layer is not None
+    #         ):
+    #             if not self.comp_attr_value_changed_connected:
+    #                 self.compositions_layer.attributeValueChanged.connect(
+    #                     self.features_changed_on_compo_layer
+    #                 )
+    #                 self.comp_attr_value_changed_connected = True
 
-                    self.compositions_attr = compositions_attr
-                    self.segments_attr = segments_attr
-                    self.priority_mode = priority_mode
+    #                 self.compositions_attr = compositions_attr
+    #                 self.segments_attr = segments_attr
+    #                 self.priority_mode = priority_mode
 
-                    self.attribute_linker_connected = True
-                    log("Attribute linker is connected")
+    #                 self.attribute_linker_connected = True
+    #                 log("Attribute linker is connected")
 
-        except Exception as e:
-            iface.messageBar().pushMessage(
-                self.tr("Erreur"),
-                str(e),
-                level=Qgis.MessageLevel.Critical,
-            )
-            return False
+    #     except Exception as e:
+    #         iface.messageBar().pushMessage(
+    #             self.tr("Erreur"),
+    #             str(e),
+    #             level=Qgis.MessageLevel.Critical,
+    #         )
+    #         return False
 
-    def disconnect_attribute_linker(self, compositions_attr, segments_attr, priority_mode):
-        try:
-            if (
-                self.segments_layer is not None
-                and self.compositions_layer is not None
-            ):
-                if self.comp_attr_value_changed_connected:
-                    self.compositions_layer.attributeValueChanged.disconnect(
-                        self.features_changed_on_compo_layer
-                    )
-                    self.comp_attr_value_changed_connected = False
+    # def disconnect_attribute_linker(self, compositions_attr, segments_attr, priority_mode):
+    #     try:
+    #         if (
+    #             self.segments_layer is not None
+    #             and self.compositions_layer is not None
+    #         ):
+    #             if self.comp_attr_value_changed_connected:
+    #                 self.compositions_layer.attributeValueChanged.disconnect(
+    #                     self.features_changed_on_compo_layer
+    #                 )
+    #                 self.comp_attr_value_changed_connected = False
 
-                    self.attribute_linker_connected = False
-                    log("Attribute linker is disconnected")
+    #                 self.attribute_linker_connected = False
+    #                 log("Attribute linker is disconnected")
 
-        except Exception as e:
-            iface.messageBar().pushMessage(
-                self.tr("Erreur"),
-                str(e),
-                level=Qgis.MessageLevel.Critical,
-            )
-            return False
+    #     except Exception as e:
+    #         iface.messageBar().pushMessage(
+    #             self.tr("Erreur"),
+    #             str(e),
+    #             level=Qgis.MessageLevel.Critical,
+    #         )
+    #         return False
 
     def get_segments_layer(self):
         if not self.project:

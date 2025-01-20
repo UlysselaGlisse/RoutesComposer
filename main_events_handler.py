@@ -50,26 +50,26 @@ class MainEventsHandlers:
 
         MainEventsHandlers.belonging_connected = False
 
-    def connect_attribute_linker(self, compositions_attr, segments_attr, priority_mode):
-        linkage = {
-            'compositions_attr': compositions_attr,
-            'segments_attr': segments_attr,
-            'priority_mode': priority_mode
-        }
+    # def connect_attribute_linker(self, compositions_attr, segments_attr, priority_mode):
+    #     linkage = {
+    #         'compositions_attr': compositions_attr,
+    #         'segments_attr': segments_attr,
+    #         'priority_mode': priority_mode
+    #     }
 
-        if linkage not in self.active_linkages:
-            self.active_linkages.append(linkage)
-            routes_composer = RoutesComposer.get_instance()
-            routes_composer.connect_attribute_linker(compositions_attr, segments_attr, priority_mode)
+    #     if linkage not in self.active_linkages:
+    #         self.active_linkages.append(linkage)
+    #         routes_composer = RoutesComposer.get_instance()
+    #         routes_composer.connect_attribute_linker(compositions_attr, segments_attr, priority_mode)
 
-    def disconnect_attribute_linker(self, compositions_attr, segments_attr, priority_mode):
-        linkage = {
-            'compositions_attr': compositions_attr,
-            'segments_attr': segments_attr,
-            'priority_mode': priority_mode
-        }
+    # def disconnect_attribute_linker(self, compositions_attr, segments_attr, priority_mode):
+    #     linkage = {
+    #         'compositions_attr': compositions_attr,
+    #         'segments_attr': segments_attr,
+    #         'priority_mode': priority_mode
+    #     }
 
-        if linkage in self.active_linkages:
-            self.active_linkages.remove(linkage)
-            routes_composer = RoutesComposer.get_instance()
-            routes_composer.disconnect_attribute_linker(compositions_attr, segments_attr, priority_mode)
+    #     if linkage in self.active_linkages:
+    #         self.active_linkages.remove(linkage)
+    #         routes_composer = RoutesComposer.get_instance()
+    #         routes_composer.disconnect_attribute_linker(compositions_attr, segments_attr, priority_mode)

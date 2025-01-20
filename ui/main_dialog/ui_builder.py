@@ -264,13 +264,13 @@ class UiBuilder(QObject):
         self.linked_layout.addLayout(linkage_layout)
         self.linked_layout_group.setVisible(True)
 
-        # Connecter la liaison
-        main_events_handler = MainEventsHandlers()
-        main_events_handler.connect_attribute_linker(
-            linkage['compositions_attr'],
-            linkage['segments_attr'],
-            linkage['priority_mode']
-        )
+        # # Connecter la liaison
+        # main_events_handler = MainEventsHandlers()
+        # main_events_handler.connect_attribute_linker(
+        #     linkage['compositions_attr'],
+        #     linkage['segments_attr'],
+        #     linkage['priority_mode']
+        # )
 
     def init_linkages(self):
         settings = QSettings()
@@ -294,13 +294,13 @@ class UiBuilder(QObject):
                 widget.deleteLater()
         layout.deleteLater()
 
-        # Déconnecter la liaison
-        main_events_handler = MainEventsHandlers()
-        main_events_handler.disconnect_attribute_linker(
-            linkage['compositions_attr'],
-            linkage['segments_attr'],
-            linkage['priority_mode']
-        )
+        # # Déconnecter la liaison
+        # main_events_handler = MainEventsHandlers()
+        # main_events_handler.disconnect_attribute_linker(
+        #     linkage['compositions_attr'],
+        #     linkage['segments_attr'],
+        #     linkage['priority_mode']
+        # )
 
         if self.linked_layout.count() == 0:
             self.linked_layout_group.setVisible(False)

@@ -39,7 +39,7 @@ class PluginOptionsWidget(QDialog):
         dev_layout = QVBoxLayout()
 
         self.log_checkbox = QCheckBox(self.tr("Activer les logs dans la console python"))
-        self.log_checkbox.setChecked(False)
+        self.log_checkbox.setChecked(True)
         self.log_checkbox.stateChanged.connect(self.save_options)
 
         dev_layout.addWidget(self.log_checkbox)
@@ -67,6 +67,6 @@ class PluginOptionsWidget(QDialog):
         self.show_label_checkbox.setChecked(show_label)
 
         log_checkbox = settings.value(
-            "routes_composer/log", "False") =="True"
+            "routes_composer/log", "True") =="True"
         self.log_checkbox.setChecked(log_checkbox)
         config.logging_enabled = log_checkbox

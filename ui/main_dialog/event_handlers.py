@@ -104,12 +104,12 @@ class EventHandlers(QObject):
             settings.setValue("routes_composer/attribute_linkages", linkages)
             self.dialog.ui.add_linkage_to_ui(new_linkage)
 
-            main_events_handler = MainEventsHandlers()
-            main_events_handler.connect_attribute_linker(
-                new_linkage['compositions_attr'],
-                new_linkage['segments_attr'],
-                new_linkage['priority_mode']
-            )
+            # main_events_handler = MainEventsHandlers()
+            # main_events_handler.connect_attribute_linker(
+            #     new_linkage['compositions_attr'],
+            #     new_linkage['segments_attr'],
+            #     new_linkage['priority_mode']
+            # )
 
 
     def show_info(self):
