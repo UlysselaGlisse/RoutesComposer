@@ -101,11 +101,11 @@ class AttributeLinker:
                 self.segments_layer.updateFeature(segment)
                 update_count += 1
 
-            QMessageBox.information(
-                None,
-                "Lier les attributs",
-                f"Mise à jour terminée pour l'attribut: {self.compositions_attr}",
-            )
+            # QMessageBox.information(
+            #     None,
+            #     "Lier les attributs",
+            #     f"Mise à jour terminée pour l'attribut: {self.compositions_attr}",
+            # )
 
             return True
 

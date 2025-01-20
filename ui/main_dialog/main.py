@@ -51,6 +51,7 @@ class RoutesComposerDialog(QDialog):
 
 
         self.ui.init_ui()
+        self.ui.init_linkages()
         self.load_settings()
         self.setup_signals()
         self.update_ui_state()
@@ -150,7 +151,8 @@ class RoutesComposerDialog(QDialog):
             self.advanced_options.on_priority_mode_selected
         )
         self.ui.update_attributes_button.clicked.connect(self.advanced_options.start_attribute_linking)
-        # self.save_linkage_button.clicked.connect(self.ui.save_linkage)
+
+        self.ui.save_linkage_button.clicked.connect(self.event_handlers.save_linkage)
 
         # Appartenance des segments
         self.ui.belonging_segments_button.clicked.connect(

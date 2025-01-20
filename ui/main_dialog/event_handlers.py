@@ -1,7 +1,7 @@
 """Event handlers for RoutesComposerDialog."""
 
 from qgis.core import Qgis, QgsProject
-from qgis.PyQt.QtCore import QObject
+from qgis.PyQt.QtCore import QObject, QSettings
 from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.utils import iface
 
@@ -82,6 +82,35 @@ class EventHandlers(QObject):
                 self.main_events_handler.connect_belonging()
             elif not belonging:
                 self.main_events_handler.disconnect_belonging()
+
+    def save_linkage(self):
+        self.compositions_attr = self.dialog.ui.compositions_attr_combo.currentText()
+        self.segments_attr = self.dialog.ui.segments_attr_combo.currentText()
+        self.priority_mode = self.dialog.ui.priority_mode_combo.currentText()
+
+        settings = QSettings()
+        # Récupérer les liaisons existantes ou créer une nouvelle liste
+        linkages = settings.value("routes_composer/attribute_linkages", []) or []
+
+        # Créer une nouvelle liaison
+        new_linkage = {
+            'compositions_attr': self.compositions_attr,
+            'segments_attr': self.segments_attr,
+            'priority_mode': self.priority_mode
+        }
+
+        if new_linkage not in linkages:
+            linkages.append(new_linkage)
+            settings.setValue("routes_composer/attribute_linkages", linkages)
+            self.dialog.ui.add_linkage_to_ui(new_linkage)
+
+            main_events_handler = MainEventsHandlers()
+            main_events_handler.connect_attribute_linker(
+                new_linkage['compositions_attr'],
+                new_linkage['segments_attr'],
+                new_linkage['priority_mode']
+            )
+
 
     def show_info(self):
         self.dialog.info.exec_()

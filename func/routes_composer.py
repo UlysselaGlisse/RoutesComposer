@@ -217,19 +217,25 @@ class RoutesComposer(QObject):
             self.segments_layer.updateFields()
             self.segments_layer.triggerRepaint()
 
+        log(self.attribute_linker_connected)
         if self.attribute_linker_connected:
-            if self.compositions_layer.fields()[idx].name() != self.compositions_attr:
-                return
-            attribute_linker = AttributeLinker(
-                                    self.segments_layer,
-                                    self.compositions_layer,
-                                    self.segments_attr,
-                                    self.compositions_attr,
-                                    self.id_column_name,
-                                    self.segments_column_name,
-                                    self.priority_mode
-                                )
-            attribute_linker.update_segments_attr_values()
+                settings = QSettings()
+                saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
+                field_name = self.compositions_layer.fields()[idx].name()
+
+                log(f"Liens sauvegardés: {saved_linkages}")
+                for linkage in saved_linkages:
+                    if field_name == linkage['compositions_attr']:
+                        attribute_linker = AttributeLinker(
+                            self.segments_layer,
+                            self.compositions_layer,
+                            linkage['segments_attr'],
+                            linkage['compositions_attr'],
+                            self.id_column_name,
+                            self.segments_column_name,
+                            linkage['priority_mode']
+                        )
+                        attribute_linker.update_segments_attr_values()
 
 
     def features_deleted_on_compo_layer(self, fids):
@@ -284,6 +290,16 @@ class RoutesComposer(QObject):
                     ),
                     level=Qgis.MessageLevel.Info,
                 )
+                settings = QSettings()
+                saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
+                log(saved_linkages)
+                for linkage in saved_linkages:
+                    self.connect_attribute_linker(
+                        linkage['compositions_attr'],
+                        linkage['segments_attr'],
+                        linkage['priority_mode']
+                    )
+                    log(f"Linkage activated for attributes")
                 return True
 
         except Exception as e:
@@ -313,6 +329,15 @@ class RoutesComposer(QObject):
                 if self.compositions_layer is not None and self.comp_attr_value_changed_connected:
                     self.compositions_layer.attributeValueChanged.disconnect(self.features_changed_on_compo_layer)
                     self.comp_attr_value_changed_connected = False
+
+                settings = QSettings()
+                saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
+                for linkage in saved_linkages:
+                    self.disconnect_attribute_linker(
+                        linkage['compositions_attr'],
+                        linkage['segments_attr'],
+                        linkage['priority_mode']
+                    )
 
                 self.routes_composer_connected = False
 

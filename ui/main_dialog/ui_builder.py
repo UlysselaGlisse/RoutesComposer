@@ -1,7 +1,7 @@
 """Construct ui for main dialog"""
 import os
 
-from qgis.PyQt.QtCore import QObject, Qt
+from qgis.PyQt.QtCore import QObject, QSettings, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import (
     QCheckBox,
@@ -228,7 +228,7 @@ class UiBuilder(QObject):
 
         self.save_linkage_button = QPushButton(self.tr("Enregistrer la liaison"))
         self.save_linkage_button.setProperty("class", "action-button")
-        self.save_linkage_button.clicked.connect(self.save_linkage)
+        self.save_linkage_button.clicked.connect(self.dialog.event_handlers.save_linkage)
 
         self.update_attributes_button = QPushButton(
             self.tr("Mettre à jour les attributs")
@@ -246,42 +246,61 @@ class UiBuilder(QObject):
 
         return advanced_group
 
-    def save_linkage(self):
-        self.compositions_attr = self.compositions_attr_combo.currentText()
-        self.segments_attr = self.segments_attr_combo.currentText()
-        self.priority_mode = self.priority_mode_combo.currentText()
-
-        composition_layer_name = self.compositions_combo.currentText()
-        segment_layer_name = self.segments_combo.currentText()
-
+    def add_linkage_to_ui(self, linkage):
         linkage_layout = QHBoxLayout()
 
-        linkage_label = QLabel(f"{composition_layer_name}: {self.compositions_attr} -> {segment_layer_name}: {self.segments_attr} (priorité: {self.priority_mode})")
-        linkage_layout.addWidget(linkage_label)
+        label_text = (f"{self.compositions_combo.currentText()}: {linkage['compositions_attr']} -> "
+                    f"{self.segments_combo.currentText()}: {linkage['segments_attr']} "
+                    f"(priorité: {linkage['priority_mode']})")
 
+        label = QLabel(label_text)
         delete_button = QPushButton("✖")
         delete_button.setFixedSize(20, 20)
-        delete_button.clicked.connect(lambda: self.remove_linkage(linkage_layout))
+        delete_button.clicked.connect(lambda: self.remove_linkage(linkage_layout, linkage))
 
-        main_events_handler = MainEventsHandlers()
-        log("r")
-        main_events_handler.connect_attribute_linker(self.compositions_attr, self.segments_attr, self.priority_mode)
-
+        linkage_layout.addWidget(label)
         linkage_layout.addWidget(delete_button)
 
         self.linked_layout.addLayout(linkage_layout)
         self.linked_layout_group.setVisible(True)
 
-    def remove_linkage(self, layout):
+        # Connecter la liaison
+        main_events_handler = MainEventsHandlers()
+        main_events_handler.connect_attribute_linker(
+            linkage['compositions_attr'],
+            linkage['segments_attr'],
+            linkage['priority_mode']
+        )
+
+    def init_linkages(self):
+        settings = QSettings()
+        linkages = settings.value("routes_composer/attribute_linkages", []) or []
+
+        for linkage in linkages:
+            self.add_linkage_to_ui(linkage)
+
+    def remove_linkage(self, layout, linkage):
+        # Retirer la liaison des QSettings
+        settings = QSettings()
+        linkages = settings.value("routes_composer/attribute_linkages", [])
+        linkages.remove(linkage)
+        settings.setValue("routes_composer/attribute_linkages", linkages)
+
+        # Nettoyer l'UI
         self.linked_layout.removeItem(layout)
         for i in range(layout.count()):
             widget = layout.itemAt(i).widget()
             if widget:
                 widget.deleteLater()
         layout.deleteLater()
-        main_events_handler = MainEventsHandlers()
-        main_events_handler.disconnect_attribute_linker(self.compositions_attr, self.segments_attr, self.priority_mode)
 
+        # Déconnecter la liaison
+        main_events_handler = MainEventsHandlers()
+        main_events_handler.disconnect_attribute_linker(
+            linkage['compositions_attr'],
+            linkage['segments_attr'],
+            linkage['priority_mode']
+        )
 
         if self.linked_layout.count() == 0:
             self.linked_layout_group.setVisible(False)
