@@ -51,9 +51,9 @@ class RoutesComposerDialog(QDialog):
 
 
         self.ui.init_ui()
-        self.ui.init_linkages()
         self.load_settings()
         self.setup_signals()
+        self.ui.init_linkages()
         self.update_ui_state()
 
     def load_styles(self):

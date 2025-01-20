@@ -249,8 +249,8 @@ class UiBuilder(QObject):
     def add_linkage_to_ui(self, linkage):
         linkage_layout = QHBoxLayout()
 
-        label_text = (f"{self.compositions_combo.currentText()}: {linkage['compositions_attr']} -> "
-                    f"{self.segments_combo.currentText()}: {linkage['segments_attr']} "
+        label_text = (f"compositions: {linkage['compositions_attr']} -> "
+                    f"segments: {linkage['segments_attr']} "
                     f"(priorité: {linkage['priority_mode']})")
 
         label = QLabel(label_text)
@@ -272,13 +272,11 @@ class UiBuilder(QObject):
             self.add_linkage_to_ui(linkage)
 
     def remove_linkage(self, layout, linkage):
-        # Retirer la liaison des QSettings
         settings = QSettings()
         linkages = settings.value("routes_composer/attribute_linkages", [])
         linkages.remove(linkage)
         settings.setValue("routes_composer/attribute_linkages", linkages)
 
-        # Nettoyer l'UI
         self.linked_layout.removeItem(layout)
         for i in range(layout.count()):
             widget = layout.itemAt(i).widget()
