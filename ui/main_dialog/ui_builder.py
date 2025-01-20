@@ -16,6 +16,7 @@ from qgis.PyQt.QtWidgets import (
 )
 
 from ...main_events_handler import MainEventsHandlers
+from ...func.utils import log
 
 
 class UiBuilder(QObject):
@@ -246,21 +247,25 @@ class UiBuilder(QObject):
         return advanced_group
 
     def save_linkage(self):
-        compositions_attr = self.compositions_attr_combo.currentText()
-        segments_attr = self.segments_attr_combo.currentText()
-        priority_mode = self.priority_mode_combo.currentText()
+        self.compositions_attr = self.compositions_attr_combo.currentText()
+        self.segments_attr = self.segments_attr_combo.currentText()
+        self.priority_mode = self.priority_mode_combo.currentText()
 
         composition_layer_name = self.compositions_combo.currentText()
         segment_layer_name = self.segments_combo.currentText()
 
         linkage_layout = QHBoxLayout()
 
-        linkage_label = QLabel(f"{composition_layer_name}: {compositions_attr} -> {segment_layer_name}: {segments_attr} (priorité: {priority_mode})")
+        linkage_label = QLabel(f"{composition_layer_name}: {self.compositions_attr} -> {segment_layer_name}: {self.segments_attr} (priorité: {self.priority_mode})")
         linkage_layout.addWidget(linkage_label)
 
         delete_button = QPushButton("✖")
         delete_button.setFixedSize(20, 20)
         delete_button.clicked.connect(lambda: self.remove_linkage(linkage_layout))
+
+        main_events_handler = MainEventsHandlers()
+        log("r")
+        main_events_handler.connect_attribute_linker(self.compositions_attr, self.segments_attr, self.priority_mode)
 
         linkage_layout.addWidget(delete_button)
 
@@ -274,6 +279,9 @@ class UiBuilder(QObject):
             if widget:
                 widget.deleteLater()
         layout.deleteLater()
+        main_events_handler = MainEventsHandlers()
+        main_events_handler.disconnect_attribute_linker(self.compositions_attr, self.segments_attr, self.priority_mode)
+
 
         if self.linked_layout.count() == 0:
             self.linked_layout_group.setVisible(False)

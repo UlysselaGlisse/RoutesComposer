@@ -150,6 +150,7 @@ class RoutesComposerDialog(QDialog):
             self.advanced_options.on_priority_mode_selected
         )
         self.ui.update_attributes_button.clicked.connect(self.advanced_options.start_attribute_linking)
+        # self.save_linkage_button.clicked.connect(self.ui.save_linkage)
 
         # Appartenance des segments
         self.ui.belonging_segments_button.clicked.connect(

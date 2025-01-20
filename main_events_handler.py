@@ -1,5 +1,7 @@
 from qgis.PyQt.QtCore import QSettings
+
 from .func.routes_composer import RoutesComposer
+
 
 class MainEventsHandlers:
     routes_composer_connected = False
@@ -46,3 +48,17 @@ class MainEventsHandlers:
         routes_composer.disconnect_belonging()
 
         MainEventsHandlers.belonging_connected = False
+
+    def connect_attribute_linker(self, compositions_attr, segments_attr, priority_mode):
+        routes_composer = RoutesComposer.get_instance()
+        if routes_composer.routes_composer_connected and not routes_composer.attribute_linker_connected:
+            routes_composer.connect_attribute_linker(compositions_attr, segments_attr, priority_mode)
+
+            MainEventsHandlers.attribute_linker_connected = True
+
+    def disconnect_attribute_linker(self, compositions_attr, segments_attr, priority_mode):
+        routes_composer = RoutesComposer.get_instance()
+        if routes_composer.routes_composer_connected and routes_composer.attribute_linker_connected:
+            routes_composer.disconnect_attribute_linker(compositions_attr, segments_attr, priority_mode)
+
+            MainEventsHandlers.attribute_linker_connected = False

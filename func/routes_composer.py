@@ -1,3 +1,4 @@
+from ast import Attribute
 from PyQt5.QtWidgets import QMessageBox
 from qgis.core import Qgis, QgsProject, QgsVectorLayer
 from qgis.PyQt.QtCore import QObject, QSettings, QTranslator
@@ -5,6 +6,7 @@ from qgis.utils import iface
 from typing_extensions import cast
 
 from . import geom_compo, segments_belonging, split
+from .attribute_linker import AttributeLinker
 from .utils import log
 
 
@@ -49,6 +51,7 @@ class RoutesComposer(QObject):
         self.routes_composer_connected = False
         self.geom_on_fly_connected = False
         self.belonging_connected = False
+        self.attribute_linker_connected = False
 
         self.seg_feature_added_connected = False
         self.seg_feature_deleted_connected = False
@@ -182,9 +185,6 @@ class RoutesComposer(QObject):
         if self.segments_layer is None or self.compositions_layer is None:
             return
 
-        if idx != self.segments_column_index:
-            return
-
         source_feature = self.compositions_layer.getFeature(fid)
         if not source_feature.isValid():
             return
@@ -204,6 +204,9 @@ class RoutesComposer(QObject):
             self.compositions_layer.triggerRepaint()
 
         if self.belonging_connected and not self.is_splitting:
+            if idx != self.segments_column_index:
+                return
+
             self.belong = segments_belonging.SegmentsBelonging(
                 self.segments_layer,
                 self.compositions_layer,
@@ -213,6 +216,21 @@ class RoutesComposer(QObject):
             self.belong.create_or_update_belonging_column()
             self.segments_layer.updateFields()
             self.segments_layer.triggerRepaint()
+
+        if self.attribute_linker_connected:
+            if self.compositions_layer.fields()[idx].name() != self.compositions_attr:
+                return
+            attribute_linker = AttributeLinker(
+                                    self.segments_layer,
+                                    self.compositions_layer,
+                                    self.segments_attr,
+                                    self.compositions_attr,
+                                    self.id_column_name,
+                                    self.segments_column_name,
+                                    self.priority_mode
+                                )
+            attribute_linker.update_segments_attr_values()
+
 
     def features_deleted_on_compo_layer(self, fids):
         if self.segments_layer is None or self.compositions_layer is None :
@@ -419,6 +437,56 @@ class RoutesComposer(QObject):
                 self.belonging_connected = False
 
                 log("Belonging has been disconnected")
+
+        except Exception as e:
+            iface.messageBar().pushMessage(
+                self.tr("Erreur"),
+                str(e),
+                level=Qgis.MessageLevel.Critical,
+            )
+            return False
+
+    def connect_attribute_linker(self, compositions_attr, segments_attr, priority_mode):
+        try:
+            if (
+                self.segments_layer is not None
+                and self.compositions_layer is not None
+            ):
+                if not self.comp_attr_value_changed_connected:
+                    self.compositions_layer.attributeValueChanged.connect(
+                        self.features_changed_on_compo_layer
+                    )
+                    self.comp_attr_value_changed_connected = True
+
+                    self.compositions_attr = compositions_attr
+                    self.segments_attr = segments_attr
+                    self.priority_mode = priority_mode
+
+                    self.attribute_linker_connected = True
+                    log("Attribute linker is connected")
+
+        except Exception as e:
+            iface.messageBar().pushMessage(
+                self.tr("Erreur"),
+                str(e),
+                level=Qgis.MessageLevel.Critical,
+            )
+            return False
+
+    def disconnect_attribute_linker(self, compositions_attr, segments_attr, priority_mode):
+        try:
+            if (
+                self.segments_layer is not None
+                and self.compositions_layer is not None
+            ):
+                if self.comp_attr_value_changed_connected:
+                    self.compositions_layer.attributeValueChanged.disconnect(
+                        self.features_changed_on_compo_layer
+                    )
+                    self.comp_attr_value_changed_connected = False
+
+                    self.attribute_linker_connected = False
+                    log("Attribute linker is disconnected")
 
         except Exception as e:
             iface.messageBar().pushMessage(
