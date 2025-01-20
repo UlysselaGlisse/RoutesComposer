@@ -1,5 +1,7 @@
 from qgis.PyQt.QtCore import QSettings
+
 from .func.routes_composer import RoutesComposer
+
 
 class MainEventsHandlers:
     routes_composer_connected = False
@@ -8,6 +10,7 @@ class MainEventsHandlers:
 
     def __init__(self):
         self.settings = QSettings()
+        self.active_linkages = []
 
     def connect_routes_composer(self):
         routes_composer = RoutesComposer.get_instance()

@@ -29,9 +29,7 @@ class GeometryOperations(QObject):
                 self.dialog.ui.segments_column_combo.currentText(),
             )
 
-            errors_messages = geom_compo.update_compositions_geometries(
-                self.dialog.ui.progress_bar, mode="new"
-            )
+            errors_messages = geom_compo.update_compositions_geometries(self.dialog.ui.progress_bar, mode="new")
 
             self.cleanup_after_operation(errors_messages)
 

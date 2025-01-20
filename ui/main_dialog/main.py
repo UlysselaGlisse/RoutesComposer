@@ -53,6 +53,7 @@ class RoutesComposerDialog(QDialog):
         self.ui.init_ui()
         self.load_settings()
         self.setup_signals()
+        self.ui.init_linkages()
         self.update_ui_state()
 
     def load_styles(self):
@@ -150,6 +151,8 @@ class RoutesComposerDialog(QDialog):
             self.advanced_options.on_priority_mode_selected
         )
         self.ui.update_attributes_button.clicked.connect(self.advanced_options.start_attribute_linking)
+
+        self.ui.save_linkage_button.clicked.connect(self.event_handlers.save_linkage)
 
         # Appartenance des segments
         self.ui.belonging_segments_button.clicked.connect(

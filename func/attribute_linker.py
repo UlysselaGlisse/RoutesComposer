@@ -2,7 +2,7 @@
 
 from qgis.PyQt.QtWidgets import QMessageBox
 
-from .utils import log
+from .utils import log, timer_decorator
 
 
 class AttributeLinker:
@@ -44,6 +44,7 @@ class AttributeLinker:
 
         self.update_segments_attr_values()
 
+    @timer_decorator
     def update_segments_attr_values(self):
         log("r")
         try:
@@ -101,11 +102,11 @@ class AttributeLinker:
                 self.segments_layer.updateFeature(segment)
                 update_count += 1
 
-            QMessageBox.information(
-                None,
-                "Lier les attributs",
-                f"Mise à jour terminée pour l'attribut: {self.compositions_attr}",
-            )
+            # QMessageBox.information(
+            #     None,
+            #     "Lier les attributs",
+            #     f"Mise à jour terminée pour l'attribut: {self.compositions_attr}",
+            # )
 
             return True
 

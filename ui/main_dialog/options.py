@@ -56,7 +56,7 @@ class PluginOptionsWidget(QDialog):
         settings.setValue("routes_composer/ids_basket_label_hide", str(show_label))
 
         log_checkbox = self.log_checkbox.isChecked()
-        settings.setValue("routes_composer/log", str(log_checkbox))
+        settings.setValue("routes_composer/log", log_checkbox)
         config.logging_enabled = log_checkbox
 
     def load_options(self):
@@ -67,6 +67,6 @@ class PluginOptionsWidget(QDialog):
         self.show_label_checkbox.setChecked(show_label)
 
         log_checkbox = settings.value(
-            "routes_composer/log", "True") == "True"
+            "routes_composer/log", "True") =="True"
         self.log_checkbox.setChecked(log_checkbox)
         config.logging_enabled = log_checkbox

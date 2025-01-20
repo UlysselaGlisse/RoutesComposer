@@ -1,7 +1,7 @@
 """Construct ui for main dialog"""
 import os
 
-from qgis.PyQt.QtCore import QObject, Qt
+from qgis.PyQt.QtCore import QObject, QSettings, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import (
     QCheckBox,
@@ -16,6 +16,7 @@ from qgis.PyQt.QtWidgets import (
 )
 
 from ...main_events_handler import MainEventsHandlers
+from ...func.utils import log
 
 
 class UiBuilder(QObject):
@@ -211,24 +212,80 @@ class UiBuilder(QObject):
                 "1, 2 et 3 sera mis à jour pour devenir 8."
             )
         )
-        advanced_layout = QVBoxLayout()
+        button_layout = QHBoxLayout()
+        self.linked_layout = QVBoxLayout()
+
+        self.linked_layout_group = QGroupBox(self.tr("Liaisons enregistrées"))
+        self.linked_layout_group.setLayout(self.linked_layout)
+        self.linked_layout_group.setVisible(False)
 
         self.compositions_attr_combo = QComboBox()
         self.segments_attr_combo = QComboBox()
         self.priority_mode_combo = self.create_priority_mode_combo()
 
+        advanced_layout = QVBoxLayout()
         advanced_layout.addLayout(self.create_attributes_layout())
+
+        self.save_linkage_button = QPushButton(self.tr("Enregistrer la liaison"))
+        self.save_linkage_button.setProperty("class", "action-button")
+        self.save_linkage_button.clicked.connect(self.dialog.event_handlers.save_linkage)
+
         self.update_attributes_button = QPushButton(
             self.tr("Mettre à jour les attributs")
         )
         self.update_attributes_button.setProperty("class", "action-button")
 
-        advanced_layout.addWidget(self.update_attributes_button)
+        button_layout.addWidget(self.save_linkage_button)
+        button_layout.addWidget(self.update_attributes_button)
+
+        advanced_layout.addLayout(button_layout)
+        advanced_layout.addWidget(self.linked_layout_group)
+
         advanced_group.setLayout(advanced_layout)
 
-        advanced_layout.addWidget(advanced_group)
 
         return advanced_group
+
+    def add_linkage_to_ui(self, linkage):
+        linkage_layout = QHBoxLayout()
+
+        label_text = (f"compositions: {linkage['compositions_attr']} -> "
+                    f"segments: {linkage['segments_attr']} "
+                    f"(priorité: {linkage['priority_mode']})")
+
+        label = QLabel(label_text)
+        delete_button = QPushButton("✖")
+        delete_button.setFixedSize(20, 20)
+        delete_button.clicked.connect(lambda: self.remove_linkage(linkage_layout, linkage))
+
+        linkage_layout.addWidget(label)
+        linkage_layout.addWidget(delete_button)
+
+        self.linked_layout.addLayout(linkage_layout)
+        self.linked_layout_group.setVisible(True)
+
+    def init_linkages(self):
+        settings = QSettings()
+        linkages = settings.value("routes_composer/attribute_linkages", []) or []
+
+        for linkage in linkages:
+            self.add_linkage_to_ui(linkage)
+
+    def remove_linkage(self, layout, linkage):
+        settings = QSettings()
+        linkages = settings.value("routes_composer/attribute_linkages", [])
+        linkages.remove(linkage)
+        settings.setValue("routes_composer/attribute_linkages", linkages)
+
+        self.linked_layout.removeItem(layout)
+        for i in range(layout.count()):
+            widget = layout.itemAt(i).widget()
+            if widget:
+                widget.deleteLater()
+        layout.deleteLater()
+
+        if self.linked_layout.count() == 0:
+            self.linked_layout_group.setVisible(False)
 
     def create_belonging_group(self):
         belonging_group = QGroupBox(self.tr("Appartenance des segments"))
