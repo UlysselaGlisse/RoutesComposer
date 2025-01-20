@@ -95,7 +95,6 @@ class AttributeLinker:
                     )
             if updates:
                 self.segments_layer.dataProvider().changeAttributeValues(updates)
-
             return True
 
         except Exception as e:

@@ -1,4 +1,3 @@
-from ast import Attribute
 from PyQt5.QtWidgets import QMessageBox
 from qgis.core import Qgis, QgsProject, QgsVectorLayer
 from qgis.PyQt.QtCore import QObject, QSettings, QTranslator
@@ -148,7 +147,7 @@ class RoutesComposer(QObject):
         self.compositions_layer.triggerRepaint()
 
     def feature_added_on_compo_layer(self, fid):
-        if self.segments_layer is None or self.compositions_layer is None :
+        if self.segments_layer is None or self.compositions_layer is None:
             return
 
         source_feature = self.compositions_layer.getFeature(fid)
@@ -157,7 +156,6 @@ class RoutesComposer(QObject):
         log(f"New compositions feature added with id: {source_feature['id']}")
 
         if self.routes_composer_connected:
-
             segments_str = source_feature[self.segments_column_name]
             if not segments_str:
                 return
@@ -178,8 +176,26 @@ class RoutesComposer(QObject):
                 self.segments_column_name,
             )
             self.belong.create_or_update_belonging_column()
-            self.segments_layer.updateFields()
-            self.segments_layer.triggerRepaint()
+            self.segments_layer.reload()
+
+        settings = QSettings()
+        saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
+
+        if saved_linkages:
+            for linkage in saved_linkages:
+                attribute_linker = AttributeLinker(
+                    self.segments_layer,
+                    self.compositions_layer,
+                    linkage["segments_attr"],
+                    linkage["compositions_attr"],
+                    self.id_column_name,
+                    self.segments_column_name,
+                    linkage["priority_mode"],
+                )
+                attribute_linker.update_segments_attr_values()
+                self.segments_layer.reload()
+
+                log(f"Attribute {linkage['segments_attr']} update in segments layer")
 
     def feature_changed_on_compo_layer(self, fid, idx):
         if self.segments_layer is None or self.compositions_layer is None:
@@ -206,8 +222,9 @@ class RoutesComposer(QObject):
 
                 segment_id = int(segments_list[0])
                 self.geom.update_geometries_on_the_fly(segment_id)
-                log(f"Geom of modified composition {source_feature['id']} updated")
                 self.compositions_layer.triggerRepaint()
+
+                log(f"Geom of modified composition {source_feature['id']} updated")
 
             if self.belonging_connected and not self.is_splitting:
                 self.belong = segments_belonging.SegmentsBelonging(
@@ -217,28 +234,31 @@ class RoutesComposer(QObject):
                     self.segments_column_name,
                 )
                 self.belong.create_or_update_belonging_column()
-                log("Appartenance of segments updated")
+                self.segments_layer.reload()
 
-                self.segments_layer.updateFields()
-                self.segments_layer.triggerRepaint()
+                log("Appartenance of segments updated")
 
         if saved_linkages:
             for linkage in saved_linkages:
-                if field_name == linkage['compositions_attr']:
+                if field_name == linkage["compositions_attr"]:
                     attribute_linker = AttributeLinker(
                         self.segments_layer,
                         self.compositions_layer,
-                        linkage['segments_attr'],
-                        linkage['compositions_attr'],
+                        linkage["segments_attr"],
+                        linkage["compositions_attr"],
                         self.id_column_name,
                         self.segments_column_name,
-                        linkage['priority_mode']
+                        linkage["priority_mode"],
                     )
                     attribute_linker.update_segments_attr_values()
-                    log(f"Attribute {linkage['segments_attr']} updated in segments layer")
+                    self.segments_layer.reload()
+
+                    log(
+                        f"Attribute {linkage['segments_attr']} updated in segments layer"
+                    )
 
     def features_deleted_on_compo_layer(self, fids):
-        if self.segments_layer is None or self.compositions_layer is None :
+        if self.segments_layer is None or self.compositions_layer is None:
             return
         log(f"Features removed from compositions: {fids}")
 
@@ -255,10 +275,7 @@ class RoutesComposer(QObject):
 
     def connect_routes_composer(self):
         try:
-            if (
-                self.segments_layer is not None
-                and self.compositions_layer is not None
-            ):
+            if self.segments_layer is not None and self.compositions_layer is not None:
                 if not self.seg_feature_added_connected:
                     self.segments_layer.featureAdded.connect(self.feature_added)
                     self.seg_feature_added_connected = True
@@ -269,13 +286,13 @@ class RoutesComposer(QObject):
 
                 if not self.comp_feature_added_connected:
                     self.compositions_layer.featureAdded.connect(
-                    self.feature_added_on_compo_layer
+                        self.feature_added_on_compo_layer
                     )
                     self.comp_feature_added_connected = True
 
                 if not self.comp_attr_value_changed_connected:
                     self.compositions_layer.attributeValueChanged.connect(
-                    self.feature_changed_on_compo_layer
+                        self.feature_changed_on_compo_layer
                     )
                     self.comp_attr_value_changed_connected = True
 
@@ -303,21 +320,32 @@ class RoutesComposer(QObject):
     def disconnect_routes_composer(self):
         try:
             if self.segments_layer is not None and self.routes_composer_connected:
-
                 if self.seg_feature_added_connected:
                     self.segments_layer.featureAdded.disconnect(self.feature_added)
                     self.seg_feature_added_connected = False
 
                 if self.seg_feature_deleted_connected:
-                    self.segments_layer.featuresDeleted.disconnect(self.features_deleted)
+                    self.segments_layer.featuresDeleted.disconnect(
+                        self.features_deleted
+                    )
                     self.seg_feature_deleted_connected = False
 
-                if self.compositions_layer is not None and self.comp_feature_added_connected:
-                    self.compositions_layer.featureAdded.disconnect(self.feature_added_on_compo_layer)
+                if (
+                    self.compositions_layer is not None
+                    and self.comp_feature_added_connected
+                ):
+                    self.compositions_layer.featureAdded.disconnect(
+                        self.feature_added_on_compo_layer
+                    )
                     self.comp_feature_added_connected = False
 
-                if self.compositions_layer is not None and self.comp_attr_value_changed_connected:
-                    self.compositions_layer.attributeValueChanged.disconnect(self.feature_changed_on_compo_layer)
+                if (
+                    self.compositions_layer is not None
+                    and self.comp_attr_value_changed_connected
+                ):
+                    self.compositions_layer.attributeValueChanged.disconnect(
+                        self.feature_changed_on_compo_layer
+                    )
                     self.comp_attr_value_changed_connected = False
 
                 self.routes_composer_connected = False
@@ -348,7 +376,10 @@ class RoutesComposer(QObject):
                 "routes_composer", "geom_on_fly", False
             )
             if geom_on_fly:
-                if self.segments_layer is not None and not self.seg_geom_changed_connected:
+                if (
+                    self.segments_layer is not None
+                    and not self.seg_geom_changed_connected
+                ):
                     self.segments_layer.geometryChanged.connect(self.geometry_changed)
 
                     self.seg_geom_changed_connected = True
@@ -366,7 +397,9 @@ class RoutesComposer(QObject):
                 self.destroy_instance()
             else:
                 if self.seg_geom_changed_connected:
-                    self.segments_layer.geometryChanged.disconnect(self.geometry_changed)
+                    self.segments_layer.geometryChanged.disconnect(
+                        self.geometry_changed
+                    )
                     self.seg_geom_changed_connected = False
 
                 self.geom_on_fly_connected = False
@@ -381,10 +414,7 @@ class RoutesComposer(QObject):
 
     def connect_belonging(self):
         try:
-            if (
-                self.segments_layer is not None
-                and self.compositions_layer is not None
-            ):
+            if self.segments_layer is not None and self.compositions_layer is not None:
                 if not self.comp_feature_added_connected:
                     self.compositions_layer.featureAdded.connect(
                         self.feature_added_on_compo_layer
@@ -403,7 +433,6 @@ class RoutesComposer(QObject):
                     )
                     self.comp_feature_deleted_connected = True
 
-
                 self.belonging_connected = True
 
                 log("Belonging has been connected")
@@ -418,10 +447,7 @@ class RoutesComposer(QObject):
 
     def disconnect_belonging(self):
         try:
-            if (
-                self.segments_layer is not None
-                and self.compositions_layer is not None
-            ):
+            if self.segments_layer is not None and self.compositions_layer is not None:
                 if self.comp_feature_added_connected:
                     self.compositions_layer.featureAdded.disconnect(
                         self.feature_added_on_compo_layer
