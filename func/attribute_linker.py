@@ -1,7 +1,5 @@
 """Functions for linking attributes."""
 
-from qgis.PyQt.QtWidgets import QMessageBox
-
 from .utils import log, timer_decorator
 
 
@@ -24,30 +22,17 @@ class AttributeLinker:
         self.segments_column_name = segments_column_name
         self.priority_mode = priority_mode
 
-    def start(self):
-        """UNUSE Démarre la liaison des attributs."""
-        self.compositions_layer.attributeValueChanged.connect(
-            self.on_composition_changed
-        )
-
-    def stop(self):
-        """UNUSE Arrête la liaison des attributs."""
-
-        self.compositions_layer.attributeValueChanged.disconnect(
-            self.on_composition_changed
-        )
-
-    def on_composition_changed(self, fid, idx, value):
-        """UNUSE Appelé quand un attribut d'une composition change."""
-        if self.compositions_layer.fields()[idx].name() != self.compositions_attr:
-            return
-
-        self.update_segments_attr_values()
+        self.segment_appartenances = {}
 
     @timer_decorator
     def update_segments_attr_values(self):
         log("r")
         try:
+            valid_segment_ids = {
+                feature[self.id_column_name]
+                for feature in self.segments_layer.getFeatures()
+            }
+            attr_idx = self.segments_layer.fields().indexOf(self.segments_attr)
             segments_to_update = {}
 
             for composition in self.compositions_layer.getFeatures():
@@ -64,6 +49,13 @@ class AttributeLinker:
                 ]
 
                 for segment_id in segment_ids:
+                    if segment_id not in valid_segment_ids:
+                        log(
+                            f"ID de segment invalide ignoré : {segment_id}",
+                            level="WARNING",
+                        )
+                        continue
+
                     if self.priority_mode == "none":
                         segments_to_update[segment_id] = value
                     elif segment_id not in segments_to_update:
@@ -89,24 +81,20 @@ class AttributeLinker:
                             )
 
             self.segments_layer.startEditing()
-            update_count = 0
+            updates = {}
 
             for segment in self.segments_layer.getFeatures():
-                segment_id = segment[self.id_column_name]
-                if segment_id not in segments_to_update:
-                    continue
+                seg_id = segment[self.id_column_name]
+                value = segments_to_update.get(seg_id)
 
-                new_value = segments_to_update[segment_id]
-
-                segment[self.segments_attr] = new_value
-                self.segments_layer.updateFeature(segment)
-                update_count += 1
-
-            # QMessageBox.information(
-            #     None,
-            #     "Lier les attributs",
-            #     f"Mise à jour terminée pour l'attribut: {self.compositions_attr}",
-            # )
+                if segment.id() >= 0:
+                    updates[segment.id()] = {attr_idx: value}
+                else:
+                    self.segments_layer.changeAttributeValue(
+                        segment.id(), attr_idx, value
+                    )
+            if updates:
+                self.segments_layer.dataProvider().changeAttributeValues(updates)
 
             return True
 
