@@ -25,7 +25,7 @@ You will be able to directly create the geometries of compositions from the plug
 
 This plugin is accompanied by another tool that allows you to select the IDs of segments directly on the map. A small algorithm fills in the gaps if two contiguous segments are not selected.
 
-https://github.com/user-attachments/assets/e7506320-665e-49fe-bef8-5ba32d06b17d
+[panier_a_segments.webm](https://github.com/user-attachments/assets/4d1505bb-728e-4c06-a9ee-7f2c874a5062)
 
 # Installation
 
