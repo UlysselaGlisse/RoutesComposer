@@ -1,6 +1,6 @@
 """Functions for linking attributes."""
 
-from .utils import log, timer_decorator
+from .utils import log
 
 
 class AttributeLinker:
@@ -24,18 +24,34 @@ class AttributeLinker:
 
         self.segment_appartenances = {}
 
-    @timer_decorator
-    def update_segments_attr_values(self):
-        log("r")
+    def update_segments_attr_values(self, comp_id=None):
         try:
             valid_segment_ids = {
                 feature[self.id_column_name]
                 for feature in self.segments_layer.getFeatures()
             }
             attr_idx = self.segments_layer.fields().indexOf(self.segments_attr)
-            segments_to_update = {}
+            segments_with_new_value = {}
+            segments_to_update = []
 
-            for composition in self.compositions_layer.getFeatures():
+            if comp_id is not None:
+                feature = next(
+                    (
+                        f
+                        for f in self.compositions_layer.getFeatures()
+                        if f.id() == comp_id
+                    ),
+                    None,
+                )
+                if feature:
+                    compositions_to_process = [feature]
+                else:
+                    log(f"Composition avec l'ID {comp_id} non trouvée", level="WARNING")
+                    return False
+            else:
+                compositions_to_process = self.compositions_layer.getFeatures()
+
+            for composition in compositions_to_process:
                 value = composition[self.compositions_attr]
                 if value == "NULL":
                     continue
@@ -49,6 +65,7 @@ class AttributeLinker:
                 ]
 
                 for segment_id in segment_ids:
+                    segments_to_update.append(segment_id)
                     if segment_id not in valid_segment_ids:
                         log(
                             f"ID de segment invalide ignoré : {segment_id}",
@@ -57,42 +74,46 @@ class AttributeLinker:
                         continue
 
                     if self.priority_mode == "none":
-                        segments_to_update[segment_id] = value
-                    elif segment_id not in segments_to_update:
-                        segments_to_update[segment_id] = value
+                        segments_with_new_value[segment_id] = value
+                    elif segment_id not in segments_with_new_value:
+                        segments_with_new_value[segment_id] = value
                     else:
-                        current_value = segments_to_update[segment_id]
+                        current_value = segments_with_new_value[segment_id]
                         # Conversion explicite en nombres pour la comparaison,
                         # car sinon 0 n'est pas pris en compte.'
                         value_num = float(value) if value else 0
                         current_value_num = float(current_value) if current_value else 0
 
                         if self.priority_mode == "min_value":
-                            segments_to_update[segment_id] = (
+                            segments_with_new_value[segment_id] = (
                                 value
                                 if value_num < current_value_num
                                 else current_value
                             )
                         elif self.priority_mode == "max_value":
-                            segments_to_update[segment_id] = (
+                            segments_with_new_value[segment_id] = (
                                 value
                                 if value_num > current_value_num
                                 else current_value
                             )
 
             self.segments_layer.startEditing()
+            if comp_id is not None:
+                segment_features = [
+                    f
+                    for f in self.segments_layer.getFeatures()
+                    if f[self.id_column_name] in segments_to_update
+                ]
+                segments_to_process = segment_features
+            else:
+                segments_to_process = self.segments_layer.getFeatures()
+
             updates = {}
-
-            for segment in self.segments_layer.getFeatures():
+            for segment in segments_to_process:
                 seg_id = segment[self.id_column_name]
-                value = segments_to_update.get(seg_id)
+                value = segments_with_new_value.get(seg_id)
+                updates[segment.id()] = {attr_idx: value}
 
-                if segment.id() >= 0:
-                    updates[segment.id()] = {attr_idx: value}
-                else:
-                    self.segments_layer.changeAttributeValue(
-                        segment.id(), attr_idx, value
-                    )
             if updates:
                 self.segments_layer.dataProvider().changeAttributeValues(updates)
             return True

@@ -166,7 +166,7 @@ class RoutesComposer(QObject):
 
             segment_id = int(segments_list[0])
             self.geom.update_geometries_on_the_fly(segment_id)
-            self.compositions_layer.triggerRepaint()
+            self.compositions_layer.reload()
 
         if self.belonging_connected:
             self.belong = segments_belonging.SegmentsBelonging(
@@ -192,8 +192,10 @@ class RoutesComposer(QObject):
                     self.segments_column_name,
                     linkage["priority_mode"],
                 )
-                attribute_linker.update_segments_attr_values()
-                self.segments_layer.reload()
+                if attribute_linker.update_segments_attr_values(
+                    comp_id=source_feature.id()
+                ):
+                    self.segments_layer.reload()
 
                 log(f"Attribute {linkage['segments_attr']} update in segments layer")
 
@@ -250,12 +252,14 @@ class RoutesComposer(QObject):
                         self.segments_column_name,
                         linkage["priority_mode"],
                     )
-                    attribute_linker.update_segments_attr_values()
-                    self.segments_layer.reload()
+                    if attribute_linker.update_segments_attr_values(
+                        comp_id=source_feature.id()
+                    ):
+                        self.segments_layer.reload()
 
-                    log(
-                        f"Attribute {linkage['segments_attr']} updated in segments layer"
-                    )
+                        log(
+                            f"Attribute {linkage['segments_attr']} updated in segments layer"
+                        )
 
     def features_deleted_on_compo_layer(self, fids):
         if self.segments_layer is None or self.compositions_layer is None:
@@ -272,6 +276,25 @@ class RoutesComposer(QObject):
             self.belong.create_or_update_belonging_column()
             self.segments_layer.updateFields()
             self.segments_layer.triggerRepaint()
+
+        settings = QSettings()
+        saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
+
+        if saved_linkages:
+            for linkage in saved_linkages:
+                attribute_linker = AttributeLinker(
+                    self.segments_layer,
+                    self.compositions_layer,
+                    linkage["segments_attr"],
+                    linkage["compositions_attr"],
+                    self.id_column_name,
+                    self.segments_column_name,
+                    linkage["priority_mode"],
+                )
+                if attribute_linker.update_segments_attr_values():
+                    self.segments_layer.reload()
+
+                log(f"Attribute {linkage['segments_attr']} update in segments layer")
 
     def connect_routes_composer(self):
         try:
