@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsField
 
-from .utils import log
+from .utils import log, timer_decorator
 
 
 class SegmentsBelonging:
@@ -50,6 +50,7 @@ class SegmentsBelonging:
 
                     self.segment_appartenances[seg_id].append(str(comp_id))
 
+    @timer_decorator
     def create_or_update_belonging_column(self):
         try:
             self.create_belonging_column()

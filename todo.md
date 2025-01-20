@@ -8,6 +8,7 @@ splitmanager ne marche pas, car feature added est le nouvel id accordé automati
 Ce qui marche:
 - Id sans rien (mais alors pas d'attribut unique)
 - fid (génération automatique) et id avec nouvel id automatique.
+Il faut donc peut-être forcé l'usage de fid + id.
 
 * Si segment étant seul dans une composition, mais étant utilisé dans compositions avec plusieurs segments, ne pas ouvrir la pop-up.
 ## Error
@@ -29,4 +30,3 @@ Ce qui marche:
 ## Config
 
 ## Advances Options
-* Permettre de créer des liens permanent avec les attributs.
