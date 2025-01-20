@@ -24,7 +24,7 @@ Sie können direkt über die Plugin-Oberfläche die Geometrien der Kompositionen
 
 Dieses Plugin wird von einem anderen Tool begleitet, das es ermöglicht, die Segment-IDs direkt auf der Karte auszuwählen. Ein kleiner Algorithmus hilft dabei, Lücken zu schließen, wenn Sie nicht zwei zusammenhängende Segmente auswählen.
 
-https://github.com/user-attachments/assets/e7506320-665e-49fe-bef8-5ba32d06b17d
+[panier_a_segments.webm](https://github.com/user-attachments/assets/4d1505bb-728e-4c06-a9ee-7f2c874a5062)
 
 ---
 

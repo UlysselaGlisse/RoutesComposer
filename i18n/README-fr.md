@@ -29,7 +29,7 @@ Vous pourrez directement depuis l'interface du plugin créer les géométries de
 
 Ce plugin est accompagné d'un autre outil, permettant de sélectionner les ids des segments directement sur la carte. Un petit algorithme permet de boucher les trous si l'on ne sélectionne pas deux segments contigus.
 
-https://github.com/user-attachments/assets/e7506320-665e-49fe-bef8-5ba32d06b17d
+[panier_a_segments.webm](https://github.com/user-attachments/assets/4d1505bb-728e-4c06-a9ee-7f2c874a5062)
 
 
 # Installation
