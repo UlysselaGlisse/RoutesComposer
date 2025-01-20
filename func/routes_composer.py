@@ -144,7 +144,7 @@ class RoutesComposer(QObject):
 
         log(f"Updating geometries for modified segment {segment_id}")
         self.geom.update_geometries_on_the_fly(segment_id)
-        self.compositions_layer.triggerRepaint()
+        self.compositions_layer.reload()
 
     def feature_added_on_compo_layer(self, fid):
         if self.segments_layer is None or self.compositions_layer is None:
@@ -224,7 +224,7 @@ class RoutesComposer(QObject):
 
                 segment_id = int(segments_list[0])
                 self.geom.update_geometries_on_the_fly(segment_id)
-                self.compositions_layer.triggerRepaint()
+                self.compositions_layer.reload()
 
                 log(f"Geom of modified composition {source_feature['id']} updated")
 
@@ -274,8 +274,7 @@ class RoutesComposer(QObject):
                 self.segments_column_name,
             )
             self.belong.create_or_update_belonging_column()
-            self.segments_layer.updateFields()
-            self.segments_layer.triggerRepaint()
+            self.segments_layer.reload()
 
         settings = QSettings()
         saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
