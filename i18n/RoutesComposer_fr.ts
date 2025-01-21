@@ -721,6 +721,11 @@
         <source>Mettre à jour le champ d&apos;appartenance des segments en continue</source>
         <translation></translation>
     </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="257"/>
+        <source>compositions: {linkage[&apos;compositions_attr&apos;]} -&gt; segments: {linkage[&apos;segments_attr&apos;]} (priorité: {linkage[&apos;priority_mode&apos;]})</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>self.dialog</name>

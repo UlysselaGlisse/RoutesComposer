@@ -812,7 +812,7 @@ und eine &apos;id&apos;-Spalte.&lt;br&gt;
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="76"/>
         <source>Colonne id:</source>
-        <translation>Spalte ID:</translation>
+        <translation>Spalte id:</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="89"/>
@@ -922,7 +922,7 @@ und eine &apos;id&apos;-Spalte.&lt;br&gt;
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="96"/>
         <source>Liste d&apos;ids:</source>
-        <translation>Liste von IDs:</translation>
+        <translation>Liste der ids:</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="58"/>
@@ -963,6 +963,11 @@ und eine &apos;id&apos;-Spalte.&lt;br&gt;
         <location filename="../ui/main_dialog/ui_builder.py" line="323"/>
         <source>Mettre à jour le champ d&apos;appartenance des segments en continue</source>
         <translation>Segmentzugehörigkeitsfeld kontinuierlich aktualisieren</translation>
+    </message>
+    <message>
+        <location filename="../ui/main_dialog/ui_builder.py" line="257"/>
+        <source>compositions: {linkage[&apos;compositions_attr&apos;]} -&gt; segments: {linkage[&apos;segments_attr&apos;]} (priorité: {linkage[&apos;priority_mode&apos;]})</source>
+        <translation>kompositionen: {linkage[&apos;compositions_attr&apos;]} -&gt; segmente: {linkage[&apos;segments_attr&apos;]} (priorität: {linkage[&apos;priority_mode&apos;]})</translation>
     </message>
 </context>
 <context>
