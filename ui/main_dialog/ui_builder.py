@@ -201,7 +201,7 @@ class UiBuilder(QObject):
         )
 
         self.belonging_group = self.create_belonging_group()
-        self.advanced_options_container.layout().addWidget(self.belonging_group)
+        self.advanced_options_container.layout().addWidget(self.belonging_group)  # type: ignore
 
         self.advanced_options_container.setVisible(False)
 
