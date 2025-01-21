@@ -1,4 +1,5 @@
 """Construct ui for main dialog"""
+
 import os
 
 from qgis.PyQt.QtCore import QObject, QSettings, Qt
@@ -15,8 +16,7 @@ from qgis.PyQt.QtWidgets import (
     QVBoxLayout,
 )
 
-from ...main_events_handler import MainEventsHandlers
-from ...func.utils import log
+from ...connexions_handler import ConnexionsHandler
 
 
 class UiBuilder(QObject):
@@ -43,13 +43,17 @@ class UiBuilder(QObject):
 
         self.configuration_label = QLabel(self.tr("Configuration des couches"))
         self.configuration_label.setStyleSheet("font-weight: bold;")
-        header_layout.addWidget(self.configuration_label, alignment=Qt.AlignmentFlag.AlignLeft)
+        header_layout.addWidget(
+            self.configuration_label, alignment=Qt.AlignmentFlag.AlignLeft
+        )
 
         # Create settings button
         header_layout.addStretch()
 
         self.settings_button = QToolButton()
-        icon_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "icons", "icon_gear.png")
+        icon_path = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)), "icons", "icon_gear.png"
+        )
         self.settings_button.setIcon(QIcon(icon_path))
         self.settings_button.setToolTip(self.tr("Réglages et configurations"))
 
@@ -70,9 +74,9 @@ class UiBuilder(QObject):
         segments_layout.addWidget(self.segments_combo)
 
         segments_layout.addWidget(QLabel(self.tr("Colonne id:")))
-        self.id_column_combo = QComboBox()
-        segments_layout.addWidget(self.id_column_combo)
-        self.id_column_combo.setMaximumWidth(max_combo_width)
+        self.seg_id_column_combo = QComboBox()
+        segments_layout.addWidget(self.seg_id_column_combo)
+        self.seg_id_column_combo.setMaximumWidth(max_combo_width)
 
         layers_layout.addLayout(segments_layout)
 
@@ -228,7 +232,9 @@ class UiBuilder(QObject):
 
         self.save_linkage_button = QPushButton(self.tr("Enregistrer la liaison"))
         self.save_linkage_button.setProperty("class", "action-button")
-        self.save_linkage_button.clicked.connect(self.dialog.event_handlers.save_linkage)
+        self.save_linkage_button.clicked.connect(
+            self.dialog.event_handlers.save_linkage
+        )
 
         self.update_attributes_button = QPushButton(
             self.tr("Mettre à jour les attributs")
@@ -243,20 +249,23 @@ class UiBuilder(QObject):
 
         advanced_group.setLayout(advanced_layout)
 
-
         return advanced_group
 
     def add_linkage_to_ui(self, linkage):
         linkage_layout = QHBoxLayout()
 
-        label_text = (f"compositions: {linkage['compositions_attr']} -> "
-                    f"segments: {linkage['segments_attr']} "
-                    f"(priorité: {linkage['priority_mode']})")
+        label_text = (
+            f"compositions: {linkage['compositions_attr']} -> "
+            f"segments: {linkage['segments_attr']} "
+            f"(priorité: {linkage['priority_mode']})"
+        )
 
         label = QLabel(label_text)
         delete_button = QPushButton("✖")
         delete_button.setFixedSize(20, 20)
-        delete_button.clicked.connect(lambda: self.remove_linkage(linkage_layout, linkage))
+        delete_button.clicked.connect(
+            lambda: self.remove_linkage(linkage_layout, linkage)
+        )
 
         linkage_layout.addWidget(label)
         linkage_layout.addWidget(delete_button)
@@ -297,14 +306,22 @@ class UiBuilder(QObject):
 
         belonging_layout = QVBoxLayout()
 
+        button_combo_layout = QHBoxLayout()
+
+        self.compo_id_column_combo = QComboBox()
+        button_combo_layout.addWidget(QLabel(self.tr("id compositions:")))
+        button_combo_layout.addWidget(self.compo_id_column_combo)
+
         self.belonging_segments_button = QPushButton(
             self.tr("Créer/Mettre à jour le champ 'compositions' dans segments")
         )
         self.belonging_segments_button.setProperty("class", "action-button")
-        belonging_layout.addWidget(self.belonging_segments_button)
+        button_combo_layout.addWidget(self.belonging_segments_button)
+
+        belonging_layout.addLayout(button_combo_layout)
 
         self.update_belonging_segments_checkbox = QCheckBox(
-            self.tr("Mettre à jour le champ appartenance des segments en continue")
+            self.tr("Mettre à jour le champ d'appartenance des segments en continue")
         )
         belonging_layout.addWidget(self.update_belonging_segments_checkbox)
 
@@ -357,7 +374,7 @@ class UiBuilder(QObject):
 
     def get_start_button_style(self):
         # TODO: Mettre le css dans le fichier styles css.
-        if not MainEventsHandlers.routes_composer_connected:
+        if not ConnexionsHandler.routes_composer_connected:
             return """
                 QPushButton {
                     background-color: #4CAF50;

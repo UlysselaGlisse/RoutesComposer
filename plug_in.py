@@ -6,9 +6,9 @@ from qgis.PyQt.QtCore import QCoreApplication, QSettings, QTimer, QTranslator
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
+from .connexions_handler import ConnexionsHandler
 from .func.list_constructor import IDsBasket
 from .func.utils import log
-from .main_events_handler import MainEventsHandlers
 from .ui.main_dialog.main import RoutesComposerDialog
 
 
@@ -21,7 +21,7 @@ class RoutesComposerTool:
         self.toolbar = self.iface.addToolBar("Routes Composer")
         self.toolbar.setObjectName("RoutesComposerToolbar")
         self.project_loaded = False
-        self.main_events_handler = MainEventsHandlers()
+        self.connexions_handler = ConnexionsHandler()
         self.iface = iface
         project = QgsProject.instance()
         if project:
@@ -100,11 +100,11 @@ class RoutesComposerTool:
 
             if self.checks_layers():
                 if auto_start:
-                    self.main_events_handler.connect_routes_composer()
+                    self.connexions_handler.connect_routes_composer()
                 if geom_on_fly:
-                    self.main_events_handler.connect_geom_on_fly()
+                    self.connexions_handler.connect_geom_on_fly()
                 if belonging:
-                    self.main_events_handler.connect_belonging()
+                    self.connexions_handler.connect_belonging()
 
             self.update_icon()
 
@@ -149,7 +149,7 @@ class RoutesComposerTool:
         if segments_column_name not in compositions_layer.fields().names():
             return
 
-        id_column_name = settings.value("routes_composer/id_column_name", "id")
+        id_column_name = settings.value("routes_composer/seg_id_column_name", "id")
         if id_column_name not in segments_layer.fields().names():
             return
 
@@ -192,7 +192,11 @@ class RoutesComposerTool:
             os.path.dirname(__file__),
             "ui",
             "icons",
-            ("icon_run.png" if MainEventsHandlers.routes_composer_connected is True else "icon_stop.png"),
+            (
+                "icon_run.png"
+                if ConnexionsHandler.routes_composer_connected is True
+                else "icon_stop.png"
+            ),
         )
         self.actions[0].setIcon(QIcon(icon_path))
 

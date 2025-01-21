@@ -30,7 +30,7 @@ class ErrorDialog(QDialog):
         self.segments_layer = self.dialog.layer_manager.segments_layer
         self.compositions_layer = self.dialog.layer_manager.compositions_layer
         self.segments_column_name = self.dialog.ui.segments_column_combo.currentText()
-        self.id_column_name = self.dialog.ui.id_column_combo.currentText()
+        self.id_column_name = self.dialog.ui.seg_id_column_combo.currentText()
 
         self.setWindowTitle(self.tr("Erreurs détectées"))
         self.setMinimumWidth(600)
@@ -47,7 +47,6 @@ class ErrorDialog(QDialog):
         label = QLabel(self.tr("Détails des erreurs détectées :"))
         header_layout.addWidget(label)
 
-
         refresh_button = QPushButton()
         refresh_button.setIcon(
             QtWidgets.QApplication.style().standardIcon(  # type: ignore
@@ -61,7 +60,9 @@ class ErrorDialog(QDialog):
 
         layout.addLayout(header_layout)
 
-        info_label = QLabel(self.tr("L'id des compositions est celui du fournisseur de données."))
+        info_label = QLabel(
+            self.tr("L'id des compositions est celui du fournisseur de données.")
+        )
         info_label.setStyleSheet("font-style: italic; font-weight: normal;")
         info_label.setContentsMargins(0, 0, 0, 10)
         layout.addWidget(info_label)
@@ -183,9 +184,7 @@ class ErrorDialog(QDialog):
         elif error_type == "empty_segments_list":
             return self.tr(
                 "Composition : {composition_id}. Liste de segments vide.."
-            ).format(
-                composition_id=composition_id
-            )
+            ).format(composition_id=composition_id)
         elif error_type == "invalid_segment_id":
             invalid_segment_id = error.get("invalid_segment_id")
             segment_list = error.get("segment_list")

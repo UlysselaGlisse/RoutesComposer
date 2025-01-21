@@ -7,8 +7,8 @@ from qgis.PyQt.QtCore import QSettings, QTranslator
 from qgis.PyQt.QtWidgets import QDialog
 from qgis.utils import iface
 
+from ...connexions_handler import ConnexionsHandler
 from ...func.utils import log
-from ...main_events_handler import MainEventsHandlers
 from .advanced_options import AdvancedOptions
 from .event_handlers import EventHandlers
 from .geometry_operations import GeometryOperations
@@ -19,6 +19,8 @@ from .ui_builder import UiBuilder
 
 
 def show_dialog():
+    log("r")
+
     dialog = RoutesComposerDialog.get_instance(iface.mainWindow())
     dialog.show()
     return dialog
@@ -49,7 +51,6 @@ class RoutesComposerDialog(QDialog):
         self.options = PluginOptionsWidget(self)
         self.translator = QTranslator()
 
-
         self.ui.init_ui()
         self.load_settings()
         self.setup_signals()
@@ -66,11 +67,6 @@ class RoutesComposerDialog(QDialog):
         project = QgsProject.instance()
         if project:
             settings = QSettings()
-
-            self.saved_id_column = settings.value("routes_composer/id_column_name", "")
-            self.saved_segments_column = settings.value(
-                "routes_composer/segments_column_name", ""
-            )
 
             auto_start, _ = project.readBoolEntry(
                 "routes_composer", "auto_start", False
@@ -114,6 +110,7 @@ class RoutesComposerDialog(QDialog):
 
     def setup_signals(self):
         # Layers
+
         self.ui.segments_combo.currentIndexChanged.connect(
             self.layer_manager.on_segments_layer_selected
         )
@@ -122,15 +119,18 @@ class RoutesComposerDialog(QDialog):
         )
 
         # Routes composer
+
         self.ui.start_button.clicked.connect(self.event_handlers.toggle_script)
         self.ui.auto_start_checkbox.stateChanged.connect(
             self.event_handlers.on_auto_start_check
         )
 
         # Info
+
         self.ui.info_button.clicked.connect(self.event_handlers.show_info)
 
         # Geom
+
         self.ui.geom_checkbox.stateChanged.connect(
             self.event_handlers.on_geom_on_fly_check
         )
@@ -141,6 +141,7 @@ class RoutesComposerDialog(QDialog):
         self.ui.cancel_button.clicked.connect(self.event_handlers.cancel_process)
 
         # Advanced options
+
         self.ui.segments_attr_combo.currentTextChanged.connect(
             self.advanced_options.on_segments_attr_selected
         )
@@ -150,11 +151,14 @@ class RoutesComposerDialog(QDialog):
         self.ui.priority_mode_combo.currentTextChanged.connect(
             self.advanced_options.on_priority_mode_selected
         )
-        self.ui.update_attributes_button.clicked.connect(self.advanced_options.start_attribute_linking)
+        self.ui.update_attributes_button.clicked.connect(
+            self.advanced_options.start_attribute_linking
+        )
 
         self.ui.save_linkage_button.clicked.connect(self.event_handlers.save_linkage)
 
         # Appartenance des segments
+
         self.ui.belonging_segments_button.clicked.connect(
             self.advanced_options.create_or_update_belonging_column
         )
@@ -162,10 +166,11 @@ class RoutesComposerDialog(QDialog):
             self.event_handlers.on_belonging_check
         )
 
+        # options
         self.ui.settings_button.clicked.connect(self.event_handlers.show_config)
 
     def update_ui_state(self):
-        if MainEventsHandlers.routes_composer_connected:
+        if ConnexionsHandler.routes_composer_connected:
             self.ui.start_button.setText(self.tr("Arrêter"))
             self.ui.status_label.setText(self.tr("Status: En cours d'exécution"))
         else:
@@ -186,7 +191,8 @@ class RoutesComposerDialog(QDialog):
         self.ui.segments_combo.setCurrentIndex(-1)
         self.ui.compositions_combo.setCurrentIndex(-1)
         self.ui.segments_column_combo.clear()
-        self.ui.id_column_combo.clear()
+        self.ui.seg_id_column_combo.clear()
+        self.ui.compo_id_column_combo.clear()
         self.ui.segments_attr_combo.clear()
         self.ui.compositions_attr_combo.clear()
 
@@ -219,12 +225,6 @@ class RoutesComposerDialog(QDialog):
             self.layer_manager.populate_compositions_layer_combo(
                 self.ui.compositions_combo
             )
-            if self.layer_manager.segments_layer is not None:
-                self.layer_manager.populate_id_column_combo(self.layer_manager.segments_layer)
-
-            if self.layer_manager.compositions_layer is not None:
-                self.layer_manager.populate_segments_column_combo(self.layer_manager.compositions_layer)
-
 
             self.ui.segments_combo.blockSignals(False)
             self.ui.compositions_combo.blockSignals(False)

@@ -156,6 +156,7 @@ class SplitManager:
 
     def process_single_segment_composition(self, fid: int, old_id: int, new_id: int):
         """Gère le cas d'une composition d'un seul segment."""
+
         dialog = SingleSegmentDialog(old_id=old_id, new_id=new_id)
         dialog.current_segments = [old_id, new_id]
         result = dialog.exec_()
@@ -202,7 +203,7 @@ class SplitManager:
         valid_segments_ids = {
             str(f[self.routes_composer.id_column_name])
             for f in get_features_list(self.routes_composer.segments_layer)
-            if f["id"] is not None
+            if f.id() is not None
         }
         compositions = get_features_list(self.routes_composer.compositions_layer)
 

@@ -20,10 +20,12 @@ class AdvancedOptions(QObject):
             belong = SegmentsBelonging(
                 self.dialog.layer_manager.segments_layer,
                 self.dialog.layer_manager.compositions_layer,
-                self.dialog.ui.id_column_combo.currentText(),
+                self.dialog.ui.seg_id_column_combo.currentText(),
                 self.dialog.ui.segments_column_combo.currentText(),
+                self.dialog.ui.compo_id_column_combo.currentText(),
             )
-            belong.create_or_update_belonging_column()
+            belong.create_belonging_column()
+            belong.update_belonging_column()
 
     def update_segments_attr_combo(self, segments_layer):
         self.dialog.ui.segments_attr_combo.clear()
@@ -133,13 +135,8 @@ class AdvancedOptions(QObject):
             compositions_layer=self.dialog.layer_manager.compositions_layer,
             segments_attr=self.dialog.ui.segments_attr_combo.currentText(),
             compositions_attr=self.dialog.ui.compositions_attr_combo.currentText(),
-            id_column_name=self.dialog.ui.id_column_combo.currentText(),
+            id_column_name=self.dialog.ui.seg_id_column_combo.currentText(),
             segments_column_name=self.dialog.ui.segments_column_combo.currentText(),
             priority_mode=self.dialog.ui.priority_mode_combo.currentText().lower(),
         )
         self.attribute_linker.update_segments_attr_values()
-
-    def stop_attribute_linking(self):
-        """UNUSE. Arrête la liaison des attributs."""
-        if hasattr(self, "attribute_linker"):
-            self.attribute_linker.stop()

@@ -6,23 +6,23 @@ from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.utils import iface
 
 from ... import config
-from ...main_events_handler import MainEventsHandlers
+from ...connexions_handler import ConnexionsHandler
 
 
 class EventHandlers(QObject):
     def __init__(self, dialog):
         super().__init__(dialog)
         self.dialog = dialog
-        self.main_events_handler = MainEventsHandlers()
+        self.connexions_handler = ConnexionsHandler()
 
     def toggle_script(self):
         try:
-            if not MainEventsHandlers.routes_composer_connected:
+            if not ConnexionsHandler.routes_composer_connected:
                 if not self.dialog.layer_manager.check_layers_and_columns():
                     return
                 self.dialog.layer_manager.save_selected_layers_and_columns()
 
-                self.main_events_handler.connect_routes_composer()
+                self.connexions_handler.connect_routes_composer()
 
                 self.dialog.update_ui_state()
                 if self.dialog.tool:
@@ -45,7 +45,7 @@ class EventHandlers(QObject):
             project.setDirty(True)
 
     def stop_running_routes_composer(self):
-        self.main_events_handler.disconnect_routes_composer()
+        self.connexions_handler.disconnect_routes_composer()
 
         if self.dialog.ui.geom_checkbox.isChecked():
             self.dialog.ui.geom_checkbox.setChecked(False)
@@ -66,10 +66,10 @@ class EventHandlers(QObject):
             geom_on_fly = bool(state)
 
             if geom_on_fly and self.dialog.layer_manager.check_layers_and_columns():
-                self.main_events_handler.connect_geom_on_fly()
+                self.connexions_handler.connect_geom_on_fly()
 
             elif not geom_on_fly:
-                self.main_events_handler.disconnect_geom_on_fly()
+                self.connexions_handler.disconnect_geom_on_fly()
 
     def on_belonging_check(self, state):
         project = QgsProject.instance()
@@ -79,9 +79,9 @@ class EventHandlers(QObject):
             belonging = bool(state)
 
             if belonging and self.dialog.layer_manager.check_layers_and_columns():
-                self.main_events_handler.connect_belonging()
+                self.connexions_handler.connect_belonging()
             elif not belonging:
-                self.main_events_handler.disconnect_belonging()
+                self.connexions_handler.disconnect_belonging()
 
     def save_linkage(self):
         self.compositions_attr = self.dialog.ui.compositions_attr_combo.currentText()
@@ -92,9 +92,9 @@ class EventHandlers(QObject):
         linkages = settings.value("routes_composer/attribute_linkages", []) or []
 
         new_linkage = {
-            'compositions_attr': self.compositions_attr,
-            'segments_attr': self.segments_attr,
-            'priority_mode': self.priority_mode
+            "compositions_attr": self.compositions_attr,
+            "segments_attr": self.segments_attr,
+            "priority_mode": self.priority_mode,
         }
 
         if new_linkage not in linkages:

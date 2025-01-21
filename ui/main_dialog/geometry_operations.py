@@ -1,14 +1,14 @@
 """Handle geometries operation of the main dialog"""
 
+from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QMessageBox
-from qgis.core import QgsProject
 
 from ... import config
 from ...func.geom_compo import GeomCompo
+from ...func.utils import log
 from ...func.warning import verify_compositions
 from .errors_dialog import ErrorDialog
-from ...func.utils import log
 
 
 class GeometryOperations(QObject):
@@ -25,11 +25,13 @@ class GeometryOperations(QObject):
             geom_compo = GeomCompo(
                 self.dialog.layer_manager.segments_layer,
                 self.dialog.layer_manager.compositions_layer,
-                self.dialog.ui.id_column_combo.currentText(),
+                self.dialog.ui.seg_id_column_combo.currentText(),
                 self.dialog.ui.segments_column_combo.currentText(),
             )
 
-            errors_messages = geom_compo.update_compositions_geometries(self.dialog.ui.progress_bar, mode="new")
+            errors_messages = geom_compo.update_compositions_geometries(
+                self.dialog.ui.progress_bar, mode="new"
+            )
 
             self.cleanup_after_operation(errors_messages)
 
@@ -42,7 +44,7 @@ class GeometryOperations(QObject):
             geom_compo = GeomCompo(
                 self.dialog.layer_manager.segments_layer,
                 self.dialog.layer_manager.compositions_layer,
-                self.dialog.ui.id_column_combo.currentText(),
+                self.dialog.ui.seg_id_column_combo.currentText(),
                 self.dialog.ui.segments_column_combo.currentText(),
             )
             errors_messages = geom_compo.update_compositions_geometries(
@@ -83,7 +85,7 @@ class GeometryOperations(QObject):
                 self.dialog.layer_manager.segments_layer,
                 self.dialog.layer_manager.compositions_layer,
                 self.dialog.ui.segments_column_combo.currentText(),
-                self.dialog.ui.id_column_combo.currentText(),
+                self.dialog.ui.seg_id_column_combo.currentText(),
             )
 
             if errors:

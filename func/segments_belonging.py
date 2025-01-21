@@ -1,8 +1,6 @@
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsField
 
-from .utils import log, timer_decorator
-
 
 class SegmentsBelonging:
     def __init__(
@@ -11,11 +9,13 @@ class SegmentsBelonging:
         compositions_layer,
         id_column_name,
         segments_column_name,
+        compo_id_column_name,
     ):
         self.segments_layer = segments_layer
         self.compositions_layer = compositions_layer
         self.id_column_name = id_column_name
         self.segments_column_name = segments_column_name
+        self.compo_id_column_name = compo_id_column_name
 
         self.belonging_column = "compositions"
 
@@ -34,8 +34,7 @@ class SegmentsBelonging:
     def dictionary_creation(self):
         self.compositions_layer.startEditing()
         for composition in self.compositions_layer.getFeatures():
-            # TO DO: Je choisis arbitrairement la colonne 'id'. Il faudra peut-être laisser le choix.
-            comp_id = str(int(composition["id"]))
+            comp_id = str(int(composition[self.compo_id_column_name]))
             segments_str = composition[self.segments_column_name]
 
             if segments_str:
@@ -50,10 +49,8 @@ class SegmentsBelonging:
 
                     self.segment_appartenances[seg_id].append(str(comp_id))
 
-    @timer_decorator
-    def create_or_update_belonging_column(self):
+    def update_belonging_column(self):
         try:
-            self.create_belonging_column()
             self.dictionary_creation()
 
             updates = {}
