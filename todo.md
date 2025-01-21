@@ -16,7 +16,6 @@ Gérer la déconnexion lors du changement de projet
 ## Panier à segments
 
 ## Segments_belonging
-* Utilisation de la colonne 'id' forcé. Il faut soit l'indiquer, soit permettre à l'utilisateur de choisir.
 
 ## ui
 

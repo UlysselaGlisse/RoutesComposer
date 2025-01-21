@@ -66,6 +66,7 @@ class EventHandlers(QObject):
             geom_on_fly = bool(state)
 
             if geom_on_fly and self.dialog.layer_manager.check_layers_and_columns():
+                self.dialog.layer_manager.save_selected_layers_and_columns()
                 self.connexions_handler.connect_geom_on_fly()
 
             elif not geom_on_fly:

@@ -17,6 +17,7 @@ class AdvancedOptions(QObject):
         if not project:
             return
         if self.dialog.layer_manager.check_layers_and_columns():
+            self.dialog.layer_manager.save_selected_layers_and_columns()
             belong = SegmentsBelonging(
                 self.dialog.layer_manager.segments_layer,
                 self.dialog.layer_manager.compositions_layer,
