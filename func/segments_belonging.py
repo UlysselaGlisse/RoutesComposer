@@ -42,7 +42,6 @@ class SegmentsBelonging:
     @utils.timer_decorator
     def update_belonging_column(self):
         try:
-            self.segment_manager.create_segments_of_compositions_dictionary()
             segments_appartenance = (
                 self.segment_manager.create_segments_belonging_dictionary()
             )

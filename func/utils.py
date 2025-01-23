@@ -107,10 +107,11 @@ class SegmentManager:
         self.segment_appartenances = {}
         self.segments_list = {}
 
-    def create_segments_of_compositions_dictionary(self):
+    def create_segments_of_compositions_dictionary(self, fields=None):
         """Crée un dictionnaire des segments appartenant à chaque composition."""
         for composition in self.compositions_layer.getFeatures():
             segments_str = composition[self.segments_column_name]
+            compo_id = composition[self.compo_id_column_name]
 
             if segments_str:
                 segments_list = [
@@ -118,9 +119,14 @@ class SegmentManager:
                     for id_str in segments_str.split(",")
                     if id_str.strip().isdigit()
                 ]
-                self.segments_list[composition[self.compo_id_column_name]] = (
-                    segments_list
-                )
+                if fields:
+                    composition_data = {"segments": segments_list}
+                    for field in fields:
+                        composition_data[field] = composition[field]
+
+                    self.segments_list[compo_id] = composition_data
+                else:
+                    self.segments_list[compo_id] = segments_list
 
         return self.segments_list
 
@@ -144,14 +150,17 @@ class SegmentManager:
 
         return self.segment_appartenances
 
-    def get_segments_for_composition(self, composition_id):
-        """Retourne la liste des segments appartenant à une composition."""
-        return self.segment_appartenances.get(composition_id, [])
+    def get_compositions_for_segment(self, segment_id: int) -> list:
+        compositions_list = []
 
-    def get_compositions_for_segment(self, segment_id):
-        """Retourne la liste des compositions auxquelles appartient un segment."""
-        compositions = []
-        for composition_id, segments in self.segment_appartenances.items():
-            if segment_id in segments:
-                compositions.append(composition_id)
-        return compositions
+        request = (
+            f"{self.segments_column_name} LIKE '%,{segment_id},%' OR "
+            f"{self.segments_column_name} LIKE '{segment_id},%' OR "
+            f"{self.segments_column_name} LIKE '%,{segment_id}' OR "
+            f"{self.segments_column_name} = '{segment_id}'"
+        )
+        for composition in self.compositions_layer.getFeatures(request):
+            comp_id = int(composition[self.compo_id_column_name])
+            compositions_list.append(comp_id)
+
+        return compositions_list

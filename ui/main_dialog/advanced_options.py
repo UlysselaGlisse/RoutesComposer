@@ -2,7 +2,7 @@ from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QObject, QSettings, QVariant
 from qgis.PyQt.QtWidgets import QMessageBox
 
-from ...func.attribute_linker import AttributeLinker
+from ...func.attributes import AttributeLinker
 from ...func.segments_belonging import SegmentsBelonging
 from ...func.utils import log
 

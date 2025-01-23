@@ -3,7 +3,7 @@ from qgis.PyQt.QtCore import QObject, QSettings, QTranslator
 from qgis.utils import iface
 from typing_extensions import cast
 
-from .func.attribute_linker import AttributeLinker
+from .func.attributes import AttributeLinker
 from .func.geom_compo import GeomCompo
 from .func.segments_belonging import SegmentsBelonging
 from .func.split import SplitManager
@@ -161,6 +161,9 @@ class RoutesComposer(QObject):
             self.geom.update_geometries_on_the_fly(segment_id)
             self.compositions_layer.reload()
 
+        settings = QSettings()
+        saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
+
         if self.belonging_connected:
             self.belong = SegmentsBelonging(
                 self.segments_layer,
@@ -175,29 +178,18 @@ class RoutesComposer(QObject):
             self.segments_layer.reload()
             log("Belonging column on segments layer updated.")
 
-        settings = QSettings()
-        saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
-
         if saved_linkages:
-            for linkage in saved_linkages:
-                attribute_linker = AttributeLinker(
-                    self.segments_layer,
-                    self.compositions_layer,
-                    linkage["segments_attr"],
-                    linkage["compositions_attr"],
-                    self.id_column_name,
-                    self.segments_column_name,
-                    linkage["priority_mode"],
-                )
-                if attribute_linker.update_segments_attr_values(
-                    comp_id=source_feature.id()
-                ):
-                    self.segments_layer.reload()
-                    log(
-                        f"Attribute '{linkage['segments_attr']}' update in segments layer"
-                    )
+            attribute_linker = AttributeLinker(
+                self.segments_layer,
+                self.compositions_layer,
+                self.id_column_name,
+                self.segments_column_name,
+                saved_linkages,
+            )
+            if attribute_linker.update_segments_attr_values(int(source_feature["id"])):
+                self.segments_layer.reload()
+                log("Attributes updated in segments layer")
 
-    @timer_decorator
     def feature_changed_on_compositions(self, fid, idx):
         if self.segments_layer is None or self.compositions_layer is None:
             return
@@ -207,10 +199,7 @@ class RoutesComposer(QObject):
             return
         log(f"Feature modified on composition: {int(source_feature['id'])}")
 
-        settings = QSettings()
-        saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
         field_name = self.compositions_layer.fields()[idx].name()
-
         if field_name == self.segments_column_name:
             if self.routes_composer_connected:
                 segments_str = source_feature[self.segments_column_name]
@@ -241,25 +230,24 @@ class RoutesComposer(QObject):
                 self.segments_layer.reload()
                 log("Belonging column on segments layer updated.")
 
+        settings = QSettings()
+        saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
+
         if saved_linkages:
-            if field_name == linkage["compositions_attr"]:
-                for linkage in saved_linkages:
+            for linkage in saved_linkages:
+                if field_name == linkage["compositions_attr"]:
                     attribute_linker = AttributeLinker(
                         self.segments_layer,
                         self.compositions_layer,
-                        linkage["segments_attr"],
-                        linkage["compositions_attr"],
                         self.id_column_name,
                         self.segments_column_name,
-                        linkage["priority_mode"],
+                        saved_linkages if len(saved_linkages) > 1 else linkage,
                     )
                     if attribute_linker.update_segments_attr_values(
-                        comp_id=source_feature.id()
+                        int(source_feature["id"])
                     ):
                         self.segments_layer.reload()
-                        log(
-                            f"Attribute '{linkage['segments_attr']}' update in segments layer"
-                        )
+                        log("Attributes updated in segments layer")
 
     @timer_decorator
     def features_deleted_on_compositions(self, fids):
