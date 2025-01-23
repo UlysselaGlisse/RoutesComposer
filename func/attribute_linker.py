@@ -1,5 +1,3 @@
-"""Functions for linking attributes."""
-
 from .utils import log
 
 

@@ -17,7 +17,7 @@ def timer_decorator(func):
         start = time.time()
         result = func(*args, **kwargs)
         end = time.time()
-        print(f"{func.__name__} a pris {(end - start)*1000:.2f} ms")
+        print(f"{func.__name__} a pris {(end - start) * 1000:.2f} ms")
         return result
 
     return wrapper
@@ -87,3 +87,71 @@ def log(message: str, level: str = "INFO"):
             logging.critical(log_message)
         else:
             logging.info(log_message)
+
+
+class SegmentManager:
+    def __init__(
+        self,
+        compositions_layer,
+        segments_layer,
+        segments_column_name="segments",
+        seg_id_column_name="id",
+        compo_id_column_name="id",
+    ):
+        self.compositions_layer = compositions_layer
+        self.segments_layer = segments_layer
+        self.segments_column_name = segments_column_name
+        self.seg_id_column_name = seg_id_column_name
+        self.compo_id_column_name = compo_id_column_name
+
+        self.segment_appartenances = {}
+        self.segments_list = {}
+
+    def create_segments_of_compositions_dictionary(self):
+        """Crée un dictionnaire des segments appartenant à chaque composition."""
+        for composition in self.compositions_layer.getFeatures():
+            segments_str = composition[self.segments_column_name]
+
+            if segments_str:
+                segments_list = [
+                    int(id_str)
+                    for id_str in segments_str.split(",")
+                    if id_str.strip().isdigit()
+                ]
+                self.segments_list[composition[self.compo_id_column_name]] = (
+                    segments_list
+                )
+
+        return self.segments_list
+
+    def create_segments_belonging_dictionary(self):
+        """Crée un dictionnaire des compositions auxquelles appartient chaque segment."""
+        for composition in self.compositions_layer.getFeatures():
+            comp_id = str(int(composition[self.compo_id_column_name]))
+            segments_str = composition[self.segments_column_name]
+
+            if segments_str:
+                segments_list = [
+                    int(id_str)
+                    for id_str in segments_str.split(",")
+                    if id_str.strip().isdigit()
+                ]
+                for seg_id in segments_list:
+                    if seg_id not in self.segment_appartenances:
+                        self.segment_appartenances[seg_id] = []
+
+                    self.segment_appartenances[seg_id].append(str(comp_id))
+
+        return self.segment_appartenances
+
+    def get_segments_for_composition(self, composition_id):
+        """Retourne la liste des segments appartenant à une composition."""
+        return self.segment_appartenances.get(composition_id, [])
+
+    def get_compositions_for_segment(self, segment_id):
+        """Retourne la liste des compositions auxquelles appartient un segment."""
+        compositions = []
+        for composition_id, segments in self.segment_appartenances.items():
+            if segment_id in segments:
+                compositions.append(composition_id)
+        return compositions

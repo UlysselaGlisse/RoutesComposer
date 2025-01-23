@@ -1,6 +1,8 @@
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsField
 
+from . import utils
+
 
 class SegmentsBelonging:
     def __init__(
@@ -19,7 +21,13 @@ class SegmentsBelonging:
 
         self.belonging_column = "compositions"
 
-        self.segment_appartenances = {}
+        self.segment_manager = utils.SegmentManager(
+            compositions_layer=self.compositions_layer,
+            segments_layer=self.segments_layer,
+            segments_column_name=self.segments_column_name,
+            seg_id_column_name=self.id_column_name,
+            compo_id_column_name=self.compo_id_column_name,
+        )
 
     def create_belonging_column(self):
         fields = self.segments_layer.fields()
@@ -31,26 +39,13 @@ class SegmentsBelonging:
         else:
             return
 
-    def dictionary_creation(self):
-        for composition in self.compositions_layer.getFeatures():
-            comp_id = str(int(composition[self.compo_id_column_name]))
-            segments_str = composition[self.segments_column_name]
-
-            if segments_str:
-                segments_list = [
-                    int(id_str)
-                    for id_str in segments_str.split(",")
-                    if id_str.strip().isdigit()
-                ]
-                for seg_id in segments_list:
-                    if seg_id not in self.segment_appartenances:
-                        self.segment_appartenances[seg_id] = []
-
-                    self.segment_appartenances[seg_id].append(str(comp_id))
-
+    @utils.timer_decorator
     def update_belonging_column(self):
         try:
-            self.dictionary_creation()
+            self.segment_manager.create_segments_of_compositions_dictionary()
+            segments_appartenance = (
+                self.segment_manager.create_segments_belonging_dictionary()
+            )
 
             updates = {}
             attr_idx = self.segments_layer.fields().indexOf(self.belonging_column)
@@ -59,9 +54,7 @@ class SegmentsBelonging:
             for segment in self.segments_layer.getFeatures():
                 seg_id = segment[self.id_column_name]
                 appartenance_str = ",".join(
-                    sorted(
-                        map(str, self.segment_appartenances.get(seg_id, ["0"])), key=int
-                    )
+                    sorted(map(str, segments_appartenance.get(seg_id, ["0"])), key=int)
                 )
 
                 # On ne peut mettre à jour via le data provider des entités non enregistrées.

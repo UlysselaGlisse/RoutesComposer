@@ -7,7 +7,7 @@ from .func.attribute_linker import AttributeLinker
 from .func.geom_compo import GeomCompo
 from .func.segments_belonging import SegmentsBelonging
 from .func.split import SplitManager
-from .func.utils import log
+from .func.utils import log, timer_decorator
 
 
 class RoutesComposer(QObject):
@@ -134,6 +134,7 @@ class RoutesComposer(QObject):
         self.geom.update_geometries_on_the_fly(segment_id)
         self.compositions_layer.reload()
 
+    @timer_decorator
     def feature_added_on_compositions(self, fid):
         # On n'exécute pas ce qui suit lors de l'enregistrement.
         if fid >= 0:
@@ -170,9 +171,9 @@ class RoutesComposer(QObject):
                     "routes_composer/compo_id_column_name", "id"
                 ),
             )
-            if self.belong.update_belonging_column():
-                self.segments_layer.reload()
-                log("Belonging column in segment updated.")
+            self.belong.update_belonging_column()
+            self.segments_layer.reload()
+            log("Belonging column on segments layer updated.")
 
         settings = QSettings()
         saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
@@ -196,6 +197,7 @@ class RoutesComposer(QObject):
                         f"Attribute '{linkage['segments_attr']}' update in segments layer"
                     )
 
+    @timer_decorator
     def feature_changed_on_compositions(self, fid, idx):
         if self.segments_layer is None or self.compositions_layer is None:
             return
@@ -235,13 +237,13 @@ class RoutesComposer(QObject):
                         "routes_composer/compo_id_column_name", "id"
                     ),
                 )
-                if self.belong.update_belonging_column():
-                    self.segments_layer.reload()
-                    log("Appartenance of segments updated")
+                self.belong.update_belonging_column()
+                self.segments_layer.reload()
+                log("Belonging column on segments layer updated.")
 
         if saved_linkages:
-            for linkage in saved_linkages:
-                if field_name == linkage["compositions_attr"]:
+            if field_name == linkage["compositions_attr"]:
+                for linkage in saved_linkages:
                     attribute_linker = AttributeLinker(
                         self.segments_layer,
                         self.compositions_layer,
@@ -255,11 +257,11 @@ class RoutesComposer(QObject):
                         comp_id=source_feature.id()
                     ):
                         self.segments_layer.reload()
-
                         log(
-                            f"Attribute '{linkage['segments_attr']}' updated in segments layer"
+                            f"Attribute '{linkage['segments_attr']}' update in segments layer"
                         )
 
+    @timer_decorator
     def features_deleted_on_compositions(self, fids):
         if self.segments_layer is None or self.compositions_layer is None:
             return
@@ -275,29 +277,24 @@ class RoutesComposer(QObject):
                     "routes_composer/compo_id_column_name", "id"
                 ),
             )
-            if self.belong.update_belonging_column():
-                self.segments_layer.reload()
-                log("Appartenance of segments updated")
+            self.belong.update_belonging_column()
+            self.segments_layer.reload()
+            log("Belonging column on segments layer updated.")
 
         settings = QSettings()
         saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
 
         if saved_linkages:
-            for linkage in saved_linkages:
-                attribute_linker = AttributeLinker(
-                    self.segments_layer,
-                    self.compositions_layer,
-                    linkage["segments_attr"],
-                    linkage["compositions_attr"],
-                    self.id_column_name,
-                    self.segments_column_name,
-                    linkage["priority_mode"],
-                )
-                if attribute_linker.update_segments_attr_values():
-                    self.segments_layer.reload()
-                    log(
-                        f"Attribute {linkage['segments_attr']} update in segments layer"
-                    )
+            attribute_linker = AttributeLinker(
+                self.segments_layer,
+                self.compositions_layer,
+                self.id_column_name,
+                self.segments_column_name,
+                saved_linkages,
+            )
+            if attribute_linker.update_segments_attr_values():
+                self.segments_layer.reload()
+                log("Attributes updated in segments layer")
 
     def connect_routes_composer(self):
         try:
