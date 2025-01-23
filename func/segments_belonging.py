@@ -32,7 +32,6 @@ class SegmentsBelonging:
             return
 
     def dictionary_creation(self):
-        self.compositions_layer.startEditing()
         for composition in self.compositions_layer.getFeatures():
             comp_id = str(int(composition[self.compo_id_column_name]))
             segments_str = composition[self.segments_column_name]
@@ -55,12 +54,14 @@ class SegmentsBelonging:
 
             updates = {}
             attr_idx = self.segments_layer.fields().indexOf(self.belonging_column)
-            self.segments_layer.startEditing()
 
+            self.segments_layer.startEditing()
             for segment in self.segments_layer.getFeatures():
                 seg_id = segment[self.id_column_name]
                 appartenance_str = ",".join(
-                    self.segment_appartenances.get(seg_id, ["0"])
+                    sorted(
+                        map(str, self.segment_appartenances.get(seg_id, ["0"])), key=int
+                    )
                 )
 
                 # On ne peut mettre à jour via le data provider des entités non enregistrées.
