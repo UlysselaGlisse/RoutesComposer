@@ -36,9 +36,6 @@ class RoutesComposerDialog(QDialog):
         super().__init__(parent)
         self.tool = tool
         self.setWindowTitle(self.tr("Compositeur de Routes"))
-        self.setMinimumWidth(600)
-        self.initial_size = self.size()
-
         self.ui = UiBuilder(self)
         self.info = InfoDialog(self)
         self.layer_manager = LayerManager(self)

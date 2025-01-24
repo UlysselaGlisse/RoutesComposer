@@ -10,6 +10,7 @@ from qgis.PyQt.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
     QLabel,
+    QLayout,
     QProgressBar,
     QPushButton,
     QToolButton,
@@ -26,6 +27,8 @@ class UiBuilder(QObject):
 
     def init_ui(self):
         main_layout = QVBoxLayout()
+
+        self.dialog.setMinimumWidth(610)
 
         self.create_header_layout(main_layout)
 
@@ -64,19 +67,21 @@ class UiBuilder(QObject):
     def create_layer_configuration_group(self, layout):
         layers_group = QGroupBox()
         layers_layout = QVBoxLayout()
-        max_combo_width = 200
+        max_layer_combo_width = 250
+        max_column_combo_width = 100
 
         segments_layout = QHBoxLayout()
         segments_layout.addWidget(QLabel(self.tr("Couche segments:")))
         self.segments_combo = QComboBox()
-
-        self.segments_combo.setMaximumWidth(max_combo_width)
+        self.segments_combo.setMaximumWidth(max_layer_combo_width)
         segments_layout.addWidget(self.segments_combo)
 
-        segments_layout.addWidget(QLabel(self.tr("Colonne id:")))
+        id_column_label = QLabel(self.tr("Colonne id:"))
+        id_column_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        segments_layout.addWidget(id_column_label)
         self.seg_id_column_combo = QComboBox()
         segments_layout.addWidget(self.seg_id_column_combo)
-        self.seg_id_column_combo.setMaximumWidth(max_combo_width)
+        self.seg_id_column_combo.setMaximumWidth(max_column_combo_width)
 
         layers_layout.addLayout(segments_layout)
 
@@ -89,13 +94,15 @@ class UiBuilder(QObject):
         compositions_layout.addWidget(QLabel(self.tr("Couche compositions:")))
         self.compositions_combo = QComboBox()
 
-        self.compositions_combo.setMaximumWidth(max_combo_width)
+        self.compositions_combo.setMaximumWidth(max_layer_combo_width)
         compositions_layout.addWidget(self.compositions_combo)
 
         self.segments_column_combo = QComboBox()
-        compositions_layout.addWidget(QLabel(self.tr("Liste d'ids:")))
+        ids_list_label = QLabel(self.tr("Liste d'ids:"))
+        ids_list_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        compositions_layout.addWidget(ids_list_label)
         compositions_layout.addWidget(self.segments_column_combo)
-        self.segments_column_combo.setMaximumWidth(max_combo_width)
+        self.segments_column_combo.setMaximumWidth(max_column_combo_width)
 
         layers_layout.addLayout(compositions_layout)
 
@@ -207,6 +214,8 @@ class UiBuilder(QObject):
 
     def create_advanced_group(self):
         advanced_group = QGroupBox(self.tr("Lier les attributs de deux couches:"))
+        advanced_layout = QVBoxLayout()
+        advanced_layout.setSizeConstraint(QLayout.SetMinAndMaxSize)
         advanced_group.setToolTip(
             self.tr(
                 "Permet de donner la valeur de l'attribut de la composition aux segments qu'elle contient.<br><br>"
@@ -218,6 +227,11 @@ class UiBuilder(QObject):
         )
         button_layout = QHBoxLayout()
         self.linked_layout = QVBoxLayout()
+
+        self.linked_layout = QVBoxLayout()
+        self.linked_layout.setSizeConstraint(
+            QLayout.SetMinAndMaxSize
+        )  # Ajouter cette ligne
 
         self.linked_layout_group = QGroupBox(self.tr("Liaisons enregistrées"))
         self.linked_layout_group.setLayout(self.linked_layout)
@@ -244,6 +258,7 @@ class UiBuilder(QObject):
         advanced_layout.addLayout(button_layout)
         advanced_layout.addWidget(self.linked_layout_group)
 
+        advanced_layout.addStretch()
         advanced_group.setLayout(advanced_layout)
 
         return advanced_group
@@ -293,6 +308,11 @@ class UiBuilder(QObject):
         if self.linked_layout.count() == 0:
             self.linked_layout_group.setVisible(False)
 
+        self.linked_layout_group.adjustSize()
+        self.advanced_group.adjustSize()
+        self.advanced_options_container.adjustSize()
+        self.dialog.adjustSize()
+
     def create_belonging_group(self):
         belonging_group = QGroupBox(self.tr("Appartenance des segments"))
         belonging_group.setToolTip(
@@ -310,7 +330,7 @@ class UiBuilder(QObject):
         button_combo_layout.addWidget(self.compo_id_column_combo)
 
         self.belonging_segments_button = QPushButton(
-            self.tr("Créer/Mettre à jour le champ 'compositions' dans segments")
+            self.tr("Créer le champ 'compositions'")
         )
         self.belonging_segments_button.setProperty("class", "action-button")
         button_combo_layout.addWidget(self.belonging_segments_button)
