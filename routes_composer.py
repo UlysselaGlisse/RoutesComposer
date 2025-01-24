@@ -146,7 +146,14 @@ class RoutesComposer(QObject):
         source_feature = self.compositions_layer.getFeature(fid)
         if not source_feature.isValid():
             return
-        log(f"New compositions feature added with id: {int(source_feature['id'])}")
+
+        compo_id_column_name = (
+            self.settings.value("routes_composer/compo_id_column_name", "id") or "id"
+        )
+
+        log(
+            f"New compositions feature added with id: {int(source_feature[compo_id_column_name])}"
+        )
 
         if self.routes_composer_connected:
             segments_str = source_feature[self.segments_column_name]
@@ -159,10 +166,7 @@ class RoutesComposer(QObject):
 
             segment_id = int(segments_list[0])
             self.geom.update_geometries_on_the_fly(segment_id)
-            self.compositions_layer.reload()
-
-        settings = QSettings()
-        saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
+            self.compositions_layer.triggerRepaint()
 
         if self.belonging_connected:
             self.belong = SegmentsBelonging(
@@ -170,14 +174,17 @@ class RoutesComposer(QObject):
                 self.compositions_layer,
                 self.id_column_name,
                 self.segments_column_name,
-                compo_id_column_name=self.settings.value(
-                    "routes_composer/compo_id_column_name", "id"
-                ),
+                compo_id_column_name=compo_id_column_name,
             )
-            self.belong.update_belonging_column()
-            self.segments_layer.reload()
-            log("Belonging column on segments layer updated.")
+            if self.belong.update_belonging_column(
+                int(source_feature[compo_id_column_name])
+            ):
+                self.segments_layer.reload()
+                log("Belonging column on segments layer updated.")
 
+        saved_linkages = (
+            self.settings.value("routes_composer/attribute_linkages", []) or []
+        )
         if saved_linkages:
             attribute_linker = AttributeLinker(
                 self.segments_layer,
@@ -186,20 +193,31 @@ class RoutesComposer(QObject):
                 self.segments_column_name,
                 saved_linkages,
             )
-            if attribute_linker.update_segments_attr_values(int(source_feature["id"])):
+            if attribute_linker.update_segments_attr_values(
+                int(source_feature[compo_id_column_name])
+            ):
                 self.segments_layer.reload()
                 log("Attributes updated in segments layer")
 
-    def feature_changed_on_compositions(self, fid, idx):
+    @timer_decorator
+    def feature_changed_on_compositions(self, fid, idx, *args):
         if self.segments_layer is None or self.compositions_layer is None:
             return
 
         source_feature = self.compositions_layer.getFeature(fid)
         if not source_feature.isValid():
             return
-        log(f"Feature modified on composition: {int(source_feature['id'])}")
+
+        compo_id_column_name = (
+            self.settings.value("routes_composer/compo_id_column_name", "id") or "id"
+        )
 
         field_name = self.compositions_layer.fields()[idx].name()
+
+        log(
+            f"Attribute '{field_name}' modified on composition: {int(source_feature[compo_id_column_name])}"
+        )
+
         if field_name == self.segments_column_name:
             if self.routes_composer_connected:
                 segments_str = source_feature[self.segments_column_name]
@@ -214,7 +232,9 @@ class RoutesComposer(QObject):
                 self.geom.update_geometries_on_the_fly(segment_id)
                 self.compositions_layer.reload()
 
-                log(f"Geom of modified composition {source_feature['id']} updated")
+                log(
+                    f"Geom of modified composition {source_feature[compo_id_column_name]} updated"
+                )
 
             if self.belonging_connected and not self.is_splitting:
                 self.belong = SegmentsBelonging(
@@ -222,16 +242,17 @@ class RoutesComposer(QObject):
                     self.compositions_layer,
                     self.id_column_name,
                     self.segments_column_name,
-                    compo_id_column_name=self.settings.value(
-                        "routes_composer/compo_id_column_name", "id"
-                    ),
+                    compo_id_column_name=compo_id_column_name,
                 )
-                self.belong.update_belonging_column()
+                self.belong.update_belonging_column(
+                    int(source_feature[compo_id_column_name])
+                )
                 self.segments_layer.reload()
                 log("Belonging column on segments layer updated.")
 
         settings = QSettings()
         saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
+        print(saved_linkages)
 
         if saved_linkages:
             for linkage in saved_linkages:
@@ -241,10 +262,10 @@ class RoutesComposer(QObject):
                         self.compositions_layer,
                         self.id_column_name,
                         self.segments_column_name,
-                        saved_linkages if len(saved_linkages) > 1 else linkage,
+                        saved_linkages if len(saved_linkages) > 1 else [linkage],
                     )
                     if attribute_linker.update_segments_attr_values(
-                        int(source_feature["id"])
+                        int(source_feature[compo_id_column_name])
                     ):
                         self.segments_layer.reload()
                         log("Attributes updated in segments layer")

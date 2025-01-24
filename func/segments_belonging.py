@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QVariant
-from qgis.core import QgsField
+from qgis.core import QgsFeatureRequest, QgsField
 
-from . import utils
+from .utils import SegmentManager
 
 
 class SegmentsBelonging:
@@ -21,7 +21,7 @@ class SegmentsBelonging:
 
         self.belonging_column = "compositions"
 
-        self.segment_manager = utils.SegmentManager(
+        self.segments_manager = SegmentManager(
             compositions_layer=self.compositions_layer,
             segments_layer=self.segments_layer,
             segments_column_name=self.segments_column_name,
@@ -39,34 +39,45 @@ class SegmentsBelonging:
         else:
             return
 
-    @utils.timer_decorator
-    def update_belonging_column(self):
+    def update_belonging_column(self, composition_id=None):
         try:
+            segments_to_update = set()
             segments_appartenance = (
-                self.segment_manager.create_segments_belonging_dictionary()
+                self.segments_manager.create_segments_belonging_dictionary()
             )
+
+            if composition_id:
+                segments = self.segments_manager.get_segments_for_composition(
+                    composition_id
+                )
+                for segment in segments:
+                    segments_to_update.add(segment)
+            else:
+                segments_to_update = list(segments_appartenance.keys())
 
             updates = {}
             attr_idx = self.segments_layer.fields().indexOf(self.belonging_column)
 
-            self.segments_layer.startEditing()
-            for segment in self.segments_layer.getFeatures():
-                seg_id = segment[self.id_column_name]
-                appartenance_str = ",".join(
-                    sorted(map(str, segments_appartenance.get(seg_id, ["0"])), key=int)
-                )
+            if segments_to_update:
+                expr = f'"{self.id_column_name}" IN ({",".join(map(str, segments_to_update))})'
+                request = QgsFeatureRequest().setFilterExpression(expr)
 
-                # On ne peut mettre à jour via le data provider des entités non enregistrées.
-                if segment.id() >= 0:
-                    updates[segment.id()] = {attr_idx: appartenance_str}
-                else:
-                    self.segments_layer.changeAttributeValue(
-                        segment.id(), attr_idx, appartenance_str
+                for segment in self.segments_layer.getFeatures(request):
+                    appartenance_set = set(
+                        map(
+                            str,
+                            segments_appartenance.get(segment[self.id_column_name], []),
+                        )
                     )
+                    appartenance_str = ",".join(sorted(appartenance_set, key=int))
+                    updates[segment.id()] = {attr_idx: appartenance_str}
 
             if updates:
                 self.segments_layer.dataProvider().changeAttributeValues(updates)
 
+            return True
+
         except Exception as e:
             self.segments_layer.rollBack()
             raise e
+            return False

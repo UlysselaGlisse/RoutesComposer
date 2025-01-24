@@ -16,6 +16,19 @@ class AdvancedOptions(QObject):
         project = QgsProject.instance()
         if not project:
             return
+        id_field = self.dialog.layer_manager.compositions_layer.fields().field(
+            self.dialog.ui.compo_id_column_combo.currentText()
+        )
+        if id_field.type() not in (QVariant.Int, QVariant.LongLong):
+            QMessageBox.warning(
+                self.dialog,
+                self.tr("Erreur de validation"),
+                self.tr(
+                    "La colonne des identifiants de la couche 'compositions' doit être de type int."
+                ),
+            )
+            return False
+
         if self.dialog.layer_manager.check_layers_and_columns():
             self.dialog.layer_manager.save_selected_layers_and_columns()
             belong = SegmentsBelonging(
@@ -26,7 +39,23 @@ class AdvancedOptions(QObject):
                 self.dialog.ui.compo_id_column_combo.currentText(),
             )
             belong.create_belonging_column()
-            belong.update_belonging_column()
+            if belong.update_belonging_column():
+                self.dialog.layer_manager.segments_layer.reload()
+                QMessageBox.information(
+                    self.dialog,
+                    self.tr("Succès"),
+                    self.tr(
+                        "La colonne d'appartenance des segments a été mise à jour avec succès."
+                    ),
+                )
+            else:
+                QMessageBox.warning(
+                    self.dialog,
+                    self.tr("Attention"),
+                    self.tr(
+                        "Une erreur est survenue lors de la mise à jour de la colonne d'appartenance des segments."
+                    ),
+                )
 
     def update_segments_attr_combo(self, segments_layer):
         self.dialog.ui.segments_attr_combo.clear()
@@ -131,13 +160,34 @@ class AdvancedOptions(QObject):
             )
             return
 
+        linkage = {
+            "compositions_attr": self.dialog.ui.compositions_attr_combo.currentText(),
+            "priority_mode": self.dialog.ui.priority_mode_combo.currentText(),
+            "segments_attr": self.dialog.ui.segments_attr_combo.currentText(),
+        }
+
         self.attribute_linker = AttributeLinker(
             segments_layer=self.dialog.layer_manager.segments_layer,
             compositions_layer=self.dialog.layer_manager.compositions_layer,
-            segments_attr=self.dialog.ui.segments_attr_combo.currentText(),
-            compositions_attr=self.dialog.ui.compositions_attr_combo.currentText(),
             id_column_name=self.dialog.ui.seg_id_column_combo.currentText(),
             segments_column_name=self.dialog.ui.segments_column_combo.currentText(),
-            priority_mode=self.dialog.ui.priority_mode_combo.currentText().lower(),
+            linkages=[linkage],
         )
-        self.attribute_linker.update_segments_attr_values()
+        if self.attribute_linker.update_segments_attr_values():
+            self.dialog.layer_manager.segments_layer.reload()
+            QMessageBox.information(
+                self.dialog,
+                self.tr("Succès"),
+                self.tr(
+                    f"L'attribut '{linkage.get('segments_attr', '')}' a été mis à jour avec succès."
+                ),
+            )
+
+        else:
+            QMessageBox.warning(
+                self.dialog,
+                self.tr("Attention"),
+                self.tr(
+                    f"Une erreur est survenue lors de la liaison de l'attribut '{linkage.get('segments_attr', '')}'."
+                ),
+            )

@@ -164,3 +164,18 @@ class SegmentManager:
             compositions_list.append(comp_id)
 
         return compositions_list
+
+    def get_segments_for_composition(self, composition_id: int) -> list:
+        segments_list = []
+
+        request = f"{self.compo_id_column_name} = {composition_id}"
+        for composition in self.compositions_layer.getFeatures(request):
+            segments_str = composition[self.segments_column_name]
+            if segments_str:
+                segments_list = [
+                    int(id_str)
+                    for id_str in segments_str.split(",")
+                    if id_str.strip().isdigit()
+                ]
+
+        return segments_list
