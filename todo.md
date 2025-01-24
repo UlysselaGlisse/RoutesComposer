@@ -22,4 +22,3 @@ Gérer la déconnexion lors du changement de projet
 ## Config
 
 ## Attributes Linker
-* Vérfier existence des champs.

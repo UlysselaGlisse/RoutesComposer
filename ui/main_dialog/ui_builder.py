@@ -232,9 +232,6 @@ class UiBuilder(QObject):
 
         self.save_linkage_button = QPushButton(self.tr("Enregistrer la liaison"))
         self.save_linkage_button.setProperty("class", "action-button")
-        self.save_linkage_button.clicked.connect(
-            self.dialog.event_handlers.save_linkage
-        )
 
         self.update_attributes_button = QPushButton(
             self.tr("Mettre à jour les attributs")

@@ -85,17 +85,34 @@ class EventHandlers(QObject):
                 self.connexions_handler.disconnect_belonging()
 
     def save_linkage(self):
-        self.compositions_attr = self.dialog.ui.compositions_attr_combo.currentText()
-        self.segments_attr = self.dialog.ui.segments_attr_combo.currentText()
-        self.priority_mode = self.dialog.ui.priority_mode_combo.currentText()
+        compositions_attr = self.dialog.ui.compositions_attr_combo.currentText()
+        segments_attr = self.dialog.ui.segments_attr_combo.currentText()
+        priority_mode = self.dialog.ui.priority_mode_combo.currentText()
+
+        if not compositions_attr or not segments_attr or not priority_mode:
+            return
+
+        if self.dialog.layer_manager.is_column_pk_attribute(
+            self.dialog.layer_manager.compositions_layer, compositions_attr
+        ):
+            return
+
+        if self.dialog.layer_manager.is_column_pk_attribute(
+            self.dialog.layer_manager.segments_layer, segments_attr
+        ):
+            return
+        if self.dialog.layer_manager.is_id_of_routes_composer(
+            self.dialog.layer_manager.segments_layer, segments_attr
+        ):
+            return
 
         settings = QSettings()
         linkages = settings.value("routes_composer/attribute_linkages", []) or []
 
         new_linkage = {
-            "compositions_attr": self.compositions_attr,
-            "segments_attr": self.segments_attr,
-            "priority_mode": self.priority_mode,
+            "compositions_attr": compositions_attr,
+            "segments_attr": segments_attr,
+            "priority_mode": priority_mode,
         }
 
         if new_linkage not in linkages:

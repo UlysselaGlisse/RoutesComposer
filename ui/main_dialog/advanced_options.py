@@ -145,11 +145,15 @@ class AdvancedOptions(QObject):
         log(f"Priority mode selected: {selected_priority_mode}")
 
     def start_attribute_linking(self):
+        compositions_attr = self.dialog.ui.compositions_attr_combo.currentText()
+        segments_attr = self.dialog.ui.segments_attr_combo.currentText()
+        priority_mode = self.dialog.ui.priority_mode_combo.currentText()
+
         if (
             not self.dialog.ui.segments_combo.currentData()
             or not self.dialog.ui.compositions_combo.currentData()
-            or not self.dialog.ui.segments_attr_combo.currentText()
-            or not self.dialog.ui.compositions_attr_combo.currentText()
+            or not compositions_attr
+            or not segments_attr
         ):
             QMessageBox.warning(
                 self.dialog,
@@ -160,16 +164,32 @@ class AdvancedOptions(QObject):
             )
             return
 
+        if not self.dialog.layer_manager.check_layers_and_columns():
+            return
+
+        if (
+            self.dialog.layer_manager.is_column_pk_attribute(
+                self.dialog.layer_manager.compositions_layer, compositions_attr
+            )
+            or self.dialog.layer_manager.is_column_pk_attribute(
+                self.dialog.layer_manager.segments_layer, segments_attr
+            )
+            or self.dialog.layer_manager.is_id_of_routes_composer(
+                self.dialog.layer_manager.segments_layer, segments_attr
+            )
+        ):
+            return
+
         linkage = {
-            "compositions_attr": self.dialog.ui.compositions_attr_combo.currentText(),
-            "priority_mode": self.dialog.ui.priority_mode_combo.currentText(),
-            "segments_attr": self.dialog.ui.segments_attr_combo.currentText(),
+            "compositions_attr": compositions_attr,
+            "priority_mode": priority_mode,
+            "segments_attr": segments_attr,
         }
 
         self.attribute_linker = AttributeLinker(
             segments_layer=self.dialog.layer_manager.segments_layer,
             compositions_layer=self.dialog.layer_manager.compositions_layer,
-            id_column_name=self.dialog.ui.seg_id_column_combo.currentText(),
+            seg_id_column_name=self.dialog.ui.seg_id_column_combo.currentText(),
             segments_column_name=self.dialog.ui.segments_column_combo.currentText(),
             linkages=[linkage],
         )

@@ -285,6 +285,47 @@ class LayerManager(QObject):
             self.dialog.ui.segments_warning_label.setVisible(False)
             return True
 
+    def is_column_pk_attribute(self, layer, column_name):
+        """
+        Vérifie si une colonne n'est pas utilisée comme clé primaire dans une couche.
+
+        Returns:
+            bool: True si la colonne est une clé primaire, False sinon
+        """
+        if layer.primaryKeyAttributes():
+            pk_field_names = [
+                layer.fields().field(pk_index).name()
+                for pk_index in layer.primaryKeyAttributes()
+            ]
+            if column_name in pk_field_names:
+                QMessageBox.warning(
+                    self.dialog,
+                    self.tr("Erreur de validation"),
+                    self.tr(
+                        f"La colonne d'identifiants unique '{column_name}' ne peut être utilisée ici"
+                    ),
+                )
+                return True
+        return False
+
+    def is_id_of_routes_composer(self, layer, column_name):
+        """
+        Vérifie si une colonne est déjà utilisée comme identifiant unique dans routes composer.
+
+        Returns:
+            bool: True si la colonne est déjà utilisée, False sinon
+        """
+        if column_name == self.dialog.ui.seg_id_column_combo.currentText():
+            QMessageBox.warning(
+                self.dialog,
+                self.tr("Erreur de validation"),
+                self.tr(
+                    f"La colonne '{column_name}' est utilisée par routes composer, elle ne peut donc être utilisée ici."
+                ),
+            )
+            return True
+        return False
+
     def is_id_column_valid(self):
         if self.segments_layer is None:
             return False
@@ -296,24 +337,10 @@ class LayerManager(QObject):
         if id_column_name not in self.segments_layer.fields().names():
             return False
 
-        # Vérifier que ce n'est pas l'identifiant unique de la couche
-        if self.segments_layer.primaryKeyAttributes():
-            pk_field_names = [
-                self.segments_layer.fields().field(pk_index).name()
-                for pk_index in self.segments_layer.primaryKeyAttributes()
-            ]
-            if id_column_name in pk_field_names:
-                QMessageBox.warning(
-                    self.dialog,
-                    self.tr("Erreur de validation"),
-                    self.tr(
-                        "La colonne 'id' ne peut pas être l'identifiant unique de la couche 'segments'."
-                    ),
-                )
-                return False
+        if self.is_column_pk_attribute(self.segments_layer, id_column_name):
+            return False
 
         id_field = self.segments_layer.fields().field(id_column_name)
-
         if id_field.type() not in (QVariant.Int, QVariant.LongLong):
             QMessageBox.warning(
                 self.dialog,
@@ -335,6 +362,7 @@ class LayerManager(QObject):
                 )
             )
             return False
+
         if self.compositions_layer.isSpatial():
             if (
                 self.compositions_layer.geometryType() != QgsWkbTypes.LineGeometry  # type: ignore

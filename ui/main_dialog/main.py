@@ -8,7 +8,6 @@ from qgis.PyQt.QtWidgets import QDialog
 from qgis.utils import iface
 
 from ...connexions_handler import ConnexionsHandler
-from ...func.utils import log
 from .advanced_options import AdvancedOptions
 from .event_handlers import EventHandlers
 from .geometry_operations import GeometryOperations
@@ -19,8 +18,6 @@ from .ui_builder import UiBuilder
 
 
 def show_dialog():
-    log("r")
-
     dialog = RoutesComposerDialog.get_instance(iface.mainWindow())
     dialog.show()
     return dialog

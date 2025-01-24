@@ -8,13 +8,13 @@ class AttributeLinker:
         self,
         segments_layer,
         compositions_layer,
-        id_column_name,
+        seg_id_column_name,
         segments_column_name,
         linkages,
     ):
         self.segments_layer = segments_layer
         self.compositions_layer = compositions_layer
-        self.id_column_name = id_column_name
+        self.seg_id_column_name = seg_id_column_name
         self.segments_column_name = segments_column_name
         self.linkages = linkages
 
@@ -22,7 +22,7 @@ class AttributeLinker:
             compositions_layer=self.compositions_layer,
             segments_layer=self.segments_layer,
             segments_column_name=self.segments_column_name,
-            seg_id_column_name=self.id_column_name,
+            seg_id_column_name=self.seg_id_column_name,
         )
 
     def update_segments_attr_values(self, composition_id=None):
@@ -87,11 +87,11 @@ class AttributeLinker:
             updates = {}
 
             if segments_to_update:
-                expr = f'"{self.id_column_name}" IN ({",".join(map(str, segments_to_update))})'
+                expr = f'"{self.seg_id_column_name}" IN ({",".join(map(str, segments_to_update))})'
                 request = QgsFeatureRequest().setFilterExpression(expr)
 
                 for segment in self.segments_layer.getFeatures(request):
-                    seg_id = segment[self.id_column_name]
+                    seg_id = segment[self.seg_id_column_name]
 
                     feature_updates = {}
                     for segments_attr, values in segments_with_new_values.items():
