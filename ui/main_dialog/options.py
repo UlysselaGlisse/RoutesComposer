@@ -25,7 +25,9 @@ class PluginOptionsWidget(QDialog):
         segment_basket_group = QGroupBox(self.tr("Panier à segments"))
         segment_basket_layout = QVBoxLayout()
 
-        self.show_label_checkbox = QCheckBox(self.tr("Afficher le label près de la souris"))
+        self.show_label_checkbox = QCheckBox(
+            self.tr("Afficher le label près de la souris")
+        )
         self.show_label_checkbox.setChecked(True)
         self.show_label_checkbox.stateChanged.connect(self.save_options)
 
@@ -38,7 +40,9 @@ class PluginOptionsWidget(QDialog):
         dev_group = QGroupBox(self.tr("Développement"))
         dev_layout = QVBoxLayout()
 
-        self.log_checkbox = QCheckBox(self.tr("Activer les logs dans la console python"))
+        self.log_checkbox = QCheckBox(
+            self.tr("Activer les logs dans la console python")
+        )
         self.log_checkbox.setChecked(True)
         self.log_checkbox.stateChanged.connect(self.save_options)
 
@@ -63,16 +67,10 @@ class PluginOptionsWidget(QDialog):
         settings = QSettings()
 
         show_label = settings.value(
-            "routes_composer/ids_basket_label_hide",
-            True,
-            type=bool
+            "routes_composer/ids_basket_label_hide", True, type=bool
         )
         self.show_label_checkbox.setChecked(show_label)
 
-        log_checkbox = settings.value(
-            "routes_composer/log",
-            True,
-            type=bool
-        )
+        log_checkbox = settings.value("routes_composer/log", True, type=bool)
         self.log_checkbox.setChecked(log_checkbox)
         config.logging_enabled = log_checkbox

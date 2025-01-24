@@ -166,7 +166,7 @@ class RoutesComposer(QObject):
 
             segment_id = int(segments_list[0])
             self.geom.update_geometries_on_the_fly(segment_id)
-            self.compositions_layer.triggerRepaint()
+            self.compositions_layer.reload()
 
         if self.belonging_connected:
             self.belong = SegmentsBelonging(

@@ -31,7 +31,7 @@ class IDsBasket(QgsMapTool):
         compositions_layer,
         id_column_name,
         segments_column_name,
-        options_widget=None
+        options_widget=None,
     ):
         super().__init__(canvas)
         if canvas:
@@ -216,9 +216,9 @@ class IDsBasket(QgsMapTool):
             self.remove_last_segment()
         elif e.key() == Qt.Key_R:  # type: ignore
             self.restore_last_removed_segment()
-        elif e.key() == Qt.Key_E: # type: ignore
+        elif e.key() == Qt.Key_E:  # type: ignore
             self.clear_selection()
-        elif e.key() == Qt.Key_Q: # type: ignore
+        elif e.key() == Qt.Key_Q:  # type: ignore
             self.deactivate()
 
     def clear_selection(self):
@@ -362,8 +362,7 @@ class IDsBasket(QgsMapTool):
         #     return
 
         settings = QSettings()
-        show_label = settings.value(
-            "routes_composer/ids_basket_label_hide", "True") == "True"
+        show_label = settings.value("routes_composer/ids_basket_label_hide", "True")
         if not show_label:
             return
 
