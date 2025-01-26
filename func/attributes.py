@@ -112,7 +112,6 @@ class AttributeLinker:
             return False
 
     def _update_segment_value(self, values_dict, segment_id, new_value, priority_mode):
-        """Helper method to update segment values based on priority mode"""
         if priority_mode == "none":
             values_dict[segment_id] = new_value
         elif segment_id not in values_dict:

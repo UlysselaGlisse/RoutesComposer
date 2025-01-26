@@ -26,35 +26,35 @@ class AttributeLinker:
         segments_layer = QgsProject.instance().mapLayersByName("segments")[0]
         compositions_layer = QgsProject.instance().mapLayersByName("compositions")[0]
         segments_column_name = "segments"
-        id_column_name = "id"
+        seg_id_column_name = "id"
 
         self.segments_layer = segments_layer
         self.compositions_layer = compositions_layer
-        self.id_column_name = id_column_name
+        self.seg_id_column_name = seg_id_column_name
         self.segments_column_name = segments_column_name
         self.linkages = [
-            {
-                "segments_attr": "importance",
-                "compositions_attr": "importance",
-                "priority_mode": "min_value",
-            },
+            # {
+            #     "segments_attr": "importance",
+            #     "compositions_attr": "importance",
+            #     "priority_mode": "min_value",
+            # },
             {
                 "segments_attr": "massif",
                 "compositions_attr": "massif",
-                "priority_mode": "none",
+                "priority_mode": "most_frequent",
             },
-            {
-                "segments_attr": "mdiff",
-                "compositions_attr": "mdiff",
-                "priority_mode": "min_value",
-            },
+            # {
+            #     "segments_attr": "mdiff",
+            #     "compositions_attr": "mdiff",
+            #     "priority_mode": "min_value",
+            # },
         ]
 
         self.segments_manager = SegmentManager(
             compositions_layer=self.compositions_layer,
             segments_layer=self.segments_layer,
             segments_column_name=self.segments_column_name,
-            seg_id_column_name=self.id_column_name,
+            seg_id_column_name=self.seg_id_column_name,
         )
 
         self.segment_appartenances = {}
@@ -85,7 +85,7 @@ class AttributeLinker:
             }
 
             if composition_id:
-                compositions_to_process = set()
+                compositions_to_process = []
                 segments = segments_list.get(composition_id, {}).get("segments", "")
                 if segments:
                     for segment in segments:
@@ -93,7 +93,9 @@ class AttributeLinker:
                         compos = self.segments_manager.get_compositions_for_segment(
                             segment
                         )
-                        compositions_to_process.update(compos)
+                        compositions_to_process.extend(compos)
+
+                compositions_to_process = list(compositions_to_process)
             else:
                 compositions_to_process = segments_list.keys()
 
@@ -119,11 +121,12 @@ class AttributeLinker:
 
             updates = {}
             if segments_to_update:
-                expr = f'"{self.id_column_name}" IN ({",".join(map(str, segments_to_update))})'
+                expr = f'"{self.seg_id_column_name}" IN ({",".join(map(str, segments_to_update))})'
                 request = QgsFeatureRequest().setFilterExpression(expr)
 
                 for segment in self.segments_layer.getFeatures(request):
-                    seg_id = segment[self.id_column_name]
+                    seg_id = segment[self.seg_id_column_name]
+
                     feature_updates = {}
                     for segments_attr, values in segments_with_new_values.items():
                         if seg_id in values:
@@ -132,6 +135,7 @@ class AttributeLinker:
                             ]
                     if feature_updates:
                         updates[segment.id()] = feature_updates
+
             if updates:
                 self.segments_layer.dataProvider().changeAttributeValues(updates)
             return True

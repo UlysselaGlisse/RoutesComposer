@@ -109,6 +109,8 @@ class SegmentManager:
 
     def create_segments_of_compositions_dictionary(self, fields=None):
         """Crée un dictionnaire des segments appartenant à chaque composition."""
+        self.segments_list = {}
+
         for composition in self.compositions_layer.getFeatures():
             segments_str = composition[self.segments_column_name]
             compo_id = composition[self.compo_id_column_name]
@@ -132,6 +134,8 @@ class SegmentManager:
 
     def create_segments_belonging_dictionary(self):
         """Crée un dictionnaire des compositions auxquelles appartient chaque segment."""
+        self.segment_appartenances = {}
+
         for composition in self.compositions_layer.getFeatures():
             comp_id = str(int(composition[self.compo_id_column_name]))
             segments_str = composition[self.segments_column_name]

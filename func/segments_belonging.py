@@ -63,13 +63,11 @@ class SegmentsBelonging:
                 request = QgsFeatureRequest().setFilterExpression(expr)
 
                 for segment in self.segments_layer.getFeatures(request):
-                    appartenance_set = set(
-                        map(
-                            str,
-                            segments_appartenance.get(segment[self.id_column_name], []),
+                    appartenance_str = ",".join(
+                        sorted(
+                            segments_appartenance.get(segment[self.id_column_name], [])
                         )
                     )
-                    appartenance_str = ",".join(sorted(appartenance_set, key=int))
                     updates[segment.id()] = {attr_idx: appartenance_str}
 
             if updates:

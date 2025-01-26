@@ -1,3 +1,4 @@
+from PyQt5.QtCore import QRunnable, QThreadPool
 from qgis.core import Qgis, QgsProject, QgsVectorLayer
 from qgis.PyQt.QtCore import QObject, QSettings, QTranslator
 from qgis.utils import iface
@@ -8,6 +9,17 @@ from .func.geom_compo import GeomCompo
 from .func.segments_belonging import SegmentsBelonging
 from .func.split import SplitManager
 from .func.utils import log, timer_decorator
+
+
+class UpdateWorker(QRunnable):
+    def __init__(self, func, *args, **kwargs):
+        super().__init__()
+        self.func = func
+        self.args = args
+        self.kwargs = kwargs
+
+    def run(self):
+        self.func(*self.args, **self.kwargs)
 
 
 class RoutesComposer(QObject):
@@ -134,7 +146,6 @@ class RoutesComposer(QObject):
         self.geom.update_geometries_on_the_fly(segment_id)
         self.compositions_layer.reload()
 
-    @timer_decorator
     def feature_added_on_compositions(self, fid):
         # On n'exécute pas ce qui suit lors de l'enregistrement.
         if fid >= 0:
@@ -179,7 +190,6 @@ class RoutesComposer(QObject):
             if self.belong.update_belonging_column(
                 int(source_feature[compo_id_column_name])
             ):
-                self.segments_layer.reload()
                 log("Belonging column on segments layer updated.")
 
         saved_linkages = (
@@ -196,10 +206,10 @@ class RoutesComposer(QObject):
             if attribute_linker.update_segments_attr_values(
                 int(source_feature[compo_id_column_name])
             ):
-                self.segments_layer.reload()
                 log("Attributes updated in segments layer")
 
-    @timer_decorator
+        self.segments_layer.reload()
+
     def feature_changed_on_compositions(self, fid, idx, *args):
         if self.segments_layer is None or self.compositions_layer is None:
             return
@@ -244,15 +254,13 @@ class RoutesComposer(QObject):
                     self.segments_column_name,
                     compo_id_column_name=compo_id_column_name,
                 )
-                self.belong.update_belonging_column(
+                if self.belong.update_belonging_column(
                     int(source_feature[compo_id_column_name])
-                )
-                self.segments_layer.reload()
-                log("Belonging column on segments layer updated.")
+                ):
+                    log("Belonging column on segments layer updated.")
 
         settings = QSettings()
         saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
-        print(saved_linkages)
 
         if saved_linkages:
             for linkage in saved_linkages:
@@ -267,10 +275,10 @@ class RoutesComposer(QObject):
                     if attribute_linker.update_segments_attr_values(
                         int(source_feature[compo_id_column_name])
                     ):
-                        self.segments_layer.reload()
                         log("Attributes updated in segments layer")
 
-    @timer_decorator
+        self.segments_layer.reload()
+
     def features_deleted_on_compositions(self, fids):
         if self.segments_layer is None or self.compositions_layer is None:
             return
@@ -286,9 +294,8 @@ class RoutesComposer(QObject):
                     "routes_composer/compo_id_column_name", "id"
                 ),
             )
-            self.belong.update_belonging_column()
-            self.segments_layer.reload()
-            log("Belonging column on segments layer updated.")
+            if self.belong.update_belonging_column():
+                log("Belonging column on segments layer updated.")
 
         settings = QSettings()
         saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
@@ -302,8 +309,9 @@ class RoutesComposer(QObject):
                 saved_linkages,
             )
             if attribute_linker.update_segments_attr_values():
-                self.segments_layer.reload()
                 log("Attributes updated in segments layer")
+
+        self.segments_layer.reload()
 
     def connect_routes_composer(self):
         try:
