@@ -1,4 +1,3 @@
-from PyQt5.QtCore import QRunnable
 from qgis.core import Qgis, QgsProject, QgsVectorLayer
 from qgis.PyQt.QtCore import QObject, QSettings, QTranslator
 from qgis.utils import iface
@@ -9,17 +8,6 @@ from .func.geom_compo import GeomCompo
 from .func.segments_belonging import SegmentsBelonging
 from .func.split import SplitManager
 from .func.utils import log
-
-
-class UpdateWorker(QRunnable):
-    def __init__(self, func, *args, **kwargs):
-        super().__init__()
-        self.func = func
-        self.args = args
-        self.kwargs = kwargs
-
-    def run(self):
-        self.func(*self.args, **self.kwargs)
 
 
 class RoutesComposer(QObject):

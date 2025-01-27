@@ -22,4 +22,3 @@ Gérer la déconnexion lors du changement de projet
 ## Config
 
 ## Attributes Linker
-* Ajouter mode de priorité 'most_frequent'
