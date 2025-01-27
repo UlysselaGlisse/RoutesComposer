@@ -99,7 +99,7 @@ class UiBuilder(QObject):
 
         self.segments_column_combo = QComboBox()
         ids_list_label = QLabel(self.tr("Liste d'ids:"))
-        ids_list_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        ids_list_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter) # type: ignore
         compositions_layout.addWidget(ids_list_label)
         compositions_layout.addWidget(self.segments_column_combo)
         self.segments_column_combo.setMaximumWidth(max_column_combo_width)
