@@ -77,7 +77,7 @@ class UiBuilder(QObject):
         segments_layout.addWidget(self.segments_combo)
 
         id_column_label = QLabel(self.tr("Colonne id:"))
-        id_column_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        id_column_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)  # type: ignore
         segments_layout.addWidget(id_column_label)
         self.seg_id_column_combo = QComboBox()
         segments_layout.addWidget(self.seg_id_column_combo)
@@ -215,7 +215,7 @@ class UiBuilder(QObject):
     def create_advanced_group(self):
         advanced_group = QGroupBox(self.tr("Lier les attributs de deux couches:"))
         advanced_layout = QVBoxLayout()
-        advanced_layout.setSizeConstraint(QLayout.SetMinAndMaxSize)
+        advanced_layout.setSizeConstraint(QLayout.SetMinAndMaxSize)  # type: ignore
         advanced_group.setToolTip(
             self.tr(
                 "Permet de donner la valeur de l'attribut de la composition aux segments qu'elle contient.<br><br>"
@@ -230,8 +230,8 @@ class UiBuilder(QObject):
 
         self.linked_layout = QVBoxLayout()
         self.linked_layout.setSizeConstraint(
-            QLayout.SetMinAndMaxSize
-        )  # Ajouter cette ligne
+            QLayout.SetMinAndMaxSize  # type: ignore
+        )
 
         self.linked_layout_group = QGroupBox(self.tr("Liaisons enregistrées"))
         self.linked_layout_group.setLayout(self.linked_layout)

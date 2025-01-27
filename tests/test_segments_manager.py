@@ -132,7 +132,6 @@ class CompSeg:
             f"{self.segments_column_name} LIKE '%,{segment_id}' OR "
             f"{self.segments_column_name} = '{segment_id}'"
         )
-        # Récupération des compositions filtrées
         for composition in self.compositions_layer.getFeatures(request):
             comp_id = int(composition[self.compo_id_column_name])
             compositions_list.append(comp_id)
