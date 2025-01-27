@@ -20,7 +20,7 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/advanced_options.py" line="23"/>
-        <source>La colonne des identifiants de la couche 'compositions' doit être de type int.</source>
+        <source>La colonne des identifiants de la couche &apos;compositions&apos; doit être de type int.</source>
         <translation></translation>
     </message>
     <message>
@@ -30,17 +30,17 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/advanced_options.py" line="44"/>
-        <source>La colonne d'appartenance des segments a été mise à jour avec succès.</source>
+        <source>La colonne d&apos;appartenance des segments a été mise à jour avec succès.</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/advanced_options.py" line="52"/>
-        <source>Une erreur est survenue lors de la mise à jour de la colonne d'appartenance des segments.</source>
+        <source>Une erreur est survenue lors de la mise à jour de la colonne d&apos;appartenance des segments.</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/advanced_options.py" line="198"/>
-        <source>L'attribut '{linkage.get('segments_attr', '')}' a été mis à jour avec succès.</source>
+        <source>L&apos;attribut &apos;{linkage.get(&apos;segments_attr&apos;, &apos;&apos;)}&apos; a été mis à jour avec succès.</source>
         <translation></translation>
     </message>
     <message>
@@ -83,7 +83,7 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/errors_dialog.py" line="155"/>
-        <source>Les géométries pour les compositions suivantes n'ont pas pu être créées : {composition_id}.</source>
+        <source>Les géométries pour les compositions suivantes n&apos;ont pas pu être créées : {composition_id}.</source>
         <translation></translation>
     </message>
     <message>
@@ -118,7 +118,7 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/errors_dialog.py" line="180"/>
-        <source>Segment {unused_segment_id} n'est utilisé dans aucune composition.</source>
+        <source>Segment {unused_segment_id} n&apos;est utilisé dans aucune composition.</source>
         <translation></translation>
     </message>
     <message>
@@ -128,7 +128,7 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/errors_dialog.py" line="63"/>
-        <source>L'id des compositions est celui du fournisseur de données.</source>
+        <source>L&apos;id des compositions est celui du fournisseur de données.</source>
         <translation></translation>
     </message>
     <message>
@@ -195,12 +195,12 @@
     <message>
         <location filename="../ui/main_dialog/geometry_operations.py" line="33"/>
         <source>Le champ {ss} n&apos;existe pas dans la couche des compositions.</source>
-        <translation type="obsolete">Le champ {ss} n'existe pas dans la couche des compositions.</translation>
+        <translation type="obsolete">Le champ {ss} n&apos;existe pas dans la couche des compositions.</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/geometry_operations.py" line="63"/>
         <source>Le champ {segments_column_name} n&apos;existe pas dans la couche des compositions.</source>
-        <translation type="obsolete">Le champ {segments_column_name} n'existe pas dans la couche des compositions.</translation>
+        <translation type="obsolete">Le champ {segments_column_name} n&apos;existe pas dans la couche des compositions.</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/geometry_operations.py" line="100"/>
@@ -241,20 +241,20 @@
 
                 &lt;h4&gt;Sélectionnez les couches :&lt;/h4&gt;
                 &lt;p&gt;
-                Les couches sélectionnées ne peuvent avoir pour identifiant unique la colonne 'id'&lt;br&gt;
-                choisie pour routes composer. Pour un gpkg, il faudra typiquement avoir une colonne 'fid'&lt;br&gt;
-                et une colonne 'id'.&lt;br&gt;
+                Les couches sélectionnées ne peuvent avoir pour identifiant unique la colonne &apos;id&apos;&lt;br&gt;
+                choisie pour routes composer. Pour un gpkg, il faudra typiquement avoir une colonne &apos;fid&apos;&lt;br&gt;
+                et une colonne &apos;id&apos;.&lt;br&gt;
                 &lt;br&gt;
-                    - Une couche segments avec un champ 'id' qui sera utilisé pour faire vos compositions.&lt;br&gt;
+                    - Une couche segments avec un champ &apos;id&apos; qui sera utilisé pour faire vos compositions.&lt;br&gt;
                     - Une couche compositions avec un champ dans lequel vous entrez les listes de segments&lt;br&gt; (sans espaces et séparées par une virgule, par exemple 1,2,3).
                 &lt;/p&gt;
 
                 &lt;h4&gt;Panier à segments :&lt;/h4&gt;
                 &lt;p&gt;
-                    - Cliquez sur l'icône du panier.&lt;br&gt;
+                    - Cliquez sur l&apos;icône du panier.&lt;br&gt;
                     - Sélectionnez les segments qui vous intéressent. La liste se remplira.&lt;br&gt;
-                    L'outil cherchera toujours à combler les trous entre deux segments. &lt;br&gt;
-                    - Clique-droit. Le formulaire d'ajout d'une entité s'ouvre.
+                    L&apos;outil cherchera toujours à combler les trous entre deux segments. &lt;br&gt;
+                    - Clique-droit. Le formulaire d&apos;ajout d&apos;une entité s&apos;ouvre.
                 &lt;/p&gt;
 
                 &lt;h5&gt;Raccourcis:&lt;/h5&gt;
@@ -262,9 +262,9 @@
                     - &lt;b&gt;z&lt;/b&gt; pour retirer le dernier segment de la liste&lt;br&gt;
                     - &lt;b&gt;r&lt;/b&gt; pour le rétablir&lt;br&gt;
                     - &lt;b&gt;e&lt;/b&gt; pour vider la liste&lt;br&gt;
-                    - &lt;b&gt;alt + clique-gauche&lt;/b&gt; pour sélectionner tous les segments d'une composition&lt;br&gt;
+                    - &lt;b&gt;alt + clique-gauche&lt;/b&gt; pour sélectionner tous les segments d&apos;une composition&lt;br&gt;
                     - &lt;b&gt;shift + clique-droit&lt;/b&gt; pour copier la sélection dans le presse papier&lt;br&gt;
-                    - &lt;b&gt;b&lt;/b&gt; quitte l'outil
+                    - &lt;b&gt;b&lt;/b&gt; quitte l&apos;outil
                 &lt;/ul&gt;
             &lt;/div&gt;
             </source>
@@ -275,8 +275,8 @@
     <name>LayerManager</name>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="87"/>
-        <source>Attention: la couche des segments n'a pas de géométrie</source>
-        <translation type="obsolete">Attention: la couche des segments n'a pas de géométrie</translation>
+        <source>Attention: la couche des segments n&apos;a pas de géométrie</source>
+        <translation type="obsolete">Attention: la couche des segments n&apos;a pas de géométrie</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="393"/>
@@ -310,17 +310,17 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="345"/>
-        <source>La colonne 'id' de la couche 'segments' doit être de type int.</source>
+        <source>La colonne &apos;id&apos; de la couche &apos;segments&apos; doit être de type int.</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="427"/>
-        <source>La colonne 'segments' de la couche 'compositions' doit être de type texte.</source>
+        <source>La colonne &apos;segments&apos; de la couche &apos;compositions&apos; doit être de type texte.</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="445"/>
-        <source>La colonne 'segments' de la couche 'compositions' doit être de type texte et ne peut contenir que des chiffres et des virgules.</source>
+        <source>La colonne &apos;segments&apos; de la couche &apos;compositions&apos; doit être de type texte et ne peut contenir que des chiffres et des virgules.</source>
         <translation></translation>
     </message>
     <message>
@@ -340,12 +340,12 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="301"/>
-        <source>La colonne d'identifiants unique '{column_name}' ne peut être utilisée ici</source>
+        <source>La colonne d&apos;identifiants unique &apos;{column_name}&apos; ne peut être utilisée ici</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="319"/>
-        <source>La colonne '{column_name}' est utilisée par routes composer, elle ne peut donc être utilisée ici.</source>
+        <source>La colonne &apos;{column_name}&apos; est utilisée par routes composer, elle ne peut donc être utilisée ici.</source>
         <translation></translation>
     </message>
 </context>
@@ -416,7 +416,7 @@
     </message>
     <message>
         <location filename="../routes_composer.py" line="603"/>
-        <source>Le champ {self.id_column_name} n'a pas été trouvé dans la couche segments</source>
+        <source>Le champ {self.id_column_name} n&apos;a pas été trouvé dans la couche segments</source>
         <translation></translation>
     </message>
 </context>
@@ -519,13 +519,13 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/main.py" line="171"/>
-        <source>Status: En cours d'exécution</source>
-        <translation>Status: En cours d'exécution</translation>
+        <source>Status: En cours d&apos;exécution</source>
+        <translation>Status: En cours d&apos;exécution</translation>
     </message>
     <message>
         <location filename="." line="1701273966"/>
-        <source>Attention: la couche des segments n'a pas de géométrie</source>
-        <translation type="obsolete">Attention: la couche des segments n'a pas de géométrie</translation>
+        <source>Attention: la couche des segments n&apos;a pas de géométrie</source>
+        <translation type="obsolete">Attention: la couche des segments n&apos;a pas de géométrie</translation>
     </message>
     <message>
         <location filename="." line="1701273966"/>
@@ -535,7 +535,7 @@
     <message>
         <location filename="." line="1701273966"/>
         <source>Attention: la colonne segments n&apos;est pas de type texte</source>
-        <translation type="obsolete">Attention: la colonne segments n'est pas de type texte</translation>
+        <translation type="obsolete">Attention: la colonne segments n&apos;est pas de type texte</translation>
     </message>
     <message>
         <location filename="." line="1701273966"/>
@@ -545,12 +545,12 @@
     <message>
         <location filename="." line="1701273966"/>
         <source>Le champ {ss} n&apos;existe pas dans la couche des compositions.</source>
-        <translation type="obsolete">Le champ {ss} n'existe pas dans la couche des compositions.</translation>
+        <translation type="obsolete">Le champ {ss} n&apos;existe pas dans la couche des compositions.</translation>
     </message>
     <message>
         <location filename="." line="1701273966"/>
         <source>Le champ {segments_column_name} n&apos;existe pas dans la couche des compositions.</source>
-        <translation type="obsolete">Le champ {segments_column_name} n'existe pas dans la couche des compositions.</translation>
+        <translation type="obsolete">Le champ {segments_column_name} n&apos;existe pas dans la couche des compositions.</translation>
     </message>
     <message>
         <location filename="." line="1701273966"/>
@@ -570,6 +570,11 @@
         <source>Ouvrir Routes Composer</source>
         <translation></translation>
     </message>
+    <message>
+        <location filename="../plug_in.py" line="58"/>
+        <source>Sélectionner des entités sur la carte et ouvrir le formulaire d&apos;attributs&lt;br&gt;&lt;br&gt;&lt;b&gt;z&lt;/b&gt; : retire le dernier segment du panier&lt;br&gt;&lt;b&gt;r&lt;/b&gt; : le rétabli&lt;br&gt;&lt;b&gt;e&lt;/b&gt; : vide la panier&lt;br&gt;&lt;b&gt;alt + clique&lt;/b&gt; : sélectionne tous les segments d&apos;une composition&lt;br&gt;&lt;b&gt;shift + clique-droit&lt;/b&gt; : copie la liste dans le presse-papier&lt;br&gt;&lt;b&gt;q&lt;/b&gt; : quitte l&apos;outil</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>SingleSegmentDialog</name>
@@ -585,7 +590,7 @@
     </message>
     <message>
         <location filename="../ui/single_segment_dialog.py" line="21"/>
-        <source>Attention, composition d'un seul segment. Veuillez vérifier que la nouvelle composition est bonne.</source>
+        <source>Attention, composition d&apos;un seul segment. Veuillez vérifier que la nouvelle composition est bonne.</source>
         <translation></translation>
     </message>
     <message>
@@ -693,7 +698,7 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="219"/>
-        <source>Permet de donner la valeur de l'attribut de la composition aux segments qu'elle contient.&lt;br&gt;&lt;br&gt;&lt;strong&gt;Exemple :&lt;/strong&gt;&lt;br&gt;Si la route composée des segments 1, 2 et 3 est de difficulté 8, alors l'attribut 'difficulté' des segments 1, 2 et 3 sera mis à jour pour devenir 8.</source>
+        <source>Permet de donner la valeur de l&apos;attribut de la composition aux segments qu&apos;elle contient.&lt;br&gt;&lt;br&gt;&lt;strong&gt;Exemple :&lt;/strong&gt;&lt;br&gt;Si la route composée des segments 1, 2 et 3 est de difficulté 8, alors l&apos;attribut &apos;difficulté&apos; des segments 1, 2 et 3 sera mis à jour pour devenir 8.</source>
         <translation></translation>
     </message>
     <message>
@@ -723,7 +728,7 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="318"/>
-        <source>Crée un nouveau champ dans la couche des segments &lt;br&gt; avec l'id des compositions dans lequel chaque segment est utilisé.</source>
+        <source>Crée un nouveau champ dans la couche des segments &lt;br&gt; avec l&apos;id des compositions dans lequel chaque segment est utilisé.</source>
         <translation></translation>
     </message>
     <message>
@@ -733,12 +738,12 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="340"/>
-        <source>Mettre à jour le champ d'appartenance des segments en continue</source>
+        <source>Mettre à jour le champ d&apos;appartenance des segments en continue</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="332"/>
-        <source>Créer le champ 'compositions'</source>
+        <source>Créer le champ &apos;compositions&apos;</source>
         <translation></translation>
     </message>
     <message>
@@ -782,12 +787,12 @@
     <message>
         <location filename="../ui/main_dialog/geometry_operations.py" line="31"/>
         <source>Le champ {ss} n&apos;existe pas dans la couche des compositions.</source>
-        <translation type="obsolete">Le champ {ss} n'existe pas dans la couche des compositions.</translation>
+        <translation type="obsolete">Le champ {ss} n&apos;existe pas dans la couche des compositions.</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/geometry_operations.py" line="61"/>
         <source>Le champ {segments_column_name} n&apos;existe pas dans la couche des compositions.</source>
-        <translation type="obsolete">Le champ {segments_column_name} n'existe pas dans la couche des compositions.</translation>
+        <translation type="obsolete">Le champ {segments_column_name} n&apos;existe pas dans la couche des compositions.</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/geometry_operations.py" line="114"/>
@@ -796,8 +801,8 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="86"/>
-        <source>Attention: la couche des segments n'a pas de géométrie</source>
-        <translation type="obsolete">Attention: la couche des segments n'a pas de géométrie</translation>
+        <source>Attention: la couche des segments n&apos;a pas de géométrie</source>
+        <translation type="obsolete">Attention: la couche des segments n&apos;a pas de géométrie</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="110"/>

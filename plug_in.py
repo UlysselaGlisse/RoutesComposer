@@ -57,19 +57,7 @@ class RoutesComposerTool:
         )
         self.ids_basket_action = QAction(
             QIcon(icon_path),
-            QCoreApplication.translate(
-                "RoutesManagerTool",
-                """
-                Sélectionner des entités sur la carte et ouvrir le formulaire d'attributs<br>
-                <br>
-                <b>z</b> : retire le dernier segment du panier<br>
-                <b>r</b> : le rétabli<br>
-                <b>e</b> : vide la panier<br>
-                <b>alt + clique</b> : sélectionne tous les segments d'une composition<br>
-                <b>shift + clique-droit</b> : copie la liste dans le presse-papier<br>
-                <b>q</b> : quitte l'outil
-                """,
-            ),
+            QCoreApplication.translate("RoutesManagerTool","""Sélectionner des entités sur la carte et ouvrir le formulaire d'attributs<br><br><b>z</b> : retire le dernier segment du panier<br><b>r</b> : le rétabli<br><b>e</b> : vide la panier<br><b>alt + clique</b> : sélectionne tous les segments d'une composition<br><b>shift + clique-droit</b> : copie la liste dans le presse-papier<br><b>q</b> : quitte l'outil"""),
             self.iface.mainWindow(),
         )
         self.ids_basket_action.setCheckable(True)

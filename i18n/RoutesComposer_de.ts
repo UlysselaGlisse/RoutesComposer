@@ -20,8 +20,8 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/advanced_options.py" line="23"/>
-        <source>La colonne des identifiants de la couche 'compositions' doit être de type int.</source>
-        <translation>Die Bezeichnerspalte der 'compositions' Ebene muss vom Typ int sein.</translation>
+        <source>La colonne des identifiants de la couche &apos;compositions&apos; doit être de type int.</source>
+        <translation>Die Bezeichnerspalte der &apos;compositions&apos; Ebene muss vom Typ int sein.</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/advanced_options.py" line="198"/>
@@ -30,23 +30,23 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/advanced_options.py" line="44"/>
-        <source>La colonne d'appartenance des segments a été mise à jour avec succès.</source>
+        <source>La colonne d&apos;appartenance des segments a été mise à jour avec succès.</source>
         <translation>Die Segmentzugehörigkeitsspalte wurde erfolgreich aktualisiert.</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/advanced_options.py" line="52"/>
-        <source>Une erreur est survenue lors de la mise à jour de la colonne d'appartenance des segments.</source>
+        <source>Une erreur est survenue lors de la mise à jour de la colonne d&apos;appartenance des segments.</source>
         <translation>Ein Fehler ist bei der Aktualisierung der Segmentzugehörigkeitsspalte aufgetreten.</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/advanced_options.py" line="198"/>
-        <source>L'attribut '{linkage.get('segments_attr', '')}' a été mis à jour avec succès.</source>
-        <translation>The attribute '{linkage.get('segments_attr', '')}' has been successfully updated.</translation>
+        <source>L&apos;attribut &apos;{linkage.get(&apos;segments_attr&apos;, &apos;&apos;)}&apos; a été mis à jour avec succès.</source>
+        <translation>The attribute &apos;{linkage.get(&apos;segments_attr&apos;, &apos;&apos;)}&apos; has been successfully updated.</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/advanced_options.py" line="207"/>
         <source>Une erreur est survenue lors de la liaison de l&apos;attribut &apos;{linkage.get(&apos;segments_attr&apos;, &apos;&apos;)}&apos;.</source>
-        <translation>Ein Fehler ist beim Verknüpfen des Attributes '{linkage.get('segments_attr', '')}' aufgetreten.</translation>
+        <translation>Ein Fehler ist beim Verknüpfen des Attributes &apos;{linkage.get(&apos;segments_attr&apos;, &apos;&apos;)}&apos; aufgetreten.</translation>
     </message>
 </context>
 <context>
@@ -68,7 +68,7 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/errors_dialog.py" line="155"/>
-        <source>Les géométries pour les compositions suivantes n'ont pas pu être créées : {composition_id}.</source>
+        <source>Les géométries pour les compositions suivantes n&apos;ont pas pu être créées : {composition_id}.</source>
         <translation>Die Geometrien für die folgenden Kompositionen konnten nicht erstellt werden: {composition_id}.</translation>
     </message>
     <message>
@@ -123,7 +123,7 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/errors_dialog.py" line="180"/>
-        <source>Segment {unused_segment_id} n'est utilisé dans aucune composition.</source>
+        <source>Segment {unused_segment_id} n&apos;est utilisé dans aucune composition.</source>
         <translation>Segment {unused_segment_id} wird in keiner Komposition verwendet.</translation>
     </message>
     <message>
@@ -133,7 +133,7 @@
     </message>
     <message>
         <location filename="../ui/main_dialog/errors_dialog.py" line="63"/>
-        <source>L'id des compositions est celui du fournisseur de données.</source>
+        <source>L&apos;id des compositions est celui du fournisseur de données.</source>
         <translation>Die ID der Kompositionen ist die des Datenlieferanten.</translation>
     </message>
     <message>
@@ -144,7 +144,7 @@
     <message>
         <location filename="../ui/main_dialog/errors_dialog.py" line="191"/>
         <source>Composition : {composition_id}. Dans la liste: {segment_list}, l&apos;id: &apos;{invalid_segment_id}&apos; est invalide.</source>
-        <translation>Komposition: {composition_id}. In der Liste: {segment_list}, ist die ID: '{invalid_segment_id}' ungültig.</translation>
+        <translation>Komposition: {composition_id}. In der Liste: {segment_list}, ist die ID: &apos;{invalid_segment_id}&apos; ungültig.</translation>
     </message>
 </context>
 <context>
@@ -250,13 +250,13 @@
         &lt;ol&gt;
             &lt;li&gt;Sélectionnez les couches à utiliser &lt;br /&gt; (La couche des compositions doit avoir
                 un champ nommé &quot;segments&quot;)&lt;/li&gt;
-            &lt;li&gt;Cliquez sur 'Démarrer' pour activer le suivi&lt;/li&gt;
+            &lt;li&gt;Cliquez sur &apos;Démarrer&apos; pour activer le suivi&lt;/li&gt;
             &lt;li&gt;Effectuez vos modifications sur les segments&lt;/li&gt;
             &lt;li&gt;Les compositions seront mises à jour automatiquement&lt;/li&gt;
-            &lt;li&gt;Cliquez sur 'Arrêter' pour désactiver le suivi&lt;/li&gt;
+            &lt;li&gt;Cliquez sur &apos;Arrêter&apos; pour désactiver le suivi&lt;/li&gt;
         &lt;/ol&gt;
 
-        Vous pouvez voir en détail ce qu'il se passe en activant les logs &lt;br /&gt;
+        Vous pouvez voir en détail ce qu&apos;il se passe en activant les logs &lt;br /&gt;
         Ceux-ci apparaîtront dans la console python de Qgis.
         </source>
         <translation type="obsolete">
@@ -267,10 +267,10 @@ die Zusammensetzungen der Segmente basierend auf den Änderungen an den Segmente
 &lt;ol&gt;
     &lt;li&gt;Wählen Sie die zu verwendenden Ebenen aus&lt;br /&gt;
         (Die Zusammensetzungsebene muss ein Feld namens &quot;segments&quot; haben)&lt;/li&gt;
-    &lt;li&gt;Klicken Sie auf 'Start', um die Verfolgung zu aktivieren&lt;/li&gt;
+    &lt;li&gt;Klicken Sie auf &apos;Start&apos;, um die Verfolgung zu aktivieren&lt;/li&gt;
     &lt;li&gt;Führen Sie Ihre Änderungen an den Segmenten durch&lt;/li&gt;
     &lt;li&gt;Die Zusammensetzungen werden automatisch aktualisiert&lt;/li&gt;
-    &lt;li&gt;Klicken Sie auf 'Stop', um die Verfolgung zu deaktivieren&lt;/li&gt;
+    &lt;li&gt;Klicken Sie auf &apos;Stop&apos;, um die Verfolgung zu deaktivieren&lt;/li&gt;
 &lt;/ol&gt;
 
 Sie können im Detail sehen, was passiert, indem Sie die Protokolle aktivieren&lt;br /&gt;
@@ -294,11 +294,11 @@ Diese erscheinen in der Python-Konsole von QGIS.</translation>
         &lt;i&gt;Instructions :&lt;/i&gt;&lt;br&gt;
         &lt;ol&gt;
             &lt;li&gt;&lt;b&gt;Sélectionnez les couches :&lt;/b&gt;&lt;br /&gt;
-                - Une couche segments avec un champ 'id' qui sera utilisé pour faire vos compositions.&lt;br /&gt;
+                - Une couche segments avec un champ &apos;id&apos; qui sera utilisé pour faire vos compositions.&lt;br /&gt;
                 - Une couche compositions avec un champ dans lequel vous entrez les listes de segments (sans espaces et séparées par une virgule, par exemple 1,2,3).&lt;/li&gt;
             &lt;li&gt;&lt;b&gt;Panier à segments :&lt;/b&gt;&lt;br /&gt;
-                Cliquez sur l'icône, une petite bulle apparaîtra à droite du curseur. Sélectionnez les segments qui vous intéressent. La liste se remplira.&lt;br /&gt;
-                L'outil cherchera toujours à combler les trous entre deux segments.&lt;br /&gt;
+                Cliquez sur l&apos;icône, une petite bulle apparaîtra à droite du curseur. Sélectionnez les segments qui vous intéressent. La liste se remplira.&lt;br /&gt;
+                L&apos;outil cherchera toujours à combler les trous entre deux segments.&lt;br /&gt;
                 Vous pouvez appuyer sur &lt;b&gt;z&lt;/b&gt; pour retirer le dernier segment ajouté à la liste et sur &lt;b&gt;e&lt;/b&gt; pour le rétablir.&lt;/li&gt;
         &lt;/ol&gt;
         </source>
@@ -307,7 +307,7 @@ Diese erscheinen in der Python-Konsole von QGIS.</translation>
         &lt;i&gt;Anweisungen:&lt;/i&gt;&lt;br&gt;
         &lt;ol&gt;
             &lt;li&gt;&lt;b&gt;Wählen Sie die Ebenen aus:&lt;/b&gt;&lt;br /&gt;
-                - Eine Segmenteebene mit einem 'id'-Feld, das für Ihre Kompositionen verwendet wird.&lt;br /&gt;
+                - Eine Segmenteebene mit einem &apos;id&apos;-Feld, das für Ihre Kompositionen verwendet wird.&lt;br /&gt;
                 - Eine Kompositionsebene mit einem Feld, in das Sie die Listen der Segmente eingeben (ohne Leerzeichen und durch Kommas getrennt, z.B. 1,2,3).&lt;/li&gt;
             &lt;li&gt;&lt;b&gt;Segmentkorb:&lt;/b&gt;&lt;br /&gt;
                 Klicken Sie auf das Symbol, eine kleine Blase erscheint rechts vom Cursor. Wählen Sie die Segmente von Interesse aus. Die Liste füllt sich.&lt;br /&gt;
@@ -332,20 +332,20 @@ Diese erscheinen in der Python-Konsole von QGIS.</translation>
 
                 &lt;h4&gt;Sélectionnez les couches :&lt;/h4&gt;
                 &lt;p&gt;
-                Les couches sélectionnées ne peuvent avoir pour identifiant unique la colonne 'id'&lt;br&gt;
-                choisie pour routes composer. Pour un gpkg, il faudra typiquement avoir une colonne 'fid'&lt;br&gt;
-                et une colonne 'id'.&lt;br&gt;
+                Les couches sélectionnées ne peuvent avoir pour identifiant unique la colonne &apos;id&apos;&lt;br&gt;
+                choisie pour routes composer. Pour un gpkg, il faudra typiquement avoir une colonne &apos;fid&apos;&lt;br&gt;
+                et une colonne &apos;id&apos;.&lt;br&gt;
                 &lt;br&gt;
-                    - Une couche segments avec un champ 'id' qui sera utilisé pour faire vos compositions.&lt;br&gt;
+                    - Une couche segments avec un champ &apos;id&apos; qui sera utilisé pour faire vos compositions.&lt;br&gt;
                     - Une couche compositions avec un champ dans lequel vous entrez les listes de segments&lt;br&gt; (sans espaces et séparées par une virgule, par exemple 1,2,3).
                 &lt;/p&gt;
 
                 &lt;h4&gt;Panier à segments :&lt;/h4&gt;
                 &lt;p&gt;
-                    - Cliquez sur l'icône du panier.&lt;br&gt;
+                    - Cliquez sur l&apos;icône du panier.&lt;br&gt;
                     - Sélectionnez les segments qui vous intéressent. La liste se remplira.&lt;br&gt;
-                    L'outil cherchera toujours à combler les trous entre deux segments. &lt;br&gt;
-                    - Clique-droit. Le formulaire d'ajout d'une entité s'ouvre.
+                    L&apos;outil cherchera toujours à combler les trous entre deux segments. &lt;br&gt;
+                    - Clique-droit. Le formulaire d&apos;ajout d&apos;une entité s&apos;ouvre.
                 &lt;/p&gt;
 
                 &lt;h5&gt;Raccourcis:&lt;/h5&gt;
@@ -353,9 +353,9 @@ Diese erscheinen in der Python-Konsole von QGIS.</translation>
                     - &lt;b&gt;z&lt;/b&gt; pour retirer le dernier segment de la liste&lt;br&gt;
                     - &lt;b&gt;r&lt;/b&gt; pour le rétablir&lt;br&gt;
                     - &lt;b&gt;e&lt;/b&gt; pour vider la liste&lt;br&gt;
-                    - &lt;b&gt;alt + clique-gauche&lt;/b&gt; pour sélectionner tous les segments d'une composition&lt;br&gt;
+                    - &lt;b&gt;alt + clique-gauche&lt;/b&gt; pour sélectionner tous les segments d&apos;une composition&lt;br&gt;
                     - &lt;b&gt;shift + clique-droit&lt;/b&gt; pour copier la sélection dans le presse papier&lt;br&gt;
-                    - &lt;b&gt;b&lt;/b&gt; quitte l'outil
+                    - &lt;b&gt;b&lt;/b&gt; quitte l&apos;outil
                 &lt;/ul&gt;
             &lt;/div&gt;
             </source>
@@ -368,11 +368,11 @@ Diese erscheinen in der Python-Konsole von QGIS.</translation>
 
 &lt;h4&gt;Wählen Sie die Layer aus:&lt;/h4&gt;
 &lt;p&gt;
-Die ausgewählten Layer können nicht die Spalte 'id' als eindeutigen Bezeichner haben,&lt;br&gt;
-die für Routen ausgewählt wurde. Für eine gpkg-Datei benötigen Sie typischerweise eine 'fid'-Spalte&lt;br&gt;
-und eine 'id'-Spalte.&lt;br&gt;
+Die ausgewählten Layer können nicht die Spalte &apos;id&apos; als eindeutigen Bezeichner haben,&lt;br&gt;
+die für Routen ausgewählt wurde. Für eine gpkg-Datei benötigen Sie typischerweise eine &apos;fid&apos;-Spalte&lt;br&gt;
+und eine &apos;id&apos;-Spalte.&lt;br&gt;
 &lt;br&gt;
-    - Ein Segment-Layer mit einem 'id'-Feld, das für Ihre Zusammensetzungen verwendet wird.&lt;br&gt;
+    - Ein Segment-Layer mit einem &apos;id&apos;-Feld, das für Ihre Zusammensetzungen verwendet wird.&lt;br&gt;
     - Ein Zusammensetzungs-Layer mit einem Feld, in das Sie die Segmentlisten eingeben&lt;br&gt; (ohne Leerzeichen und durch Kommas getrennt, zum Beispiel 1,2,3).
 &lt;/p&gt;
 
@@ -412,14 +412,14 @@ und eine 'id'-Spalte.&lt;br&gt;
     <message>
         <location filename="../layers_config.py" line="87"/>
         <source>Le champ &apos;{segments_column_name}&apos; n&apos;existe pas dans la couche compositions</source>
-        <translation type="obsolete">Das Feld '{segments_column_name}' existiert nicht in der Kompositionsebene</translation>
+        <translation type="obsolete">Das Feld &apos;{segments_column_name}&apos; existiert nicht in der Kompositionsebene</translation>
     </message>
 </context>
 <context>
     <name>LayerManager</name>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="87"/>
-        <source>Attention: la couche des segments n'a pas de géométrie</source>
+        <source>Attention: la couche des segments n&apos;a pas de géométrie</source>
         <translation type="obsolete">Achtung: Die Segmentebene hat keine Geometrie</translation>
     </message>
     <message>
@@ -454,18 +454,18 @@ und eine 'id'-Spalte.&lt;br&gt;
     </message>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="345"/>
-        <source>La colonne 'id' de la couche 'segments' doit être de type int.</source>
-        <translation>Die Spalte 'id' der Schicht 'segments' muss vom Typ int sein.</translation>
+        <source>La colonne &apos;id&apos; de la couche &apos;segments&apos; doit être de type int.</source>
+        <translation>Die Spalte &apos;id&apos; der Schicht &apos;segments&apos; muss vom Typ int sein.</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="427"/>
-        <source>La colonne 'segments' de la couche 'compositions' doit être de type texte.</source>
-        <translation>Die Spalte 'segments' der Schicht 'compositions' muss vom Typ Text sein.</translation>
+        <source>La colonne &apos;segments&apos; de la couche &apos;compositions&apos; doit être de type texte.</source>
+        <translation>Die Spalte &apos;segments&apos; der Schicht &apos;compositions&apos; muss vom Typ Text sein.</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="445"/>
-        <source>La colonne 'segments' de la couche 'compositions' doit être de type texte et ne peut contenir que des chiffres et des virgules.</source>
-        <translation>Die Spalte 'segments' der Schicht 'compositions' muss vom Typ Text sein und darf nur Zahlen und Kommas enthalten.</translation>
+        <source>La colonne &apos;segments&apos; de la couche &apos;compositions&apos; doit être de type texte et ne peut contenir que des chiffres et des virgules.</source>
+        <translation>Die Spalte &apos;segments&apos; der Schicht &apos;compositions&apos; muss vom Typ Text sein und darf nur Zahlen und Kommas enthalten.</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="254"/>
@@ -484,18 +484,18 @@ und eine 'id'-Spalte.&lt;br&gt;
     </message>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="306"/>
-        <source>La colonne 'id' ne peut pas être l'identifiant unique de la couche 'segments'.</source>
+        <source>La colonne &apos;id&apos; ne peut pas être l&apos;identifiant unique de la couche &apos;segments&apos;.</source>
         <translation type="obsolete">Die id Spalte kann nicht der eindeutige Bezeichner der Segmentebene sein.</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="301"/>
-        <source>La colonne d'identifiants unique '{column_name}' ne peut être utilisée ici</source>
-        <translation>Die eindeutige Kennungsspalte '{column_name}' kann hier nicht verwendet werden</translation>
+        <source>La colonne d&apos;identifiants unique &apos;{column_name}&apos; ne peut être utilisée ici</source>
+        <translation>Die eindeutige Kennungsspalte &apos;{column_name}&apos; kann hier nicht verwendet werden</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="319"/>
-        <source>La colonne '{column_name}' est utilisée par routes composer, elle ne peut donc être utilisée ici.</source>
-        <translation>Die Spalte '{column_name}' wird von routes composer verwendet und kann daher hier nicht verwendet werden.</translation>
+        <source>La colonne &apos;{column_name}&apos; est utilisée par routes composer, elle ne peut donc être utilisée ici.</source>
+        <translation>Die Spalte &apos;{column_name}&apos; wird von routes composer verwendet und kann daher hier nicht verwendet werden.</translation>
     </message>
 </context>
 <context>
@@ -513,11 +513,11 @@ und eine 'id'-Spalte.&lt;br&gt;
     <message>
         <location filename="../layers.py" line="73"/>
         <source>Le champ &apos;{segments_column_name}&apos; n&apos;existe pas dans la couche compositions</source>
-        <translation type="obsolete">Das Feld '{segments_column_name}' existiert nicht in der Kompositionsschicht</translation>
+        <translation type="obsolete">Das Feld &apos;{segments_column_name}&apos; existiert nicht in der Kompositionsschicht</translation>
     </message>
     <message>
         <location filename="../layers.py" line="91"/>
-        <source>Le champ {self.id_column_name} n'a pas été trouvé dans la couche segments</source>
+        <source>Le champ {self.id_column_name} n&apos;a pas été trouvé dans la couche segments</source>
         <translation type="obsolete">Das Feld {self.id_column_name} wurde in der Schicht Segmente nicht gefunden</translation>
     </message>
 </context>
@@ -548,8 +548,8 @@ und eine 'id'-Spalte.&lt;br&gt;
     <name>RoutesComposer</name>
     <message>
         <location filename="." line="7103842"/>
-        <source>Le champ 'id' n'a pas été trouvé dans la couche segments</source>
-        <translation type="obsolete">Das Feld 'id' wurde in der Schicht Segmente nicht gefunden</translation>
+        <source>Le champ &apos;id&apos; n&apos;a pas été trouvé dans la couche segments</source>
+        <translation type="obsolete">Das Feld &apos;id&apos; wurde in der Schicht Segmente nicht gefunden</translation>
     </message>
     <message>
         <location filename="../routes_composer.py" line="334"/>
@@ -593,7 +593,7 @@ und eine 'id'-Spalte.&lt;br&gt;
     </message>
     <message>
         <location filename="../routes_composer.py" line="603"/>
-        <source>Le champ {self.id_column_name} n'a pas été trouvé dans la couche segments</source>
+        <source>Le champ {self.id_column_name} n&apos;a pas été trouvé dans la couche segments</source>
         <translation>Das Feld {self.id_column_name} wurde in der Schicht Segmente nicht gefunden</translation>
     </message>
     <message>
@@ -681,7 +681,7 @@ und eine 'id'-Spalte.&lt;br&gt;
     </message>
     <message>
         <location filename="../ui/main_dialog/main.py" line="171"/>
-        <source>Status: En cours d'exécution</source>
+        <source>Status: En cours d&apos;exécution</source>
         <translation>Status: In Ausführung</translation>
     </message>
     <message>
@@ -698,10 +698,10 @@ und eine 'id'-Spalte.&lt;br&gt;
         1. Sélectionnez les couches à utiliser
             (La couche des compositions doit avoir
             un champ nommé &quot;segments&quot;)
-        2. Cliquez sur 'Démarrer' pour activer le suivi
+        2. Cliquez sur &apos;Démarrer&apos; pour activer le suivi
         3. Effectuez vos modifications sur les segments
         4. Les compositions seront mises à jour automatiquement
-        5. Cliquez sur 'Arrêter' pour désactiver le suivi
+        5. Cliquez sur &apos;Arrêter&apos; pour désactiver le suivi
         </source>
         <translation type="obsolete">
         Netzwerk-Manager
@@ -711,10 +711,10 @@ und eine 'id'-Spalte.&lt;br&gt;
         Anweisungen:
         1. Wählen Sie die zu verwendenden Ebenen aus
         (Die Ebene der Zusammensetzungen muss ein Feld namens &quot;Segmente&quot; haben)
-        2. Klicken Sie auf 'Starten', um die Überwachung zu aktivieren
+        2. Klicken Sie auf &apos;Starten&apos;, um die Überwachung zu aktivieren
         3. Nehmen Sie Ihre Änderungen an den Segmenten vor
         4. Die Zusammensetzungen werden automatisch aktualisiert
-        5. Klicken Sie auf 'Stoppen', um die Überwachung zu deaktivierenNetzwerk-Manager**
+        5. Klicken Sie auf &apos;Stoppen&apos;, um die Überwachung zu deaktivierenNetzwerk-Manager**
 </translation>
     </message>
     <message>
@@ -749,7 +749,7 @@ und eine 'id'-Spalte.&lt;br&gt;
     </message>
     <message>
         <location filename="." line="7103842"/>
-        <source>Attention: la couche des segments n'a pas de géométrie</source>
+        <source>Attention: la couche des segments n&apos;a pas de géométrie</source>
         <translation type="obsolete">Achtung: Die Segmentebene hat keine Geometrie</translation>
     </message>
     <message>
@@ -810,8 +810,13 @@ und eine 'id'-Spalte.&lt;br&gt;
     </message>
     <message>
         <location filename="../plug_in.py" line="59"/>
-        <source>Sélectionner des entités sur la carte et ouvrir le formulaire d'attributs.</source>
+        <source>Sélectionner des entités sur la carte et ouvrir le formulaire d&apos;attributs.</source>
         <translation type="obsolete">Objekte auf der Karte auswählen und das Attributformular öffnen.</translation>
+    </message>
+    <message>
+        <location filename="../plug_in.py" line="58"/>
+        <source>Sélectionner des entités sur la carte et ouvrir le formulaire d&apos;attributs&lt;br&gt;&lt;br&gt;&lt;b&gt;z&lt;/b&gt; : retire le dernier segment du panier&lt;br&gt;&lt;b&gt;r&lt;/b&gt; : le rétabli&lt;br&gt;&lt;b&gt;e&lt;/b&gt; : vide la panier&lt;br&gt;&lt;b&gt;alt + clique&lt;/b&gt; : sélectionne tous les segments d&apos;une composition&lt;br&gt;&lt;b&gt;shift + clique-droit&lt;/b&gt; : copie la liste dans le presse-papier&lt;br&gt;&lt;b&gt;q&lt;/b&gt; : quitte l&apos;outil</source>
+        <translation>Wählen Sie Objekte auf der Karte aus und öffnen Sie das Attributformular&lt;br&gt;&lt;br&gt;&lt;b&gt;z&lt;/b&gt; : entfernt das letzte Segment aus dem Korb&lt;br&gt;&lt;b&gt;r&lt;/b&gt; : stellt es wieder her&lt;br&gt;&lt;b&gt;e&lt;/b&gt; : leert den Korb&lt;br&gt;&lt;b&gt;alt + Klick&lt;/b&gt; : wählt alle Segmente einer Komposition aus&lt;br&gt;&lt;b&gt;shift + Rechtsklick&lt;/b&gt; : kopiert die Liste in die Zwischenablage&lt;br&gt;&lt;b&gt;q&lt;/b&gt; : beendet das Tool</translation>
     </message>
 </context>
 <context>
@@ -823,7 +828,7 @@ und eine 'id'-Spalte.&lt;br&gt;
     </message>
     <message>
         <location filename="../ui/single_segment_dialog.py" line="21"/>
-        <source>Attention, composition d'un seul segment. Veuillez vérifier que la nouvelle composition est bonne.</source>
+        <source>Attention, composition d&apos;un seul segment. Veuillez vérifier que la nouvelle composition est bonne.</source>
         <translation>Achtung, Komposition aus einem einzigen Segment. Bitte überprüfen Sie, ob die neue Komposition korrekt ist.</translation>
     </message>
     <message>
@@ -941,8 +946,8 @@ und eine 'id'-Spalte.&lt;br&gt;
     </message>
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="219"/>
-        <source>Permet de donner la valeur de l'attribut de la composition aux segments qu'elle contient.&lt;br&gt;&lt;br&gt;&lt;strong&gt;Exemple :&lt;/strong&gt;&lt;br&gt;Si la route composée des segments 1, 2 et 3 est de difficulté 8, alors l'attribut 'difficulté' des segments 1, 2 et 3 sera mis à jour pour devenir 8.</source>
-        <translation>Ermöglicht es, den Wert des Attributs der Komposition den Segmenten, die sie enthält, zuzuordnen.&lt;br&gt;&lt;br&gt;&lt;strong&gt;Beispiel :&lt;/strong&gt;&lt;br&gt;Wenn die aus den Segmenten 1, 2 und 3 bestehende Straße den Schwierigkeitsgrad 8 hat, wird das Attribut 'Schwierigkeit' der Segmente 1, 2 und 3 auf 8 aktualisiert.</translation>
+        <source>Permet de donner la valeur de l&apos;attribut de la composition aux segments qu&apos;elle contient.&lt;br&gt;&lt;br&gt;&lt;strong&gt;Exemple :&lt;/strong&gt;&lt;br&gt;Si la route composée des segments 1, 2 et 3 est de difficulté 8, alors l&apos;attribut &apos;difficulté&apos; des segments 1, 2 et 3 sera mis à jour pour devenir 8.</source>
+        <translation>Ermöglicht es, den Wert des Attributs der Komposition den Segmenten, die sie enthält, zuzuordnen.&lt;br&gt;&lt;br&gt;&lt;strong&gt;Beispiel :&lt;/strong&gt;&lt;br&gt;Wenn die aus den Segmenten 1, 2 und 3 bestehende Straße den Schwierigkeitsgrad 8 hat, wird das Attribut &apos;Schwierigkeit&apos; der Segmente 1, 2 und 3 auf 8 aktualisiert.</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="355"/>
@@ -976,7 +981,7 @@ und eine 'id'-Spalte.&lt;br&gt;
     </message>
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="318"/>
-        <source>Crée un nouveau champ dans la couche des segments &lt;br&gt; avec l'id des compositions dans lequel chaque segment est utilisé.</source>
+        <source>Crée un nouveau champ dans la couche des segments &lt;br&gt; avec l&apos;id des compositions dans lequel chaque segment est utilisé.</source>
         <translation>Erstellt ein neues Feld in der Segmentebene &lt;br&gt;mit den Kompositions-IDs in denen jedes Segment verwendet wird.</translation>
     </message>
     <message>
@@ -986,23 +991,23 @@ und eine 'id'-Spalte.&lt;br&gt;
     </message>
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="315"/>
-        <source>Créer/Mettre à jour le champ 'compositions' dans segments</source>
+        <source>Créer/Mettre à jour le champ &apos;compositions&apos; dans segments</source>
         <translation type="obsolete">Kompositionsfeld in Segmenten erstellen/aktualisieren</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="340"/>
-        <source>Mettre à jour le champ d'appartenance des segments en continue</source>
+        <source>Mettre à jour le champ d&apos;appartenance des segments en continue</source>
         <translation>Segmentzugehörigkeitsfeld kontinuierlich aktualisieren</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="269"/>
-        <source>compositions: {linkage['compositions_attr']} -&gt; segments: {linkage['segments_attr']} (priorité: {linkage['priority_mode']})</source>
-        <translation type="obsolete">kompositionen: {linkage['compositions_attr']} -&gt; segmente: {linkage['segments_attr']} (priorität: {linkage['priority_mode']})</translation>
+        <source>compositions: {linkage[&apos;compositions_attr&apos;]} -&gt; segments: {linkage[&apos;segments_attr&apos;]} (priorité: {linkage[&apos;priority_mode&apos;]})</source>
+        <translation type="obsolete">kompositionen: {linkage[&apos;compositions_attr&apos;]} -&gt; segmente: {linkage[&apos;segments_attr&apos;]} (priorität: {linkage[&apos;priority_mode&apos;]})</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="332"/>
-        <source>Créer le champ 'compositions'</source>
-        <translation>Erstellen Sie das Feld 'compositions'</translation>
+        <source>Créer le champ &apos;compositions&apos;</source>
+        <translation>Erstellen Sie das Feld &apos;compositions&apos;</translation>
     </message>
     <message>
         <location filename="../ui/main_dialog/ui_builder.py" line="372"/>
@@ -1074,7 +1079,7 @@ und eine 'id'-Spalte.&lt;br&gt;
     </message>
     <message>
         <location filename="../ui/main_dialog/layer_management.py" line="86"/>
-        <source>Attention: la couche des segments n'a pas de géométrie</source>
+        <source>Attention: la couche des segments n&apos;a pas de géométrie</source>
         <translation type="obsolete">Achtung: Die Segmentebene hat keine Geometrie</translation>
     </message>
     <message>
