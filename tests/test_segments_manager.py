@@ -36,8 +36,8 @@ class CompSeg:
     def dictionary_creation(self, fields=None):
         """Crée un dictionnaire des segments appartenant à chaque composition."""
         for composition in self.compositions_layer.getFeatures():
-            segments_str = composition[self.segments_column_name]
             compo_id = composition[self.compo_id_column_name]
+            segments_str = composition[self.segments_column_name]
 
             if segments_str:
                 segments_list = [
@@ -57,17 +57,42 @@ class CompSeg:
         return self.segments_list
 
     @timer_decorator
-    def create_compositions_by_segment_dictionary(self):
-        """Crée un dictionnaire listant les compositions contenant chaque segment."""
-        compositions_by_segment = {}
+    def create_segments_belonging_dictionary(self, fields=None):
+        """Crée un dictionnaire des compositions auxquelles appartient chaque segment.
 
-        for composition_id, segments in self.segments_list.items():
-            for segment_id in segments:
-                if segment_id not in compositions_by_segment:
-                    compositions_by_segment[segment_id] = []
-                compositions_by_segment[segment_id].append(composition_id)
+        Args:
+            fields (list, optional): Liste des champs additionnels à inclure pour chaque composition.
 
-        return compositions_by_segment
+        Returns:
+            dict: Dictionnaire avec les segments comme clés et leurs appartenances comme valeurs
+        """
+        self.segment_appartenances = {}
+
+        for composition in self.compositions_layer.getFeatures():
+            comp_id = int(composition[self.compo_id_column_name])
+            segments_str = composition[self.segments_column_name]
+
+            composition_data = {"comp_id": comp_id}
+            if fields:
+                for field in fields:
+                    composition_data[field] = composition[field]
+
+            if segments_str:
+                segments_list = [
+                    int(id_str)
+                    for id_str in segments_str.split(",")
+                    if id_str.strip().isdigit()
+                ]
+                for seg_id in segments_list:
+                    if seg_id not in self.segment_appartenances:
+                        self.segment_appartenances[seg_id] = []
+
+                    if fields:
+                        self.segment_appartenances[seg_id].append(composition_data)
+                    else:
+                        self.segment_appartenances[seg_id].append(comp_id)
+
+        return self.segment_appartenances
 
     @timer_decorator
     def get_compositions_for_segment(self, segment_id: int) -> list:
@@ -118,4 +143,3 @@ class CompSeg:
 
 
 manager = CompSeg()
-manager.dictionary_creation()

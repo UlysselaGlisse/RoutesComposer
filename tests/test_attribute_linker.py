@@ -1,5 +1,6 @@
 import time
 from functools import wraps
+from typing import Counter
 
 from qgis.core import QgsFeatureRequest, QgsProject
 
@@ -33,11 +34,11 @@ class AttributeLinker:
         self.seg_id_column_name = seg_id_column_name
         self.segments_column_name = segments_column_name
         self.linkages = [
-            # {
-            #     "segments_attr": "importance",
-            #     "compositions_attr": "importance",
-            #     "priority_mode": "min_value",
-            # },
+            {
+                "segments_attr": "importance",
+                "compositions_attr": "importance",
+                "priority_mode": "min_value",
+            },
             {
                 "segments_attr": "massif",
                 "compositions_attr": "massif",
@@ -63,20 +64,13 @@ class AttributeLinker:
     def update_segments_attr_values(self, composition_id=None):
         try:
             segments_to_update = set()
+
             compositions_attrs = [
                 linkage["compositions_attr"] for linkage in self.linkages
             ]
-
-            segments_list = (
-                self.segments_manager.create_segments_of_compositions_dictionary(
-                    compositions_attrs
-                )
-            )
-
-            segments_with_new_values = {
+            self.segments_with_new_values = {
                 linkage["segments_attr"]: {} for linkage in self.linkages
             }
-
             attr_indices = {
                 linkage["segments_attr"]: self.segments_layer.fields().indexOf(
                     linkage["segments_attr"]
@@ -84,9 +78,17 @@ class AttributeLinker:
                 for linkage in self.linkages
             }
 
+            self.segments_list = (
+                self.segments_manager.create_segments_of_compositions_dictionary(
+                    compositions_attrs
+                )
+            )
+
             if composition_id:
                 compositions_to_process = []
-                segments = segments_list.get(composition_id, {}).get("segments", "")
+                segments = self.segments_list.get(composition_id, {}).get(
+                    "segments", ""
+                )
                 if segments:
                     for segment in segments:
                         segment = int(segment)
@@ -97,29 +99,46 @@ class AttributeLinker:
 
                 compositions_to_process = list(compositions_to_process)
             else:
-                compositions_to_process = segments_list.keys()
+                compositions_to_process = self.segments_list.keys()
 
             for linkage in self.linkages:
                 segments_attr = linkage["segments_attr"]
                 compositions_attr = linkage["compositions_attr"]
                 priority_mode = linkage["priority_mode"]
 
+                if priority_mode == "most_frequent":
+                    segments_list = (
+                        self.segments_manager.create_segments_belonging_dictionary(
+                            compositions_attrs
+                        )
+                    )
+                    for segment_id, compositions in segments_list.items():
+                        attribute_values = [
+                            comp[compositions_attr] for comp in compositions
+                        ]
+                        counter = Counter(attribute_values)
+                        most_common = counter.most_common(1)[0][0]
+                        if most_common:
+                            self.segments_with_new_values[segment_id] = most_common
+
                 for comp_id in compositions_to_process:
-                    value = segments_list.get(comp_id, []).get(
+                    value = self.segments_list.get(comp_id, []).get(
                         compositions_attr, "NULL"
                     )
-                    segments = segments_list.get(comp_id, []).get("segments", "")
+                    segments = self.segments_list.get(comp_id, []).get("segments", "")
 
                     for segment_id in segments:
                         segments_to_update.add(segment_id)
                         self._update_segment_value(
-                            segments_with_new_values[segments_attr],
+                            self.segments_with_new_values[segments_attr],
                             segment_id,
                             value,
                             priority_mode,
                         )
+            print(self.segments_with_new_values)
 
             updates = {}
+
             if segments_to_update:
                 expr = f'"{self.seg_id_column_name}" IN ({",".join(map(str, segments_to_update))})'
                 request = QgsFeatureRequest().setFilterExpression(expr)
@@ -128,7 +147,7 @@ class AttributeLinker:
                     seg_id = segment[self.seg_id_column_name]
 
                     feature_updates = {}
-                    for segments_attr, values in segments_with_new_values.items():
+                    for segments_attr, values in self.segments_with_new_values.items():
                         if seg_id in values:
                             feature_updates[attr_indices[segments_attr]] = values[
                                 seg_id
@@ -145,9 +164,9 @@ class AttributeLinker:
             return False
 
     def _update_segment_value(self, values_dict, segment_id, new_value, priority_mode):
-        """Helper method to update segment values based on priority mode"""
         if priority_mode == "none":
             values_dict[segment_id] = new_value
+
         elif segment_id not in values_dict:
             values_dict[segment_id] = new_value
         else:
@@ -206,11 +225,17 @@ class SegmentManager:
 
         return self.segments_list
 
-    def create_segments_belonging_dictionary(self):
-        """Crée un dictionnaire des compositions auxquelles appartient chaque segment."""
+    def create_segments_belonging_dictionary(self, fields=None):
+        self.segment_appartenances = {}
+
         for composition in self.compositions_layer.getFeatures():
-            comp_id = str(int(composition[self.compo_id_column_name]))
+            comp_id = int(composition[self.compo_id_column_name])
             segments_str = composition[self.segments_column_name]
+
+            composition_data = {"comp_id": comp_id}
+            if fields:
+                for field in fields:
+                    composition_data[field] = composition[field]
 
             if segments_str:
                 segments_list = [
@@ -222,7 +247,10 @@ class SegmentManager:
                     if seg_id not in self.segment_appartenances:
                         self.segment_appartenances[seg_id] = []
 
-                    self.segment_appartenances[seg_id].append(str(comp_id))
+                    if fields:
+                        self.segment_appartenances[seg_id].append(composition_data)
+                    else:
+                        self.segment_appartenances[seg_id].append(comp_id)
 
         return self.segment_appartenances
 
