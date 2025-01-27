@@ -95,6 +95,34 @@ class CompSeg:
         return self.segment_appartenances
 
     @timer_decorator
+    def create_compositions_by_segment_dictionary(self, fields=None):
+        """Crée un dictionnaire listant les compositions contenant chaque segment."""
+        compositions_by_segment = {}
+        # {seg_id: [{'champ': valeur, 'champ': valeur}], seg_id: [{'champ': valeur, 'champ': valeur}]}
+
+        for (
+            composition_id,
+            composition_data,
+        ) in self.segments_list.items():  # seg_id {'champ': valeur, 'champ' : valeur}
+            segments = (
+                composition_data["segments"] if fields else composition_data
+            )  # liste de segments
+            for segment_id in segments:
+                if segment_id not in compositions_by_segment:
+                    compositions_by_segment[segment_id] = []
+
+                if fields:
+                    composition_info = {
+                        field: composition_data[field] for field in fields
+                    }
+                    # {'champ': valeur, 'champ': valeur}
+                    compositions_by_segment[segment_id].append(composition_info)
+                else:
+                    compositions_by_segment[segment_id].append(composition_id)
+
+        return compositions_by_segment
+
+    @timer_decorator
     def get_compositions_for_segment(self, segment_id: int) -> list:
         compositions_list = []
 

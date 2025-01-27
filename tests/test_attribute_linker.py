@@ -2,7 +2,8 @@ import time
 from functools import wraps
 from typing import Counter
 
-from qgis.core import QgsFeatureRequest, QgsProject
+from qgis.core import QgsProject
+from qgis.core.additions.qgsfunction import QgsFeatureRequest
 
 # exécuter le fichier dans la console python.
 # dans la console, par exemple:  manager.update_segments_attr_values()
@@ -108,37 +109,50 @@ class AttributeLinker:
 
                 if priority_mode == "most_frequent":
                     segments_list = (
-                        self.segments_manager.create_segments_belonging_dictionary(
+                        self.segments_manager.create_compositions_by_segment_dictionary(
                             compositions_attrs
                         )
                     )
                     for segment_id, compositions in segments_list.items():
+                        print(segment_id, compositions)
+                        if composition_id:
+                            compositions = [
+                                comp
+                                for comp in compositions
+                                if comp["id"] in compositions_to_process
+                            ]
+                            if not compositions:
+                                continue
+
+                        segments_to_update.add(segment_id)
                         attribute_values = [
                             comp[compositions_attr] for comp in compositions
                         ]
                         counter = Counter(attribute_values)
                         most_common = counter.most_common(1)[0][0]
                         if most_common:
-                            self.segments_with_new_values[segment_id] = most_common
+                            self.segments_with_new_values[segments_attr][segment_id] = (
+                                most_common
+                            )
 
-                for comp_id in compositions_to_process:
-                    value = self.segments_list.get(comp_id, []).get(
-                        compositions_attr, "NULL"
-                    )
-                    segments = self.segments_list.get(comp_id, []).get("segments", "")
-
-                    for segment_id in segments:
-                        segments_to_update.add(segment_id)
-                        self._update_segment_value(
-                            self.segments_with_new_values[segments_attr],
-                            segment_id,
-                            value,
-                            priority_mode,
+                else:
+                    for comp_id in compositions_to_process:
+                        value = self.segments_list.get(comp_id, []).get(
+                            compositions_attr, "NULL"
                         )
-            print(self.segments_with_new_values)
+                        segments = self.segments_list.get(comp_id, []).get(
+                            "segments", ""
+                        )
 
+                        for segment_id in segments:
+                            segments_to_update.add(segment_id)
+                            self._update_segment_value(
+                                self.segments_with_new_values[segments_attr],
+                                segment_id,
+                                value,
+                                priority_mode,
+                            )
             updates = {}
-
             if segments_to_update:
                 expr = f'"{self.seg_id_column_name}" IN ({",".join(map(str, segments_to_update))})'
                 request = QgsFeatureRequest().setFilterExpression(expr)
@@ -203,7 +217,12 @@ class SegmentManager:
         self.segments_list = {}
 
     def create_segments_of_compositions_dictionary(self, fields=None):
-        """Crée un dictionnaire des segments appartenant à chaque composition."""
+        """
+        Crée un dictionnaire des segments appartenant à chaque composition.
+
+        Return:
+            {comp_id: {'champ': valeur, 'champ': valeur}, comp_id: {'champ': valeur, 'champ': valeur}}
+        """
         for composition in self.compositions_layer.getFeatures():
             segments_str = composition[self.segments_column_name]
             compo_id = composition[self.compo_id_column_name]
@@ -224,6 +243,34 @@ class SegmentManager:
                     self.segments_list[compo_id] = segments_list
 
         return self.segments_list
+
+    def create_compositions_by_segment_dictionary(self, fields=None):
+        """
+        Crée un dictionnaire listant les compositions contenant chaque segment.
+        Return:
+            {seg_id: [{'champ': valeur, 'champ': valeur}, {'champ': valeur, 'champ': valeur}], seg_id: [{'champ': valeur, 'champ': valeur}]}
+        """
+        compositions_by_segment = {}
+
+        for (
+            composition_id,
+            composition_data,
+        ) in self.segments_list.items():
+            segments = composition_data["segments"] if fields else composition_data
+            for segment_id in segments:
+                if segment_id not in compositions_by_segment:
+                    compositions_by_segment[segment_id] = []
+
+                if fields:
+                    composition_info = {
+                        field: composition_data[field] for field in fields
+                    }
+                    composition_info["id"] = composition_id
+                    compositions_by_segment[segment_id].append(composition_info)
+                else:
+                    compositions_by_segment[segment_id].append(composition_id)
+
+        return compositions_by_segment
 
     def create_segments_belonging_dictionary(self, fields=None):
         self.segment_appartenances = {}

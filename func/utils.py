@@ -108,9 +108,12 @@ class SegmentManager:
         self.segments_list = {}
 
     def create_segments_of_compositions_dictionary(self, fields=None):
-        """Crée un dictionnaire des segments appartenant à chaque composition."""
-        self.segments_list = {}
+        """
+        Crée un dictionnaire des segments appartenant à chaque composition.
 
+        Return:
+            {comp_id: {'champ': valeur, 'champ': valeur}, comp_id: {'champ': valeur, 'champ': valeur}}
+        """
         for composition in self.compositions_layer.getFeatures():
             segments_str = composition[self.segments_column_name]
             compo_id = composition[self.compo_id_column_name]
@@ -153,6 +156,34 @@ class SegmentManager:
                     self.segment_appartenances[seg_id].append(str(comp_id))
 
         return self.segment_appartenances
+
+    def create_compositions_by_segment_dictionary(self, fields=None):
+        """
+        Crée un dictionnaire listant les compositions contenant chaque segment.
+        Return:
+            {seg_id: [{'champ': valeur, 'champ': valeur}, {'champ': valeur, 'champ': valeur}], seg_id: [{'champ': valeur, 'champ': valeur}]}
+        """
+        compositions_by_segment = {}
+
+        for (
+            composition_id,
+            composition_data,
+        ) in self.segments_list.items():
+            segments = composition_data["segments"] if fields else composition_data
+            for segment_id in segments:
+                if segment_id not in compositions_by_segment:
+                    compositions_by_segment[segment_id] = []
+
+                if fields:
+                    composition_info = {
+                        field: composition_data[field] for field in fields
+                    }
+                    composition_info["id"] = composition_id
+                    compositions_by_segment[segment_id].append(composition_info)
+                else:
+                    compositions_by_segment[segment_id].append(composition_id)
+
+        return compositions_by_segment
 
     def get_compositions_for_segment(self, segment_id: int) -> list:
         compositions_list = []

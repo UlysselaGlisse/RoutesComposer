@@ -368,14 +368,15 @@ class UiBuilder(QObject):
 
     def create_priority_mode_combo(self):
         combo = QComboBox()
-        combo.addItems([self.tr("none"), self.tr("min_value"), self.tr("max_value")])
+        combo.addItems(["none", "min_value", "max_value", "most_frequent"])
         combo.setToolTip(
             self.tr(
                 "Sélectionnez le mode de priorité pour le lien des attributs.<br>"
                 "<strong>Options disponibles:</strong><br>"
                 "- <em>none</em>: Pas de priorité.<br>"
                 "- <em>min_value</em>: Prioriser la valeur minimale.<br>"
-                "- <em>max_value</em>: Prioriser la valeur maximale."
+                "- <em>max_value</em>: Prioriser la valeur maximale.<br>"
+                "- <em>most_frequent</em>: Prioriser la valeur la plus fréquente."
             )
         )
         return combo
