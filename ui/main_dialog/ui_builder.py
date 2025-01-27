@@ -266,10 +266,10 @@ class UiBuilder(QObject):
     def add_linkage_to_ui(self, linkage):
         linkage_layout = QHBoxLayout()
 
-        label_text = self.tr(
+        label_text = (
             f"compositions: {linkage['compositions_attr']} -> "
             f"segments: {linkage['segments_attr']} "
-            f"(priorité: {linkage['priority_mode']})"
+            f"(priority: {linkage['priority_mode']})"
         )
 
         label = QLabel(label_text)

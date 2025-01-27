@@ -36,6 +36,7 @@ class RoutesComposerDialog(QDialog):
         super().__init__(parent)
         self.tool = tool
         self.setWindowTitle(self.tr("Compositeur de Routes"))
+
         self.ui = UiBuilder(self)
         self.info = InfoDialog(self)
         self.layer_manager = LayerManager(self)
@@ -43,6 +44,7 @@ class RoutesComposerDialog(QDialog):
         self.geometry_ops = GeometryOperations(self)
         self.advanced_options = AdvancedOptions(self)
         self.options = PluginOptionsWidget(self)
+
         self.translator = QTranslator()
 
         self.ui.init_ui()
