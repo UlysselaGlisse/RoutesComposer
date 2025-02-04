@@ -48,7 +48,6 @@ class SplitManager:
                     int(id.strip()) for id in str(segments_list_str).split(",")
                 ]
                 if int(segment_id) in segments_list_ids:
-                    log(f"Segment find in composition: {composition.id()}")
                     segments_lists_ids.append((composition.id(), segments_list_ids))
 
             except Exception as e:

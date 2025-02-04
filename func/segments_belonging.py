@@ -9,13 +9,13 @@ class SegmentsBelonging:
         self,
         segments_layer,
         compositions_layer,
-        id_column_name,
+        seg_id_column_name,
         segments_column_name,
         compo_id_column_name,
     ):
         self.segments_layer = segments_layer
         self.compositions_layer = compositions_layer
-        self.id_column_name = id_column_name
+        self.seg_id_column_name = seg_id_column_name
         self.segments_column_name = segments_column_name
         self.compo_id_column_name = compo_id_column_name
 
@@ -25,7 +25,7 @@ class SegmentsBelonging:
             compositions_layer=self.compositions_layer,
             segments_layer=self.segments_layer,
             segments_column_name=self.segments_column_name,
-            seg_id_column_name=self.id_column_name,
+            seg_id_column_name=self.seg_id_column_name,
             compo_id_column_name=self.compo_id_column_name,
         )
 
@@ -59,13 +59,13 @@ class SegmentsBelonging:
             attr_idx = self.segments_layer.fields().indexOf(self.belonging_column)
 
             if segments_to_update:
-                expr = f'"{self.id_column_name}" IN ({",".join(map(str, segments_to_update))})'
+                expr = f'"{self.seg_id_column_name}" IN ({",".join(map(str, segments_to_update))})'
                 request = QgsFeatureRequest().setFilterExpression(expr)
 
                 for segment in self.segments_layer.getFeatures(request):
                     appartenance_str = ",".join(
                         sorted(
-                            segments_appartenance.get(segment[self.id_column_name], [])
+                            segments_appartenance.get(segment[self.seg_id_column_name], [])
                         )
                     )
                     if segment.id() >= 0:

@@ -73,11 +73,11 @@ class RoutesComposer(QObject):
             return
 
         segment_id = int(source_feature.attributes()[self.id_column_index])
-        log(f"segment id: {segment_id}")
         if segment_id is None:
             return
 
         if self.split_manager.has_duplicate_segment_id(segment_id):
+            log(f"segment id: {segment_id}, has been duplicated")
             new_geometry = source_feature.geometry()
             if not new_geometry or new_geometry.isEmpty():
                 return
