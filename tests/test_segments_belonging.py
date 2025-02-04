@@ -65,39 +65,42 @@ class SegmentsBelonging:
     @timer_decorator
     def update_belonging_column(self, composition_id=None):
         try:
-            segments_to_update = set()
             segments_appartenance = (
                 self.segments_manager.create_segments_belonging_dictionary()
             )
 
             if composition_id:
+                segments_to_update = set()
+
                 segments = self.segments_manager.get_segments_for_composition(
                     composition_id
                 )
                 for segment in segments:
                     segments_to_update.add(segment)
+
+                if segments_to_update:
+                    expr = f'"{self.seg_id_column_name}" IN ({",".join(map(str, segments_to_update))})'
+                    request = QgsFeatureRequest().setFilterExpression(expr)
+
+                    features = self.segments_layer.getFeatures(request)
             else:
-                segments_to_update = list(segments_appartenance.keys())
+                features = self.segments_layer.getFeatures()
 
             updates = {}
             attr_idx = self.segments_layer.fields().indexOf(self.belonging_column)
 
-            if segments_to_update:
-                expr = f'"{self.seg_id_column_name}" IN ({",".join(map(str, segments_to_update))})'
-                request = QgsFeatureRequest().setFilterExpression(expr)
-
-                for segment in self.segments_layer.getFeatures(request):
-                    appartenance_str = ",".join(
-                        sorted(
-                            segments_appartenance.get(segment[self.id_column_name], [])
-                        )
+            for segment in features:
+                appartenance_str = ",".join(
+                    sorted(
+                        segments_appartenance.get(segment[self.seg_id_column_name], [])
                     )
-                    if segment.id() >= 0:
-                        updates[segment.id()] = {attr_idx: appartenance_str}
-                    else:
-                        self.segments_layer.changeAttributeValue(
-                            segment.id(), attr_idx, appartenance_str
-                        )
+                )
+                if segment.id() >= 0:
+                    updates[segment.id()] = {attr_idx: appartenance_str}
+                else:
+                    self.segments_layer.changeAttributeValue(
+                        segment.id(), attr_idx, appartenance_str
+                    )
 
             if updates:
                 self.segments_layer.dataProvider().changeAttributeValues(updates)
@@ -108,6 +111,7 @@ class SegmentsBelonging:
             self.segments_layer.rollBack()
             raise e
             return False
+
 
 
 class SegmentManager:
