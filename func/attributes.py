@@ -79,7 +79,6 @@ class AttributeLinker:
                         )
                     )
                     for segment_id, compositions in segments_list.items():
-                        print(segment_id, compositions)
                         if composition_id:
                             compositions = [
                                 comp
