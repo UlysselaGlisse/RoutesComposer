@@ -68,7 +68,12 @@ class SegmentsBelonging:
                             segments_appartenance.get(segment[self.id_column_name], [])
                         )
                     )
-                    updates[segment.id()] = {attr_idx: appartenance_str}
+                    if segment.id() >= 0:
+                        updates[segment.id()] = {attr_idx: appartenance_str}
+                    else:
+                        self.segments_layer.changeAttributeValue(
+                            segment.id(), attr_idx, appartenance_str
+                        )
 
             if updates:
                 self.segments_layer.dataProvider().changeAttributeValues(updates)

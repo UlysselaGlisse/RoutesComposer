@@ -127,9 +127,15 @@ class AttributeLinker:
                     feature_updates = {}
                     for segments_attr, values in self.segments_with_new_values.items():
                         if seg_id in values:
-                            feature_updates[attr_indices[segments_attr]] = values[
-                                seg_id
-                            ]
+                            if segment.id() >= 0:
+                                feature_updates[attr_indices[segments_attr]] = values[
+                                    seg_id
+                                ]
+                            else:
+                                self.segments_layer.changeAttributeValue(
+                                                        segment.id(), attr_indices[segments_attr], values[seg_id]
+                                                    )
+
                     if feature_updates:
                         updates[segment.id()] = feature_updates
 
@@ -137,8 +143,9 @@ class AttributeLinker:
                 self.segments_layer.dataProvider().changeAttributeValues(updates)
             return True
 
-        except Exception:
+        except Exception as e:
             self.segments_layer.rollBack()
+            raise e
             return False
 
     def _update_segment_value(self, values_dict, segment_id, new_value, priority_mode):
