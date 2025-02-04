@@ -57,6 +57,7 @@ class RoutesComposer(QObject):
         self.comp_feature_added_connected = False
         self.comp_feature_deleted_connected = False
         self.comp_attr_value_changed_connected = False
+        self.rollback_on_compo_connected = False
 
         self.is_splitting = False
 
@@ -272,6 +273,7 @@ class RoutesComposer(QObject):
             return
         log(f"Features removed from compositions: {fids}")
 
+
         if self.belonging_connected:
             self.belong = SegmentsBelonging(
                 self.segments_layer,
@@ -301,6 +303,9 @@ class RoutesComposer(QObject):
 
         self.segments_layer.reload()
 
+    # def rollback_on_compo(self):
+
+
     def connect_routes_composer(self):
         try:
             if self.segments_layer is not None and self.compositions_layer is not None:
@@ -327,6 +332,12 @@ class RoutesComposer(QObject):
                         self.feature_changed_on_compositions
                     )
                     self.comp_attr_value_changed_connected = True
+
+                # if not self.rollback_on_compo_connected:
+                #     self.compositions_layer.beforeRollBack.connect(
+                #         self.rollback_on_compo
+                #     )
+                #     self.rollback_on_compo_connected = True
 
                 self.routes_composer_connected = True
 
@@ -381,6 +392,15 @@ class RoutesComposer(QObject):
                         self.feature_changed_on_compositions
                     )
                     self.comp_attr_value_changed_connected = False
+
+                # if (
+                #     self.compositions_layer is not None
+                #     and self.rollback_on_compo_connected
+                # ):
+                #     self.compositions_layer.beforeRollBack.disconnect(
+                #         self.rollback_on_compo
+                #     )
+                #     self.rollback_on_compo_connected = False
 
                 self.routes_composer_connected = False
 
