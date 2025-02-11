@@ -9,7 +9,7 @@ from qgis.PyQt.QtWidgets import (
 from ... import config
 
 
-class PluginOptionsWidget(QDialog):
+class PluginOptions(QDialog):
     def __init__(self, iface, parent=None):
         super().__init__(parent)
 
@@ -43,7 +43,7 @@ class PluginOptionsWidget(QDialog):
         self.log_checkbox = QCheckBox(
             self.tr("Activer les logs dans la console python")
         )
-        self.log_checkbox.setChecked(True)
+        self.log_checkbox.setChecked(False)
         self.log_checkbox.stateChanged.connect(self.save_options)
 
         dev_layout.addWidget(self.log_checkbox)

@@ -44,6 +44,7 @@ class SegmentsBelonging:
             segments_appartenance = (
                 self.segments_manager.create_segments_belonging_dictionary()
             )
+            features = None
 
             if composition_id:
                 segments_to_update = set()
@@ -59,7 +60,8 @@ class SegmentsBelonging:
                     request = QgsFeatureRequest().setFilterExpression(expr)
 
                     features = self.segments_layer.getFeatures(request)
-            else:
+
+            if features is None:
                 features = self.segments_layer.getFeatures()
 
             updates = {}

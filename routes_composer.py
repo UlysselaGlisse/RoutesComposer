@@ -57,7 +57,6 @@ class RoutesComposer(QObject):
         self.comp_feature_added_connected = False
         self.comp_feature_deleted_connected = False
         self.comp_attr_value_changed_connected = False
-        self.rollback_on_compo_connected = False
 
         self.is_splitting = False
 
@@ -303,9 +302,6 @@ class RoutesComposer(QObject):
 
         self.segments_layer.reload()
 
-    # def rollback_on_compo(self):
-
-
     def connect_routes_composer(self):
         try:
             if self.segments_layer is not None and self.compositions_layer is not None:
@@ -332,12 +328,6 @@ class RoutesComposer(QObject):
                         self.feature_changed_on_compositions
                     )
                     self.comp_attr_value_changed_connected = True
-
-                # if not self.rollback_on_compo_connected:
-                #     self.compositions_layer.beforeRollBack.connect(
-                #         self.rollback_on_compo
-                #     )
-                #     self.rollback_on_compo_connected = True
 
                 self.routes_composer_connected = True
 
@@ -392,15 +382,6 @@ class RoutesComposer(QObject):
                         self.feature_changed_on_compositions
                     )
                     self.comp_attr_value_changed_connected = False
-
-                # if (
-                #     self.compositions_layer is not None
-                #     and self.rollback_on_compo_connected
-                # ):
-                #     self.compositions_layer.beforeRollBack.disconnect(
-                #         self.rollback_on_compo
-                #     )
-                #     self.rollback_on_compo_connected = False
 
                 self.routes_composer_connected = False
 
@@ -505,13 +486,13 @@ class RoutesComposer(QObject):
     def disconnect_belonging(self):
         try:
             if self.segments_layer is not None and self.compositions_layer is not None:
-                if self.comp_feature_added_connected:
+                if self.comp_feature_added_connected and not self.routes_composer_connected:
                     self.compositions_layer.featureAdded.disconnect(
                         self.feature_added_on_compositions
                     )
                     self.comp_feature_added_connected = False
 
-                if self.comp_attr_value_changed_connected:
+                if self.comp_attr_value_changed_connected and not self.routes_composer_connected:
                     self.compositions_layer.attributeValueChanged.disconnect(
                         self.feature_changed_on_compositions
                     )

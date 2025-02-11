@@ -13,7 +13,7 @@ from .event_handlers import EventHandlers
 from .geometry_operations import GeometryOperations
 from .info_dialog import InfoDialog
 from .layer_management import LayerManager
-from .options import PluginOptionsWidget
+from .options import PluginOptions
 from .ui_builder import UiBuilder
 
 
@@ -43,7 +43,7 @@ class RoutesComposerDialog(QDialog):
         self.event_handlers = EventHandlers(self)
         self.geometry_ops = GeometryOperations(self)
         self.advanced_options = AdvancedOptions(self)
-        self.options = PluginOptionsWidget(self)
+        self.options = PluginOptions(self)
 
         self.translator = QTranslator()
 

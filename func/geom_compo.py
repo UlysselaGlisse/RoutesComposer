@@ -56,7 +56,11 @@ class GeomCompo:
         segments_points = {}
         expr = f"{self.id_column_name} IN ({','.join(map(str, needed_segments))})"
         for segment in self.segments_layer.getFeatures(expr):
-            points = segment.geometry().asPolyline()
+            geometry = segment.geometry()
+            if not geometry or geometry.isEmpty():
+                continue
+
+            points = geometry.asPolyline()
             if points:
                 segments_points[segment[self.id_column_name]] = points
 

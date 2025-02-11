@@ -5,11 +5,13 @@ from qgis.core import QgsProject, QgsVectorLayer
 from qgis.PyQt.QtCore import QCoreApplication, QSettings, QTimer, QTranslator
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
+from qgis.gui import Options
 
 from .connexions_handler import ConnexionsHandler
 from .func.list_constructor import IDsBasket
 from .func.utils import log
 from .ui.main_dialog.main import RoutesComposerDialog
+from .ui.main_dialog.options import PluginOptions
 
 
 class RoutesComposerTool:
@@ -64,6 +66,8 @@ class RoutesComposerTool:
         self.ids_basket_action.triggered.connect(self.toggle_ids_basket)
         self.toolbar.addAction(self.ids_basket_action)
         self.actions.append(self.ids_basket_action)
+        options = PluginOptions(self.iface)
+        options.load_options()
 
     def on_project_load(self):
         project = QgsProject.instance()
