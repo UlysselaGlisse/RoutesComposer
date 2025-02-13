@@ -2,7 +2,7 @@ from collections import Counter
 
 from qgis.core import QgsFeatureRequest
 
-from .utils import SegmentManager
+from .utils import LayersAssociationManager
 
 
 class AttributeLinker:
@@ -20,7 +20,7 @@ class AttributeLinker:
         self.segments_column_name = segments_column_name
         self.linkages = linkages
 
-        self.segments_manager = SegmentManager(
+        self.segments_manager = LayersAssociationManager(
             compositions_layer=self.compositions_layer,
             segments_layer=self.segments_layer,
             segments_column_name=self.segments_column_name,

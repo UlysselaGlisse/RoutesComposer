@@ -17,47 +17,6 @@ class SplitManager:
     def __init__(self, routes_composer):
         self.routes_composer = routes_composer
 
-    def get_compositions_list_segments(self, segment_id: int) -> list:
-        """Récupère toutes les listes de segments contenant l'id du segment divisé."""
-        if not segment_id:
-            return []
-
-        segments_lists_ids = []
-
-        request = QgsFeatureRequest()
-        expression = (
-            f"{self.routes_composer.segments_column_name} LIKE '%,{segment_id},%' OR "
-            f"{self.routes_composer.segments_column_name} LIKE '{segment_id},%' OR "
-            f"{self.routes_composer.segments_column_name} LIKE '%,{segment_id}' OR "
-            f"{self.routes_composer.segments_column_name} = '{segment_id}'"
-        )
-        request.setFilterExpression(expression)
-
-        compositions = get_features_list(
-            self.routes_composer.compositions_layer, request
-        )
-
-        for composition in compositions:
-            segments_list_str = composition[self.routes_composer.segments_column_name]
-
-            if not segments_list_str:
-                continue
-
-            try:
-                segments_list_ids = [
-                    int(id.strip()) for id in str(segments_list_str).split(",")
-                ]
-                if int(segment_id) in segments_list_ids:
-                    segments_lists_ids.append((composition.id(), segments_list_ids))
-
-            except Exception as e:
-                log(
-                    f"Erreur lors du traitement de la composition {composition.id()}: {str(e)}",
-                    level="WARNING",
-                )
-
-        return segments_lists_ids
-
     def update_compositions_segments(
         self,
         fid: int,
@@ -139,7 +98,7 @@ class SplitManager:
 
         adjacent_feature = next(
             self.routes_composer.segments_layer.getFeatures(
-                f"{self.routes_composer.id_column_name} = {adjacent_id}"
+                f"{self.routes_composer.seg_id_column_name} = {adjacent_id}"
             ),
             None,
         )
@@ -178,7 +137,7 @@ class SplitManager:
                         new_segments_str,
                     )
                     log(
-                        f"Composition {composition.id()} has been updated with segments: '{new_segments_str}'"
+                        f"Composition {composition.id()} (data provider) has been updated with segments: '{new_segments_str}'"
                     )
 
                 except Exception as e:
@@ -200,7 +159,7 @@ class SplitManager:
     def clean_invalid_segments(self) -> None:
         """Supprime les références aux segments qui n'existent plus dans la table segments."""
         valid_segments_ids = {
-            str(f[self.routes_composer.id_column_name])
+            str(f[self.routes_composer.seg_id_column_name])
             for f in get_features_list(self.routes_composer.segments_layer)
             if f.id() is not None
         }
@@ -236,7 +195,7 @@ class SplitManager:
 
     def has_duplicate_segment_id(self, segment_id: int) -> bool:
         """Vérifie si un id de segments existe plusieurs fois. Si oui, il s'agit d'un segment divisé."""
-        expression = f"{self.routes_composer.id_column_name} = '{segment_id}'"
+        expression = f"{self.routes_composer.seg_id_column_name} = '{segment_id}'"
         request = QgsFeatureRequest().setFilterExpression(expression)
         request.setLimit(2)
 

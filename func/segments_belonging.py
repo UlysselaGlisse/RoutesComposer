@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsFeatureRequest, QgsField
 
-from .utils import SegmentManager
+from .utils import LayersAssociationManager
 
 
 class SegmentsBelonging:
@@ -21,7 +21,7 @@ class SegmentsBelonging:
 
         self.belonging_column = "compositions"
 
-        self.segments_manager = SegmentManager(
+        self.segments_manager = LayersAssociationManager(
             compositions_layer=self.compositions_layer,
             segments_layer=self.segments_layer,
             segments_column_name=self.segments_column_name,

@@ -89,7 +89,7 @@ def log(message: str, level: str = "INFO"):
             logging.info(log_message)
 
 
-class SegmentManager:
+class LayersAssociationManager:
     def __init__(
         self,
         compositions_layer,
@@ -199,6 +199,36 @@ class SegmentManager:
             compositions_list.append(comp_id)
 
         return compositions_list
+
+    def get_compositions_list_segments(self, segment_id: int) -> list:
+        """
+        Récupère toutes les listes de segments contenant l'id du segment.
+        Return:
+        [(comp_id, [seg_id, seg_id]), (comp_id, [seg_id])]
+        """
+        if not segment_id:
+            return []
+
+        segments_lists_ids = []
+        request = (
+            f"{self.segments_column_name} LIKE '%,{segment_id},%' OR "
+            f"{self.segments_column_name} LIKE '{segment_id},%' OR "
+            f"{self.segments_column_name} LIKE '%,{segment_id}' OR "
+            f"{self.segments_column_name} = '{segment_id}'"
+        )
+        for composition in self.compositions_layer.getFeatures(request):
+            segments_list_str = composition[self.segments_column_name]
+
+            if segments_list_str:
+                segments_list_ids = [
+                    int(id_str)
+                    for id_str in segments_list_str.split(",")
+                    if id_str.strip().isdigit()
+                ]
+                if int(segment_id) in segments_list_ids:
+                    segments_lists_ids.append((composition.id(), segments_list_ids))
+
+        return segments_lists_ids
 
     def get_segments_for_composition(self, composition_id: int) -> list:
         segments_list = []

@@ -7,7 +7,7 @@ from .func.attributes import AttributeLinker
 from .func.geom_compo import GeomCompo
 from .func.segments_belonging import SegmentsBelonging
 from .func.split import SplitManager
-from .func.utils import log
+from .func.utils import LayersAssociationManager, log, timer_decorator
 
 
 class RoutesComposer(QObject):
@@ -35,13 +35,18 @@ class RoutesComposer(QObject):
         self.segments_column_name, self.segments_column_index = (
             self.get_segments_column_name()
         )
-        self.id_column_name, self.id_column_index = self.get_id_column_name()
+        self.seg_id_column_name, self.id_column_index = self.get_id_column_name()
 
+        self.segment_manager = LayersAssociationManager(
+            self.compositions_layer,
+            self.segments_layer,
+            self.segments_column_name,
+            self.seg_id_column_name)
         self.split_manager = SplitManager(self)
         self.geom = GeomCompo(
             self.segments_layer,
             self.compositions_layer,
-            self.id_column_name,
+            self.seg_id_column_name,
             self.segments_column_name,
         )
 
@@ -60,6 +65,7 @@ class RoutesComposer(QObject):
 
         self.is_splitting = False
 
+    @timer_decorator
     def feature_added_on_segments(self, feature_id):
         """Traite l'ajout d'une nouvelle entité dans la couche segments."""
         # Pendant l'enregistrement: fid >= 0.'
@@ -84,13 +90,13 @@ class RoutesComposer(QObject):
 
             original_feature = next(
                 self.segments_layer.getFeatures(
-                    f"{self.id_column_name} = {segment_id}"
+                    f"{self.seg_id_column_name} = {segment_id}"
                 ),
                 None,
             )
 
             if original_feature:
-                segments_lists_ids = self.split_manager.get_compositions_list_segments(
+                segments_lists_ids = self.segment_manager.get_compositions_list_segments(
                     segment_id
                 )
                 next_id = self.split_manager.get_next_id()
@@ -116,7 +122,8 @@ class RoutesComposer(QObject):
 
         self.split_manager.clean_invalid_segments()
 
-    def geometry_changed_on_segments(self, fid):
+    @timer_decorator
+    def geometry_changed_on_segments(self, fid, geometry=None):
         log(fid)
         """Crée la géométrie des compositions lors du changement de la géométrie d'un segment"""
         if self.segments_layer is None or self.compositions_layer is None:
@@ -171,7 +178,7 @@ class RoutesComposer(QObject):
             self.belong = SegmentsBelonging(
                 self.segments_layer,
                 self.compositions_layer,
-                self.id_column_name,
+                self.seg_id_column_name,
                 self.segments_column_name,
                 compo_id_column_name=compo_id_column_name,
             )
@@ -187,7 +194,7 @@ class RoutesComposer(QObject):
             attribute_linker = AttributeLinker(
                 self.segments_layer,
                 self.compositions_layer,
-                self.id_column_name,
+                self.seg_id_column_name,
                 self.segments_column_name,
                 saved_linkages,
             )
@@ -238,7 +245,7 @@ class RoutesComposer(QObject):
                 self.belong = SegmentsBelonging(
                     self.segments_layer,
                     self.compositions_layer,
-                    self.id_column_name,
+                    self.seg_id_column_name,
                     self.segments_column_name,
                     compo_id_column_name=compo_id_column_name,
                 )
@@ -256,7 +263,7 @@ class RoutesComposer(QObject):
                     attribute_linker = AttributeLinker(
                         self.segments_layer,
                         self.compositions_layer,
-                        self.id_column_name,
+                        self.seg_id_column_name,
                         self.segments_column_name,
                         saved_linkages if len(saved_linkages) > 1 else [linkage],
                     )
@@ -277,7 +284,7 @@ class RoutesComposer(QObject):
             self.belong = SegmentsBelonging(
                 self.segments_layer,
                 self.compositions_layer,
-                self.id_column_name,
+                self.seg_id_column_name,
                 self.segments_column_name,
                 compo_id_column_name=self.settings.value(
                     "routes_composer/compo_id_column_name", "id"
@@ -293,7 +300,7 @@ class RoutesComposer(QObject):
             attribute_linker = AttributeLinker(
                 self.segments_layer,
                 self.compositions_layer,
-                self.id_column_name,
+                self.seg_id_column_name,
                 self.segments_column_name,
                 saved_linkages,
             )
@@ -593,21 +600,21 @@ class RoutesComposer(QObject):
         return self.segments_column_name, self.segments_column_index
 
     def get_id_column_name(self):
-        self.id_column_name = self.settings.value(
+        self.seg_id_column_name = self.settings.value(
             "routes_composer/seg_id_column_name", "id"
         )
         if self.segments_layer is not None:
             self.id_column_index = self.segments_layer.fields().indexOf(
-                self.id_column_name
+                self.seg_id_column_name
             )
         if self.id_column_index == -1:
             raise Exception(
                 self.tr(
-                    f"Le champ {self.id_column_name} n'a pas été trouvé dans la couche segments",
+                    f"Le champ {self.seg_id_column_name} n'a pas été trouvé dans la couche segments",
                 )
             )
 
-        return self.id_column_name, self.id_column_index
+        return self.seg_id_column_name, self.id_column_index
 
     def on_layer_removed(self, layer_ids):
         if self.routes_composer_connected:

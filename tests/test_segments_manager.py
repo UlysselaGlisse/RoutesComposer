@@ -1,7 +1,7 @@
 import time
 from functools import wraps
 
-from qgis.core import QgsProject
+from qgis.core import QgsFeatureRequest, QgsProject
 
 # exécuter le fichier dans la console python.
 # dans la console, par exemple:  manager.get_seg_for_comp(1)
@@ -19,6 +19,24 @@ def timer_decorator(func):
         return result
 
     return wrapper
+
+def get_features_list(layer, request=None, return_as="list"):
+    """Retourne une liste ou un set d'entités."""
+    features = []
+    if request:
+        iterator = layer.getFeatures(request)
+    else:
+        iterator = layer.getFeatures()
+
+    feature = next(iterator, None)
+    while feature:
+        features.append(feature)
+        feature = next(iterator, None)
+
+    if return_as == "set":
+        return set(features)
+
+    return features
 
 
 class CompSeg:
@@ -167,6 +185,33 @@ class CompSeg:
             if segment_id in segments:
                 compositions.append(composition_id)
         return compositions
+
+    @timer_decorator
+    def get_compositions_list_segments(self, segment_id: int) -> list:
+        """Récupère toutes les listes de segments contenant l'id du segment."""
+        if not segment_id:
+            return []
+
+        segments_lists_ids = []
+        request = (
+            f"{self.segments_column_name} LIKE '%,{segment_id},%' OR "
+            f"{self.segments_column_name} LIKE '{segment_id},%' OR "
+            f"{self.segments_column_name} LIKE '%,{segment_id}' OR "
+            f"{self.segments_column_name} = '{segment_id}'"
+        )
+        for composition in self.compositions_layer.getFeatures(request):
+            segments_list_str = composition[self.segments_column_name]
+
+            if segments_list_str:
+                segments_list_ids = [
+                    int(id_str)
+                    for id_str in segments_list_str.split(",")
+                    if id_str.strip().isdigit()
+                ]
+                if int(segment_id) in segments_list_ids:
+                    segments_lists_ids.append((composition.id(), segments_list_ids))
+
+        return segments_lists_ids
 
 
 manager = CompSeg()

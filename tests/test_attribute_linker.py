@@ -52,7 +52,7 @@ class AttributeLinker:
             # },
         ]
 
-        self.segments_manager = SegmentManager(
+        self.segments_manager = LayersAssociationManager(
             compositions_layer=self.compositions_layer,
             segments_layer=self.segments_layer,
             segments_column_name=self.segments_column_name,
@@ -207,7 +207,7 @@ class AttributeLinker:
 
 
 
-class SegmentManager:
+class LayersAssociationManager:
     def __init__(
         self,
         compositions_layer,
