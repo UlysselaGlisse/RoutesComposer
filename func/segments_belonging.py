@@ -40,6 +40,8 @@ class SegmentsBelonging:
             return
 
     def update_belonging_column(self, composition_id=None):
+        self.segments_layer.startEditing()
+
         try:
             segments_belonging = (
                 self.segments_manager.create_segments_belonging_dictionary()
@@ -49,8 +51,10 @@ class SegmentsBelonging:
             if composition_id:
                 segments_to_update = set()
 
-                segments_list = self.segments_manager.get_segments_list_for_composition(
-                    composition_id
+                segments_list = (
+                    self.segments_manager.get_segments_list_for_composition(
+                        composition_id
+                    )
                 )
                 if segments_list:
                     for segment in segments_list:
@@ -66,12 +70,16 @@ class SegmentsBelonging:
                 features = self.segments_layer.getFeatures()
 
             updates = {}
-            attr_idx = self.segments_layer.fields().indexOf(self.belonging_column)
+            attr_idx = self.segments_layer.fields().indexOf(
+                self.belonging_column
+            )
 
             for segment in features:
                 appartenance_str = ",".join(
                     sorted(
-                        segments_belonging.get(segment[self.seg_id_column_name], [])
+                        segments_belonging.get(
+                            segment[self.seg_id_column_name], []
+                        )
                     )
                 )
                 if segment.id() >= 0:
@@ -82,7 +90,9 @@ class SegmentsBelonging:
                     )
 
             if updates:
-                self.segments_layer.dataProvider().changeAttributeValues(updates)
+                self.segments_layer.dataProvider().changeAttributeValues(
+                    updates
+                )
 
             return True
 

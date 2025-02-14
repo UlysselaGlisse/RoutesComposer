@@ -44,10 +44,8 @@ class AttributeLinker:
                 for linkage in self.linkages
             }
 
-            self.segments_list = (
-                self.segments_manager.create_segments_list_and_values_dictionary(
-                    compositions_attrs
-                )
+            self.segments_list = self.segments_manager.create_segments_list_and_values_dictionary(
+                compositions_attrs
             )
 
             if composition_id:
@@ -58,8 +56,10 @@ class AttributeLinker:
                 if segments:
                     for segment in segments:
                         segment = int(segment)
-                        compos = self.segments_manager.get_compositions_for_segment(
-                            segment
+                        compos = (
+                            self.segments_manager.get_compositions_for_segment(
+                                segment
+                            )
                         )
                         compositions_to_process.extend(compos)
 
@@ -73,10 +73,8 @@ class AttributeLinker:
                 priority_mode = linkage["priority_mode"]
 
                 if priority_mode == "most_frequent":
-                    segments_list = (
-                        self.segments_manager.create_values_of_compositions_for_each_segment_dictionary(
-                            compositions_attrs
-                        )
+                    segments_list = self.segments_manager.create_values_of_compositions_for_each_segment_dictionary(
+                        compositions_attrs
                     )
                     for segment_id, compositions in segments_list.items():
                         if composition_id:
@@ -95,9 +93,9 @@ class AttributeLinker:
                         counter = Counter(attribute_values)
                         most_common = counter.most_common(1)[0][0]
                         if most_common:
-                            self.segments_with_new_values[segments_attr][segment_id] = (
-                                most_common
-                            )
+                            self.segments_with_new_values[segments_attr][
+                                segment_id
+                            ] = most_common
 
                 else:
                     for comp_id in compositions_to_process:
@@ -125,22 +123,30 @@ class AttributeLinker:
                     seg_id = segment[self.seg_id_column_name]
 
                     feature_updates = {}
-                    for segments_attr, values in self.segments_with_new_values.items():
+                    for (
+                        segments_attr,
+                        values,
+                    ) in self.segments_with_new_values.items():
                         if seg_id in values:
                             if segment.id() >= 0:
-                                feature_updates[attr_indices[segments_attr]] = values[
-                                    seg_id
-                                ]
+                                feature_updates[attr_indices[segments_attr]] = (
+                                    values[seg_id]
+                                )
                             else:
                                 self.segments_layer.changeAttributeValue(
-                                                        segment.id(), attr_indices[segments_attr], values[seg_id]
-                                                    )
+                                    segment.id(),
+                                    attr_indices[segments_attr],
+                                    values[seg_id],
+                                )
 
                     if feature_updates:
                         updates[segment.id()] = feature_updates
 
             if updates:
-                self.segments_layer.dataProvider().changeAttributeValues(updates)
+                self.segments_layer.startEditing()
+                self.segments_layer.dataProvider().changeAttributeValues(
+                    updates
+                )
             return True
 
         except Exception as e:
@@ -148,7 +154,9 @@ class AttributeLinker:
             raise e
             return False
 
-    def _update_segment_value(self, values_dict, segment_id, new_value, priority_mode):
+    def _update_segment_value(
+        self, values_dict, segment_id, new_value, priority_mode
+    ):
         if priority_mode == "none":
             values_dict[segment_id] = new_value
 
@@ -161,9 +169,13 @@ class AttributeLinker:
 
             if priority_mode == "min_value":
                 values_dict[segment_id] = (
-                    new_value if value_num < current_value_num else current_value
+                    new_value
+                    if value_num < current_value_num
+                    else current_value
                 )
             elif priority_mode == "max_value":
                 values_dict[segment_id] = (
-                    new_value if value_num > current_value_num else current_value
+                    new_value
+                    if value_num > current_value_num
+                    else current_value
                 )

@@ -61,20 +61,24 @@ def print_geometry_info(geometry, label):
     """
     )
 
+
 def get_comp_id_column_name():
     settings = QSettings()
-    comp_id_column_name = (
-        settings.value("routes_composer/compo_id_column_name", "id")
+    comp_id_column_name = settings.value(
+        "routes_composer/compo_id_column_name", "id"
     )
     if comp_id_column_name:
         return comp_id_column_name
     else:
         return ""
 
+
 def log(message: str, level: str = "INFO"):
     """Fonction pour gérer l'affichage des logs"""
     if config.logging_enabled is True:
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[
+            :-3
+        ]
 
         current_frame = inspect.currentframe()
 
@@ -138,10 +142,12 @@ class LayersAssociationManager:
                             ...
                         }
                     }
-            """
+        """
         for composition in self.compositions_layer.getFeatures():
             compo_id = composition[self.compo_id_column_name]
-            segments_list = self.convert_segments_list(composition[self.segments_column_name])
+            segments_list = self.convert_segments_list(
+                composition[self.segments_column_name]
+            )
 
             if fields:
                 composition_data = {"segments": segments_list}
@@ -164,8 +170,10 @@ class LayersAssociationManager:
         self.segment_belonging = {}
 
         for composition in self.compositions_layer.getFeatures():
-            comp_id = composition[self.compo_id_column_name]
-            segments_list = self.convert_segments_list(composition[self.segments_column_name])
+            comp_id = int(composition[self.compo_id_column_name])
+            segments_list = self.convert_segments_list(
+                composition[self.segments_column_name]
+            )
 
             for seg_id in segments_list:
                 if seg_id not in self.segment_belonging:
@@ -277,7 +285,9 @@ class LayersAssociationManager:
             f"{self.segments_column_name} = '{segment_id}'"
         )
         for composition in self.compositions_layer.getFeatures(request):
-            segments_list = self.convert_segments_list(composition[self.segments_column_name])
+            segments_list = self.convert_segments_list(
+                composition[self.segments_column_name]
+            )
             if int(segment_id) in segments_list:
                 segments_lists_ids.append((composition.id(), segments_list))
 
@@ -298,7 +308,6 @@ class LayersAssociationManager:
             segments_list_str = composition[self.segments_column_name]
 
             return self.convert_segments_list(segments_list_str)
-
 
     def convert_segments_list(self, segments_list_str):
         """

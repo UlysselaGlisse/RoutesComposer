@@ -28,8 +28,8 @@ class SegmentsBelonging:
         project = QgsProject.instance()
         if not project:
             return
-        segments_layer = project.mapLayersByName("segments")[0]
-        compositions_layer = project.mapLayersByName("compositions")[0]
+        segments_layer = project.mapLayersByName("seg")[0]
+        compositions_layer = project.mapLayersByName("comp")[0]
         segments_column_name = "segments"
         seg_id_column_name = "id"
         compo_id_column_name = "id"
@@ -54,44 +54,60 @@ class SegmentsBelonging:
     def create_belonging_column(self):
         fields = self.segments_layer.fields()
         if self.belonging_column not in fields.names():
-            # Création du champ s'il n'existe pas
-            field = QgsField(self.belonging_column, QVariant.String)
-            self.segments_layer.dataProvider().addAttributes([field])
+            self.segments_layer.dataProvider().addAttributes([
+                QgsField(self.belonging_column, QVariant.String)
+            ])
             self.segments_layer.updateFields()
-            return True
         else:
-            return False
+            return
 
     @timer_decorator
     def update_belonging_column(self, composition_id=None):
+        if self.segments_layer is None:
+            print("problème avec les couches")
+        print(self.segments_layer.name())
         try:
             segments_belonging = (
                 self.segments_manager.create_segments_belonging_dictionary()
             )
-            print(segments_belonging)
+            features = None
+
             if composition_id:
                 segments_to_update = set()
 
-                segments = self.segments_manager.get_segments_list_for_composition(
-                    composition_id
+                segments_list = (
+                    self.segments_manager.get_segments_list_for_composition(
+                        composition_id
+                    )
                 )
-                for segment in segments:
-                    segments_to_update.add(segment)
+                if segments_list:
+                    for segment in segments_list:
+                        segments_to_update.add(segment)
 
-                if segments_to_update:
-                    expr = f'"{self.seg_id_column_name}" IN ({",".join(map(str, segments_to_update))})'
-                    request = QgsFeatureRequest().setFilterExpression(expr)
+                    if segments_to_update:
+                        expr = f'"{self.seg_id_column_name}" IN ({",".join(map(str, segments_to_update))})'
+                        request = QgsFeatureRequest().setFilterExpression(expr)
 
-                    features = self.segments_layer.getFeatures(request)
-            else:
+                        features = self.segments_layer.getFeatures(request)
+
+            if features is None:
                 features = self.segments_layer.getFeatures()
 
             updates = {}
-            attr_idx = self.segments_layer.fields().indexOf(self.belonging_column)
+            attr_idx = self.segments_layer.fields().indexOf(
+                self.belonging_column
+            )
+            self.segments_layer.startEditing()
+            self.segments_layer.beginEditCommand("edit")
 
             for segment in features:
-                appartenance_str = sorted(segments_belonging.get(segment[self.seg_id_column_name], []))
-                print(appartenance_str)
+                appartenance_str = ",".join(
+                    sorted(
+                        segments_belonging.get(
+                            segment[self.seg_id_column_name], []
+                        )
+                    )
+                )
 
                 if segment.id() >= 0:
                     updates[segment.id()] = {attr_idx: appartenance_str}
@@ -101,7 +117,10 @@ class SegmentsBelonging:
                     )
 
             if updates:
-                self.segments_layer.dataProvider().changeAttributeValues(updates)
+                self.segments_layer.dataProvider().changeAttributeValues(
+                    updates
+                )
+                self.segments_layer.commitChanges()
 
             return True
 
@@ -109,7 +128,6 @@ class SegmentsBelonging:
             self.segments_layer.rollBack()
             raise e
             return False
-
 
 
 class LayersAssociationManager:
@@ -129,7 +147,6 @@ class LayersAssociationManager:
 
         self.segments_list = {}
 
-    @timer_decorator
     def create_segments_list_and_values_dictionary(self, fields=None):
         """
         Crée un dictionnaire des compositions avec la liste des segments, et possiblement la valeur d'un ou plusieurs champs.
@@ -151,10 +168,12 @@ class LayersAssociationManager:
                             ...
                         }
                     }
-            """
+        """
         for composition in self.compositions_layer.getFeatures():
             compo_id = composition[self.compo_id_column_name]
-            segments_list = self.convert_segments_list(composition[self.segments_column_name])
+            segments_list = self.convert_segments_list(
+                composition[self.segments_column_name]
+            )
 
             if fields:
                 composition_data = {"segments": segments_list}
@@ -167,7 +186,6 @@ class LayersAssociationManager:
 
         return self.segments_list
 
-    @timer_decorator
     def create_segments_belonging_dictionary(self):
         """
         Crée un dictionnaire des segments avec la liste des compositions auxquelles ils appartiennent.
@@ -178,14 +196,16 @@ class LayersAssociationManager:
         self.segment_belonging = {}
 
         for composition in self.compositions_layer.getFeatures():
-            comp_id = composition[self.compo_id_column_name]
-            segments_list = self.convert_segments_list(composition[self.segments_column_name])
+            comp_id = int(composition[self.compo_id_column_name])
+            segments_list = self.convert_segments_list(
+                composition[self.segments_column_name]
+            )
 
             for seg_id in segments_list:
                 if seg_id not in self.segment_belonging:
                     self.segment_belonging[seg_id] = []
 
-                self.segment_belonging[seg_id].append(comp_id)
+                self.segment_belonging[seg_id].append(str(comp_id))
 
         return self.segment_belonging
 
@@ -245,7 +265,7 @@ class LayersAssociationManager:
 
         return compositions_by_segment
 
-    def get_compositions_for_segment(self, segment_id):
+    def get_compositions_for_segment(self, segment_id, get_feature="no"):
         """
         Retourne la liste des compositions auxquelles un segment appartient.
 
@@ -264,12 +284,14 @@ class LayersAssociationManager:
             f"{self.segments_column_name} = '{segment_id}'"
         )
         for composition in self.compositions_layer.getFeatures(request):
-            comp_id = int(composition[self.compo_id_column_name])
-            compositions_list.append(comp_id)
+            if get_feature == "yes":
+                compositions_list.append(composition)
+            else:
+                comp_id = int(composition[self.compo_id_column_name])
+                compositions_list.append(comp_id)
 
         return compositions_list
 
-    @timer_decorator
     def get_segments_list_for_segment(self, segment_id):
         """
         Récupère les listes de segments contenant l'id du segment.
@@ -289,13 +311,14 @@ class LayersAssociationManager:
             f"{self.segments_column_name} = '{segment_id}'"
         )
         for composition in self.compositions_layer.getFeatures(request):
-            segments_list = self.convert_segments_list(composition[self.segments_column_name])
+            segments_list = self.convert_segments_list(
+                composition[self.segments_column_name]
+            )
             if int(segment_id) in segments_list:
                 segments_lists_ids.append((composition.id(), segments_list))
 
         return segments_lists_ids
 
-    @timer_decorator
     def get_segments_list_for_composition(self, composition_id):
         """
         Retourne la liste de segments d'une composition

@@ -65,7 +65,10 @@ class EventHandlers(QObject):
             project.setDirty(True)
             geom_on_fly = bool(state)
 
-            if geom_on_fly and self.dialog.layer_manager.check_layers_and_columns():
+            if (
+                geom_on_fly
+                and self.dialog.layer_manager.check_layers_and_columns()
+            ):
                 self.dialog.layer_manager.save_selected_layers_and_columns()
                 self.connexions_handler.connect_geom_on_fly()
 
@@ -79,7 +82,10 @@ class EventHandlers(QObject):
             project.setDirty(True)
             belonging = bool(state)
 
-            if belonging and self.dialog.layer_manager.check_layers_and_columns():
+            if (
+                belonging
+                and self.dialog.layer_manager.check_layers_and_columns()
+            ):
                 self.connexions_handler.connect_belonging()
             elif not belonging:
                 self.connexions_handler.disconnect_belonging()
@@ -107,7 +113,9 @@ class EventHandlers(QObject):
             return
 
         settings = QSettings()
-        linkages = settings.value("routes_composer/attribute_linkages", []) or []
+        linkages = (
+            settings.value("routes_composer/attribute_linkages", []) or []
+        )
 
         new_linkage = {
             "compositions_attr": compositions_attr,

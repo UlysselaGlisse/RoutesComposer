@@ -25,7 +25,7 @@ class SplitManager:
         new_id: int,
         original_feature: QgsFeature,
         new_feature: QgsFeature,
-        segment_lists_ids: list
+        segment_lists_ids: list,
     ) -> None:
         """Met à jour les compositions après division d'un segment."""
 
@@ -53,25 +53,36 @@ class SplitManager:
 
                     new_segments_list = segments_list.copy()
                     if is_correctly_oriented:
-                        new_segments_list[old_index:old_index + 1] = [int(old_id), int(new_id)]
+                        new_segments_list[old_index : old_index + 1] = [
+                            int(old_id),
+                            int(new_id),
+                        ]
                     else:
-                        new_segments_list[old_index:old_index + 1] = [int(new_id), int(old_id)]
+                        new_segments_list[old_index : old_index + 1] = [
+                            int(new_id),
+                            int(old_id),
+                        ]
+
+                    new_segments_list = ",".join(map(str, new_segments_list))
 
                     if composition_id >= 0:
                         updates[composition_id] = {
-                            self.rc.segments_column_index: ",".join(map(str, new_segments_list))
+                            self.rc.segments_column_index: new_segments_list
                         }
                     else:
                         self.rc.compositions_layer.changeAttributeValue(
-                            composition_id, self.rc.segments_column_index, ",".join(map(str, new_segments_list))
+                            composition_id,
+                            self.rc.segments_column_index,
+                            new_segments_list,
                         )
                 else:
                     self.process_single_segment_composition(fid, old_id, new_id)
 
-
             if updates:
-                self.rc.compositions_layer.dataProvider().changeAttributeValues(updates)
-                self.rc.compositions_layer.reload()
+                self.rc.compositions_layer.dataProvider().changeAttributeValues(
+                    updates
+                )
+            self.rc.compositions_layer.reload()
 
         except Exception as e:
             raise Exception(
@@ -109,7 +120,9 @@ class SplitManager:
 
         return True
 
-    def process_single_segment_composition(self, fid: int, old_id: int, new_id: int):
+    def process_single_segment_composition(
+        self, fid: int, old_id: int, new_id: int
+    ):
         """Gère le cas d'une composition d'un seul segment."""
 
         dialog = SingleSegmentDialog(old_id=old_id, new_id=new_id)
@@ -126,7 +139,9 @@ class SplitManager:
 
             if composition:
                 try:
-                    new_segments_str = ",".join(map(str, dialog.current_segments))
+                    new_segments_str = ",".join(
+                        map(str, dialog.current_segments)
+                    )
                     self.rc.compositions_layer.startEditing()
                     self.rc.compositions_layer.changeAttributeValue(
                         composition.id(),
@@ -163,15 +178,15 @@ class SplitManager:
 
         self.rc.compositions_layer.startEditing()
         for composition in self.rc.compositions_layer.getFeatures():
-            segments_list = self.rc.lam.convert_segments_list(composition[self.rc.segments_column_name])
+            segments_list = self.rc.lam.convert_segments_list(
+                composition[self.rc.segments_column_name]
+            )
             valid_segments = [
-                seg
-                for seg in segments_list
-                if seg in valid_segments_ids
+                seg for seg in segments_list if seg in valid_segments_ids
             ]
 
             if len(valid_segments) != len(segments_list):
-                new_segments_str = ",".join(map(str,valid_segments))
+                new_segments_str = ",".join(map(str, valid_segments))
                 log(
                     f"Removing segments {[seg for seg in segments_list if seg not in valid_segments_ids]} from composition {composition.id()}"
                 )
@@ -201,8 +216,6 @@ class SplitManager:
 
     def get_next_id(self) -> int:
         next_id = int(
-            self.rc.segments_layer.maximumValue(
-                self.rc.id_column_index
-            )
+            self.rc.segments_layer.maximumValue(self.rc.id_column_index)
         )
         return next_id + 1

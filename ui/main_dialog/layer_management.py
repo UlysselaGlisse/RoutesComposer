@@ -94,9 +94,13 @@ class LayerManager(QObject):
                 seg_id_column_name
             )
             if seg_id_column_idx >= 0:
-                self.dialog.ui.seg_id_column_combo.setCurrentIndex(seg_id_column_idx)
+                self.dialog.ui.seg_id_column_combo.setCurrentIndex(
+                    seg_id_column_idx
+                )
             else:
-                seg_id_pattern = re.compile(r"^id?s?[_]|[_]?id?s?$", re.IGNORECASE)
+                seg_id_pattern = re.compile(
+                    r"^id?s?[_]|[_]?id?s?$", re.IGNORECASE
+                )
                 for i in range(self.dialog.ui.seg_id_column_combo.count()):
                     if seg_id_pattern.search(
                         self.dialog.ui.seg_id_column_combo.itemText(i)
@@ -108,7 +112,9 @@ class LayerManager(QObject):
         self.dialog.ui.segments_column_combo.clear()
 
         if compositions_layer:
-            field_names = [field.name() for field in compositions_layer.fields()]
+            field_names = [
+                field.name() for field in compositions_layer.fields()
+            ]
             self.dialog.ui.segments_column_combo.addItems(field_names)
 
             segments_column_name = self.settings.value(
@@ -137,7 +143,9 @@ class LayerManager(QObject):
         self.dialog.ui.compo_id_column_combo.clear()
 
         if compositions_layer:
-            field_names = [field.name() for field in compositions_layer.fields()]
+            field_names = [
+                field.name() for field in compositions_layer.fields()
+            ]
             self.dialog.ui.compo_id_column_combo.addItems(field_names)
 
             compo_id_column_name = self.settings.value(
@@ -173,7 +181,9 @@ class LayerManager(QObject):
 
         project = QgsProject.instance()
         if project:
-            self.segments_layer = cast(QgsVectorLayer, project.mapLayer(segments_id))
+            self.segments_layer = cast(
+                QgsVectorLayer, project.mapLayer(segments_id)
+            )
             if self.segments_layer is not None:
                 self.check_segments_layer(message_type="warning")
                 self.populate_seg_id_column_combo(self.segments_layer)
@@ -205,7 +215,9 @@ class LayerManager(QObject):
                     self.compositions_layer
                 )
 
-                log(f"Compositions layer selected: {self.compositions_layer.name()}")
+                log(
+                    f"Compositions layer selected: {self.compositions_layer.name()}"
+                )
 
     def check_layers_and_columns(self):
         if not self.check_segments_layer(message_type="box"):
@@ -227,7 +239,9 @@ class LayerManager(QObject):
         project = QgsProject.instance()
         if project:
             segments_id = self.dialog.ui.segments_combo.currentData()
-            self.settings.setValue("routes_composer/segments_layer_id", segments_id)
+            self.settings.setValue(
+                "routes_composer/segments_layer_id", segments_id
+            )
 
             compositions_id = self.dialog.ui.compositions_combo.currentData()
             self.settings.setValue(
@@ -235,7 +249,9 @@ class LayerManager(QObject):
             )
 
             id_column = self.dialog.ui.seg_id_column_combo.currentText()
-            self.settings.setValue("routes_composer/seg_id_column_name", id_column)
+            self.settings.setValue(
+                "routes_composer/seg_id_column_name", id_column
+            )
 
             segments_column = self.dialog.ui.segments_column_combo.currentText()
             self.settings.setValue(
@@ -292,6 +308,18 @@ class LayerManager(QObject):
         Returns:
             bool: True si la colonne est une clé primaire, False sinon
         """
+        pk_attributes = layer.primaryKeyAttributes()
+        if not pk_attributes:
+            QMessageBox.warning(
+                self.dialog,
+                self.tr("Erreur de validation"),
+                self.tr(
+                    "La couche n'a pas de colonne d'identifiants uniques."
+                ),
+            )
+            return True
+
+
         if layer.primaryKeyAttributes():
             pk_field_names = [
                 layer.fields().field(pk_index).name()
@@ -365,7 +393,8 @@ class LayerManager(QObject):
 
         if self.compositions_layer.isSpatial():
             if (
-                self.compositions_layer.geometryType() != QgsWkbTypes.LineGeometry  # type: ignore
+                self.compositions_layer.geometryType()
+                != QgsWkbTypes.LineGeometry  # type: ignore
             ):
                 if message_type == "box":
                     QMessageBox.warning(
@@ -414,14 +443,18 @@ class LayerManager(QObject):
         if self.compositions_layer is None:
             return False
 
-        segments_column_name = self.dialog.ui.segments_column_combo.currentText()
+        segments_column_name = (
+            self.dialog.ui.segments_column_combo.currentText()
+        )
         if not segments_column_name:
             return False
 
         if segments_column_name not in self.compositions_layer.fields().names():
             return False
 
-        segment_field = self.compositions_layer.fields().field(segments_column_name)
+        segment_field = self.compositions_layer.fields().field(
+            segments_column_name
+        )
 
         if segment_field.type() != QVariant.String:
             QMessageBox.warning(

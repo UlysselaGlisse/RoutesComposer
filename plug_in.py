@@ -43,10 +43,16 @@ class RoutesComposerTool:
         self.iface.mapCanvas().mapToolSet.connect(self.deactivate_ids_basket)
 
     def initGui(self):
-        icon_path = os.path.join(os.path.dirname(__file__), "ui", "icons", "icon.png")
+        icon_path = os.path.join(
+            os.path.dirname(__file__), "ui", "icons", "icon.png"
+        )
         show_action = QAction(
             QIcon(icon_path),
-            (QCoreApplication.translate("RoutesManagerTool", "Ouvrir Routes Composer")),
+            (
+                QCoreApplication.translate(
+                    "RoutesManagerTool", "Ouvrir Routes Composer"
+                )
+            ),
             self.iface.mainWindow(),
         )
         show_action.triggered.connect(self.show_dialog)
@@ -58,7 +64,10 @@ class RoutesComposerTool:
         )
         self.ids_basket_action = QAction(
             QIcon(icon_path),
-            QCoreApplication.translate("RoutesManagerTool","""Sélectionner des entités sur la carte et ouvrir le formulaire d'attributs<br><br><b>z</b> : retire le dernier segment du panier<br><b>r</b> : le rétabli<br><b>e</b> : vide la panier<br><b>alt + clique</b> : sélectionne tous les segments d'une composition<br><b>shift + clique-droit</b> : copie la liste dans le presse-papier<br><b>q</b> : quitte l'outil"""),
+            QCoreApplication.translate(
+                "RoutesManagerTool",
+                """Sélectionner des entités sur la carte et ouvrir le formulaire d'attributs<br><br><b>z</b> : retire le dernier segment du panier<br><b>r</b> : le rétabli<br><b>e</b> : vide la panier<br><b>alt + clique</b> : sélectionne tous les segments d'une composition<br><b>shift + clique-droit</b> : copie la liste dans le presse-papier<br><b>q</b> : quitte l'outil""",
+            ),
             self.iface.mainWindow(),
         )
         self.ids_basket_action.setCheckable(True)
@@ -87,7 +96,9 @@ class RoutesComposerTool:
             geom_on_fly, _ = project.readBoolEntry(
                 "routes_composer", "geom_on_fly", False
             )
-            belonging, _ = project.readBoolEntry("routes_composer", "belonging", False)
+            belonging, _ = project.readBoolEntry(
+                "routes_composer", "belonging", False
+            )
 
             if self.checks_layers():
                 if auto_start:
@@ -109,9 +120,9 @@ class RoutesComposerTool:
             saved_compositions_layer_id = settings.value(
                 "routes_composer/compositions_layer_id", ""
             )
-            if not project.mapLayer(saved_segments_layer_id) or not project.mapLayer(
-                saved_compositions_layer_id
-            ):
+            if not project.mapLayer(
+                saved_segments_layer_id
+            ) or not project.mapLayer(saved_compositions_layer_id):
                 return False
 
             return True
@@ -121,8 +132,12 @@ class RoutesComposerTool:
         if not project:
             return
         settings = QSettings()
-        segments_layer_id = settings.value("routes_composer/segments_layer_id", "")
-        segments_layer = cast(QgsVectorLayer, project.mapLayer(segments_layer_id))
+        segments_layer_id = settings.value(
+            "routes_composer/segments_layer_id", ""
+        )
+        segments_layer = cast(
+            QgsVectorLayer, project.mapLayer(segments_layer_id)
+        )
         if segments_layer is None:
             return
         compositions_layer_id = settings.value(
@@ -140,7 +155,9 @@ class RoutesComposerTool:
         if segments_column_name not in compositions_layer.fields().names():
             return
 
-        seg_id_column_name = settings.value("routes_composer/seg_id_column_name", "id")
+        seg_id_column_name = settings.value(
+            "routes_composer/seg_id_column_name", "id"
+        )
         if seg_id_column_name not in segments_layer.fields().names():
             return
 
@@ -177,6 +194,12 @@ class RoutesComposerTool:
         if self.dialog:
             self.dialog.close()
         del self.toolbar
+        if self.connexions_handler.routes_composer_connected:
+            self.connexions_handler.disconnect_routes_composer()
+        if self.connexions_handler.belonging_connected:
+            self.connexions_handler.disconnect_belonging()
+        if self.connexions_handler.geom_on_fly_connected:
+            self.connexions_handler.disconnect_geom_on_fly()
 
     def update_icon(self):
         icon_path = os.path.join(

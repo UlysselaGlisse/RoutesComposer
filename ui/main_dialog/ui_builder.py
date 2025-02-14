@@ -99,7 +99,7 @@ class UiBuilder(QObject):
 
         self.segments_column_combo = QComboBox()
         ids_list_label = QLabel(self.tr("Liste d'ids:"))
-        ids_list_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter) # type: ignore
+        ids_list_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)  # type: ignore
         compositions_layout.addWidget(ids_list_label)
         compositions_layout.addWidget(self.segments_column_combo)
         self.segments_column_combo.setMaximumWidth(max_column_combo_width)
@@ -149,12 +149,16 @@ class UiBuilder(QObject):
     def create_action_buttons(self, layout):
         action_buttons_layout = QHBoxLayout()
 
-        self.check_errors_button = QPushButton(self.tr("Vérifier les compositions"))
+        self.check_errors_button = QPushButton(
+            self.tr("Vérifier les compositions")
+        )
         self.check_errors_button.setProperty("class", "action-button")
 
         action_buttons_layout.addWidget(self.check_errors_button)
 
-        self.create_or_update_geom_button = QPushButton(self.tr("Créer les géométries"))
+        self.create_or_update_geom_button = QPushButton(
+            self.tr("Créer les géométries")
+        )
         self.create_or_update_geom_button.setProperty("class", "action-button")
 
         action_buttons_layout.addWidget(self.create_or_update_geom_button)
@@ -181,7 +185,9 @@ class UiBuilder(QObject):
         self.toggle_advanced_button_layout = QHBoxLayout()
         self.toggle_advanced_label = QLabel(self.tr("Options avancées"))
         self.toggle_advanced_arrow = QLabel("▶")
-        self.toggle_advanced_arrow.setStyleSheet("cursor: pointer; margin-left: 2px;")
+        self.toggle_advanced_arrow.setStyleSheet(
+            "cursor: pointer; margin-left: 2px;"
+        )
 
         self.toggle_advanced_label.mousePressEvent = (
             lambda ev: self.toggle_advanced_options(ev)
@@ -192,7 +198,9 @@ class UiBuilder(QObject):
 
         self.toggle_advanced_button_layout.addWidget(self.toggle_advanced_label)
         self.toggle_advanced_button_layout.addWidget(self.toggle_advanced_arrow)
-        self.toggle_advanced_button_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.toggle_advanced_button_layout.setAlignment(
+            Qt.AlignmentFlag.AlignLeft
+        )
 
         layout.addLayout(self.toggle_advanced_button_layout)
 
@@ -213,7 +221,9 @@ class UiBuilder(QObject):
         self.advanced_options_container.setVisible(False)
 
     def create_advanced_group(self):
-        advanced_group = QGroupBox(self.tr("Lier les attributs de deux couches:"))
+        advanced_group = QGroupBox(
+            self.tr("Lier les attributs de deux couches:")
+        )
         advanced_layout = QVBoxLayout()
         advanced_layout.setSizeConstraint(QLayout.SetMinAndMaxSize)  # type: ignore
         advanced_group.setToolTip(
@@ -244,7 +254,9 @@ class UiBuilder(QObject):
         advanced_layout = QVBoxLayout()
         advanced_layout.addLayout(self.create_attributes_layout())
 
-        self.save_linkage_button = QPushButton(self.tr("Enregistrer la liaison"))
+        self.save_linkage_button = QPushButton(
+            self.tr("Enregistrer la liaison")
+        )
         self.save_linkage_button.setProperty("class", "action-button")
 
         self.update_attributes_button = QPushButton(
@@ -287,7 +299,9 @@ class UiBuilder(QObject):
 
     def init_linkages(self):
         settings = QSettings()
-        linkages = settings.value("routes_composer/attribute_linkages", []) or []
+        linkages = (
+            settings.value("routes_composer/attribute_linkages", []) or []
+        )
 
         for linkage in linkages:
             self.add_linkage_to_ui(linkage)
@@ -330,7 +344,7 @@ class UiBuilder(QObject):
         button_combo_layout.addWidget(self.compo_id_column_combo)
 
         self.belonging_segments_button = QPushButton(
-            self.tr("Créer le champ 'compositions'")
+            self.tr("Mettre à jour le champ 'compositions'")
         )
         self.belonging_segments_button.setProperty("class", "action-button")
         button_combo_layout.addWidget(self.belonging_segments_button)
@@ -338,7 +352,9 @@ class UiBuilder(QObject):
         belonging_layout.addLayout(button_combo_layout)
 
         self.update_belonging_segments_checkbox = QCheckBox(
-            self.tr("Mettre à jour le champ d'appartenance des segments en continue")
+            self.tr(
+                "Mettre à jour le champ d'appartenance des segments en continue"
+            )
         )
         belonging_layout.addWidget(self.update_belonging_segments_checkbox)
 
@@ -350,7 +366,9 @@ class UiBuilder(QObject):
         attributes_layout = QVBoxLayout()
 
         compositions_attr_layout = QHBoxLayout()
-        compositions_attr_layout.addWidget(QLabel(self.tr("Attribut compositions:")))
+        compositions_attr_layout.addWidget(
+            QLabel(self.tr("Attribut compositions:"))
+        )
         compositions_attr_layout.addWidget(self.compositions_attr_combo)
         attributes_layout.addLayout(compositions_attr_layout)
 
