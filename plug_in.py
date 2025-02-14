@@ -5,7 +5,6 @@ from qgis.core import QgsProject, QgsVectorLayer
 from qgis.PyQt.QtCore import QCoreApplication, QSettings, QTimer, QTranslator
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
-from qgis.gui import Options
 
 from .connexions_handler import ConnexionsHandler
 from .func.list_constructor import IDsBasket
@@ -141,8 +140,8 @@ class RoutesComposerTool:
         if segments_column_name not in compositions_layer.fields().names():
             return
 
-        id_column_name = settings.value("routes_composer/seg_id_column_name", "id")
-        if id_column_name not in segments_layer.fields().names():
+        seg_id_column_name = settings.value("routes_composer/seg_id_column_name", "id")
+        if seg_id_column_name not in segments_layer.fields().names():
             return
 
         if segments_layer.isValid():
@@ -151,7 +150,7 @@ class RoutesComposerTool:
                 canvas,
                 segments_layer,
                 compositions_layer,
-                id_column_name,
+                seg_id_column_name,
                 segments_column_name,
             )
             canvas.setMapTool(tool)

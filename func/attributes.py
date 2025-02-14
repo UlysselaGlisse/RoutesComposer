@@ -45,7 +45,7 @@ class AttributeLinker:
             }
 
             self.segments_list = (
-                self.segments_manager.create_segments_of_compositions_dictionary(
+                self.segments_manager.create_segments_list_and_values_dictionary(
                     compositions_attrs
                 )
             )
@@ -74,7 +74,7 @@ class AttributeLinker:
 
                 if priority_mode == "most_frequent":
                     segments_list = (
-                        self.segments_manager.create_compositions_by_segment_dictionary(
+                        self.segments_manager.create_values_of_compositions_for_each_segment_dictionary(
                             compositions_attrs
                         )
                     )

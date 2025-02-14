@@ -65,14 +65,14 @@ class SegmentsBelonging:
     @timer_decorator
     def update_belonging_column(self, composition_id=None):
         try:
-            segments_appartenance = (
+            segments_belonging = (
                 self.segments_manager.create_segments_belonging_dictionary()
             )
-
+            print(segments_belonging)
             if composition_id:
                 segments_to_update = set()
 
-                segments = self.segments_manager.get_segments_for_composition(
+                segments = self.segments_manager.get_segments_list_for_composition(
                     composition_id
                 )
                 for segment in segments:
@@ -90,11 +90,9 @@ class SegmentsBelonging:
             attr_idx = self.segments_layer.fields().indexOf(self.belonging_column)
 
             for segment in features:
-                appartenance_str = ",".join(
-                    sorted(
-                        segments_appartenance.get(segment[self.seg_id_column_name], [])
-                    )
-                )
+                appartenance_str = sorted(segments_belonging.get(segment[self.seg_id_column_name], []))
+                print(appartenance_str)
+
                 if segment.id() >= 0:
                     updates[segment.id()] = {attr_idx: appartenance_str}
                 else:
@@ -131,54 +129,132 @@ class LayersAssociationManager:
 
         self.segments_list = {}
 
-    def create_segments_of_compositions_dictionary(self, fields=None):
-        """Crée un dictionnaire des segments appartenant à chaque composition."""
-        self.segment_list = {}
+    @timer_decorator
+    def create_segments_list_and_values_dictionary(self, fields=None):
+        """
+        Crée un dictionnaire des compositions avec la liste des segments, et possiblement la valeur d'un ou plusieurs champs.
 
+        Args:
+            fields (list[str], optional): Liste des champs additionnels à inclure pour chaque composition.
+                Si None, retourne uniquement la liste des segments.
+
+        Returns:
+            dict:
+                - Si fields est None :
+                    {comp_id (int): list[int]}  # Liste des ids des segments
+                - Si fields est renseigné :
+                    {
+                        comp_id (int): {
+                            'segments': list[int],  # Liste des ids des segments
+                            'field1': value1,       # Valeurs des champs additionnels
+                            'field2': value2,
+                            ...
+                        }
+                    }
+            """
         for composition in self.compositions_layer.getFeatures():
-            segments_str = composition[self.segments_column_name]
             compo_id = composition[self.compo_id_column_name]
+            segments_list = self.convert_segments_list(composition[self.segments_column_name])
 
-            if segments_str:
-                segments_list = [
-                    int(id_str)
-                    for id_str in segments_str.split(",")
-                    if id_str.strip().isdigit()
-                ]
-                if fields:
-                    composition_data = {"segments": segments_list}
-                    for field in fields:
-                        composition_data[field] = composition[field]
+            if fields:
+                composition_data = {"segments": segments_list}
+                for field in fields:
+                    composition_data[field] = composition[field]
 
-                    self.segments_list[compo_id] = composition_data
-                else:
-                    self.segments_list[compo_id] = segments_list
+                self.segments_list[compo_id] = composition_data
+            else:
+                self.segments_list[compo_id] = segments_list
 
         return self.segments_list
 
+    @timer_decorator
     def create_segments_belonging_dictionary(self):
-        """Crée un dictionnaire des compositions auxquelles appartient chaque segment."""
-        self.segment_appartenances = {}
+        """
+        Crée un dictionnaire des segments avec la liste des compositions auxquelles ils appartiennent.
+
+        Returns:
+            dict: {seg_id (int): list[str]}  # Liste des ids de compositions.
+        """
+        self.segment_belonging = {}
 
         for composition in self.compositions_layer.getFeatures():
-            comp_id = str(int(composition[self.compo_id_column_name]))
-            segments_str = composition[self.segments_column_name]
+            comp_id = composition[self.compo_id_column_name]
+            segments_list = self.convert_segments_list(composition[self.segments_column_name])
 
-            if segments_str:
-                segments_list = [
-                    int(id_str)
-                    for id_str in segments_str.split(",")
-                    if id_str.strip().isdigit()
+            for seg_id in segments_list:
+                if seg_id not in self.segment_belonging:
+                    self.segment_belonging[seg_id] = []
+
+                self.segment_belonging[seg_id].append(comp_id)
+
+        return self.segment_belonging
+
+    def create_values_of_compositions_for_each_segment_dictionary(self, fields):
+        """
+        Crée un dictionnaire des segments avec la valeur des champs de compositions auxquelles ils appartiennent.
+
+        Args:
+            fields(list[str]): Liste des champs passée à la fonction create_segments_list_and_values_dictionary
+
+        Returns:
+            dict:
+                {
+                    seg_id (int): [
+                        {
+                            field1: value1,
+                            field2: value2,
+                            ...,
+                            'id': comp_id (int)
+                        },
+                        {...}, # Autres compositions contenant ce segment
+                    ],
+                    ... # Autres segments
+                }
+        Example:
+            {
+                12: [
+                    {'importance': 2, 'id': 123},
+                    {'importance': 0, 'id': 124},
+                    ...
+                ],
+                13: [
+                    {'importance': 0, 'id': 123},
+                    ...
                 ]
-                for seg_id in segments_list:
-                    if seg_id not in self.segment_appartenances:
-                        self.segment_appartenances[seg_id] = []
+            }
+        """
+        if not self.segments_list:
+            self.create_segments_list_and_values_dictionary(fields)
 
-                    self.segment_appartenances[seg_id].append(str(comp_id))
+        compositions_by_segment = {}
 
-        return self.segment_appartenances
+        for (
+            composition_id,
+            composition_data,
+        ) in self.segments_list.items():
+            segments = composition_data["segments"]
+            for segment_id in segments:
+                if segment_id not in compositions_by_segment:
+                    compositions_by_segment[segment_id] = []
 
-    def get_compositions_for_segment(self, segment_id: int) -> list:
+                composition_info = {
+                    field: composition_data[field] for field in fields
+                }
+                composition_info["id"] = composition_id
+                compositions_by_segment[segment_id].append(composition_info)
+
+        return compositions_by_segment
+
+    def get_compositions_for_segment(self, segment_id):
+        """
+        Retourne la liste des compositions auxquelles un segment appartient.
+
+        Returns:
+            list[int] # Liste des ids de compositions
+        """
+        if not segment_id:
+            return []
+
         compositions_list = []
 
         request = (
@@ -193,20 +269,70 @@ class LayersAssociationManager:
 
         return compositions_list
 
-    def get_segments_for_composition(self, composition_id: int) -> list:
-        segments_list = []
+    @timer_decorator
+    def get_segments_list_for_segment(self, segment_id):
+        """
+        Récupère les listes de segments contenant l'id du segment.
+
+        Returns:
+            list[tuple]: (comp_id (int), list[int]) # Liste des ids de segments
+        """
+        if not segment_id:
+            return []
+
+        segments_lists_ids = []
+
+        request = (
+            f"{self.segments_column_name} LIKE '%,{segment_id},%' OR "
+            f"{self.segments_column_name} LIKE '{segment_id},%' OR "
+            f"{self.segments_column_name} LIKE '%,{segment_id}' OR "
+            f"{self.segments_column_name} = '{segment_id}'"
+        )
+        for composition in self.compositions_layer.getFeatures(request):
+            segments_list = self.convert_segments_list(composition[self.segments_column_name])
+            if int(segment_id) in segments_list:
+                segments_lists_ids.append((composition.id(), segments_list))
+
+        return segments_lists_ids
+
+    @timer_decorator
+    def get_segments_list_for_composition(self, composition_id):
+        """
+        Retourne la liste de segments d'une composition
+
+        Returns:
+            list[int] # Liste des ids de segments
+        """
+        if not composition_id:
+            return []
 
         request = f"{self.compo_id_column_name} = {composition_id}"
         for composition in self.compositions_layer.getFeatures(request):
-            segments_str = composition[self.segments_column_name]
-            if segments_str:
-                segments_list = [
-                    int(id_str)
-                    for id_str in segments_str.split(",")
-                    if id_str.strip().isdigit()
-                ]
+            segments_list_str = composition[self.segments_column_name]
 
-        return segments_list
+            return self.convert_segments_list(segments_list_str)
+
+    def convert_segments_list(self, segments_list_str):
+        """
+        Convertit une chaîne d'ids de segments en liste d'entiers.
+
+        Args:
+            segments_list_str: Chaîne contenant les ids de segments séparées par des virgules dans la couche compositions
+
+        Returns:
+            list[int]
+
+        Example:
+            "1,2,3" -> [1,2,3]
+        """
+        if not segments_list_str:
+            return []
+
+        return [
+            int(id_str)
+            for id_str in segments_list_str.split(",")
+            if id_str.strip().isdigit()
+        ]
 
 
 manager = SegmentsBelonging()

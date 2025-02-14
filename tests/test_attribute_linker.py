@@ -80,7 +80,7 @@ class AttributeLinker:
             }
 
             self.segments_list = (
-                self.segments_manager.create_segments_of_compositions_dictionary(
+                self.segments_manager.create_segments_list_and_values_dictionary(
                     compositions_attrs
                 )
             )
@@ -225,7 +225,7 @@ class LayersAssociationManager:
         self.segment_appartenances = {}
         self.segments_list = {}
 
-    def create_segments_of_compositions_dictionary(self, fields=None):
+    def create_segments_list_and_values_dictionary(self, fields=None):
         """
         Crée un dictionnaire des segments appartenant à chaque composition.
 

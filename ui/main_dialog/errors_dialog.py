@@ -19,8 +19,7 @@ from qgis.PyQt.QtWidgets import (
 )
 from qgis.utils import iface
 
-from ...func import warning
-
+from ...func.warning import ErrorsFinder
 
 class ErrorDialog(QDialog):
     def __init__(self, dialog, errors, parent=None):
@@ -30,7 +29,7 @@ class ErrorDialog(QDialog):
         self.segments_layer = self.dialog.layer_manager.segments_layer
         self.compositions_layer = self.dialog.layer_manager.compositions_layer
         self.segments_column_name = self.dialog.ui.segments_column_combo.currentText()
-        self.id_column_name = self.dialog.ui.seg_id_column_combo.currentText()
+        self.seg_id_column_name = self.dialog.ui.seg_id_column_combo.currentText()
 
         self.setWindowTitle(self.tr("Erreurs détectées"))
         self.setMinimumWidth(600)
@@ -78,55 +77,16 @@ class ErrorDialog(QDialog):
 
         self.setLayout(layout)
 
-        self.setStyleSheet(self.get_stylesheet())
-
     def refresh_errors(self):
-        errors = warning.verify_compositions(
+        errors_finder = ErrorsFinder(
             self.segments_layer,
             self.compositions_layer,
             self.segments_column_name,
-            self.id_column_name,
+            self.seg_id_column_name,
         )
-        self.display_errors(errors)
 
-    def get_stylesheet(self):
-        return """
-            QDialog {
-                background-color: #f9f9f9;
-            }
-            QLabel {
-                font-weight: bold;
-                margin-bottom: 10px;
-            }
-            QTreeWidget {
-                border: 1px solid #cccccc;
-                border-radius: 5px;
-                padding: 5px;
-                background-color: #ffffff;
-            }
-            QPushButton {
-                background-color: white; /* Changer le fond du bouton en blanc */
-                color: black; /* Vous pouvez changer la couleur du texte si nécessaire */
-                padding: 5px 10px;
-                border: 1px solid #cccccc; /* Ajouter un bord pour le style */
-                border-radius: 5px;
-                margin-top: 10px;
-            }
-            QPushButton:hover {
-                background-color: #e2e2e2; /* Changez de couleur au survol pour réagir */
-            }
-            QPushButton:pressed { /* État lorsqu'il est enfoncé */
-                background-color: #d9d9d9; /* Une autre couleur de fond lorsqu'il est enfoncé */
-                border: 1px solid #999999;
-            }
-            QPushButton[icon] {
-                background-color: transparent;
-                border: 1px solid #cccccc;
-                min-width: 30px;
-                min-height: 30px;
-                margin-left: 10px;
-            }
-        """
+        errors = errors_finder.verify_compositions()
+        self.display_errors(errors)
 
     def display_errors(self, errors):
         self.error_tree_widget.clear()
@@ -150,6 +110,7 @@ class ErrorDialog(QDialog):
     def format_error_detail(self, error):
         error_type = error.get("error_type")
         composition_id = error.get("composition_id", "N/A")
+        segment_list = error.get("segment_list")
 
         if error_type == "failed_compositions":
             return self.tr(
@@ -185,15 +146,25 @@ class ErrorDialog(QDialog):
             return self.tr(
                 "Composition : {composition_id}. Liste de segments vide.."
             ).format(composition_id=composition_id)
+
         elif error_type == "invalid_segment_id":
             invalid_segment_id = error.get("invalid_segment_id")
-            segment_list = error.get("segment_list")
             return self.tr(
                 "Composition : {composition_id}. Dans la liste: {segment_list}, l'id: '{invalid_segment_id}' est invalide."
             ).format(
                 composition_id=composition_id,
                 segment_list=segment_list,
                 invalid_segment_id=invalid_segment_id,
+            )
+
+        elif error_type == "duplicate_segment_id":
+            duplicate_segment_id = error.get("duplicate_segment_id")
+            return self.tr(
+                "Composition: {composition_id}. Ids {duplicate_segment_id} dupliqués dans la liste {segment_list}"
+            ).format(
+                composition_id=composition_id,
+                duplicate_segment_id=duplicate_segment_id,
+                segment_list=segment_list
             )
 
         return self.tr("Erreur inconnue. Détails: {details}").format(details=str(error))
@@ -205,29 +176,37 @@ class ErrorDialog(QDialog):
         error_type = item.parent().text(0)
         detail_text = item.text(1)
 
-        if error_type == self.tr("discontinuity"):
+        if error_type == "discontinuity":
             match = re.search(r"segments: (\d+), (\d+)", detail_text)
             if match:
                 first_segment_id = match.group(1)
                 self.zoom_to_segment(first_segment_id)
 
-        elif error_type == self.tr("missing_segment"):
+        elif error_type == "missing_segment":
             match = re.search(r"Segment: (\d+)", detail_text)
             if match:
                 missing_segment_id = match.group(1)
                 self.zoom_to_segment(missing_segment_id)
 
-        elif error_type == self.tr("unused_segment"):
+        elif error_type == "unused_segment":
             match = re.search(r"Segment (\d+)", detail_text)
             if match:
                 unused_segment_id = match.group(1)
                 self.zoom_to_segment(unused_segment_id)
 
+        elif error_type == "duplicate_segment_id":
+            match = re.search(r"Ids (\d+)", detail_text)
+            if match:
+                duplicate_segment_id = match.group(1)
+                self.zoom_to_segment(duplicate_segment_id)
+
     def zoom_to_segment(self, segment_id):
+        expr = f"\"{self.seg_id_column_name}\" = '{segment_id}'"
+        self.segments_layer.selectByExpression(expr)
         feature = next(
             self.segments_layer.getFeatures(
                 QgsFeatureRequest().setFilterExpression(
-                    f"\"{self.id_column_name}\" = '{segment_id}'"
+                    expr
                 )
             ),
             None,

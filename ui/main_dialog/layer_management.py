@@ -330,17 +330,17 @@ class LayerManager(QObject):
         if self.segments_layer is None:
             return False
 
-        id_column_name = self.dialog.ui.seg_id_column_combo.currentText()
-        if not id_column_name:
+        seg_id_column_name = self.dialog.ui.seg_id_column_combo.currentText()
+        if not seg_id_column_name:
             return False
 
-        if id_column_name not in self.segments_layer.fields().names():
+        if seg_id_column_name not in self.segments_layer.fields().names():
             return False
 
-        if self.is_column_pk_attribute(self.segments_layer, id_column_name):
+        if self.is_column_pk_attribute(self.segments_layer, seg_id_column_name):
             return False
 
-        id_field = self.segments_layer.fields().field(id_column_name)
+        id_field = self.segments_layer.fields().field(seg_id_column_name)
         if id_field.type() not in (QVariant.Int, QVariant.LongLong):
             QMessageBox.warning(
                 self.dialog,

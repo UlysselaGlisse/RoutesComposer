@@ -9,52 +9,84 @@ from qgis.core import (
 
 from . import utils
 
-error_layer = None
+class ErrorsFinder:
+    def __init__(self,
+        segments_layer,
+        compositions_layer,
+        segments_column_name,
+        seg_id_column_name
+    ):
+        self.segments_layer = segments_layer
+        self.compositions_layer = compositions_layer
+        self.segments_column_name = segments_column_name
+        self.seg_id_column_name = seg_id_column_name
+        self.comp_id_column_name = utils.get_comp_id_column_name()
+        comp_id = utils.get_comp_id_column_name()
+        self.comp_id_column_name = comp_id if comp_id else ""
 
+        self.errors = []
+        self.segments_geom_dict = self._create_segments_geom_dict()
+        self.used_segments_ids = set()
 
-def verify_compositions(
-    segments_layer, compositions_layer, segments_column_name, id_column_name
-):
-    """
-    Vérifie les segments présents dans les listes des compositions et la continuité des segments.
-    """
-    errors = []
+    def verify_compositions(self):
+        """
+        Vérifie les segments présents dans les listes des compositions et la continuité des segments.
+        """
 
-    segments_geom_dict = {
-        str(seg[id_column_name]): seg.geometry()
-        for seg in utils.get_features_list(segments_layer)
-    }
-    compositions = utils.get_features_list(compositions_layer)
+        for composition in self.compositions_layer.getFeatures():
+            segments_list_str = composition[self.segments_column_name]
+            if self.check_empty_list(composition, segments_list_str):
+                segments_list = [seg.strip() for seg in str(segments_list_str).split(",")]
+                self.check_duplicate_and_invalid_seg_id(composition, segments_list)
+                self.check_discontinuity(composition, segments_list)
 
-    used_segment_ids = set()
-    discontinuity_errors = defaultdict(list)
+                self.used_segments_ids.update(segments_list)
 
-    for composition in compositions:
-        segments_str = composition[segments_column_name]
+        self.check_unused_segments()
+
+        return self.errors
+
+    def check_empty_list(self, composition, segments_list_str):
         if (
-            segments_str is None
-            or str(segments_str).upper() == "NULL"
-            or not segments_str
+            segments_list_str is None
+            or str(segments_list_str).upper() == "NULL"
+            or not segments_list_str
         ):
-            errors.append(
+            self.errors.append(
                 {
-                    "composition_id": composition.id(),
+                    "composition_id": composition[self.comp_id_column_name] if self.comp_id_column_name else composition.id(),
                     "error_type": "empty_segments_list",
                 }
             )
-            continue
-        segments_list = [seg.strip() for seg in str(segments_str).split(",")]
+            return False
+        return True
+
+    def check_duplicate_and_invalid_seg_id(self, composition, segments_list):
+        seen_segments = set()
         for segment_id in segments_list:
             if not segment_id.isdigit():
-                errors.append(
+                self.errors.append(
                     {
-                        "composition_id": composition.id(),
+                        "composition_id": composition[self.comp_id_column_name] if self.comp_id_column_name else composition.id(),
                         "error_type": "invalid_segment_id",
                         "segment_list": (segments_list),
                         "invalid_segment_id": segment_id,
                     }
                 )
-        used_segment_ids.update(segments_list)
+            elif segment_id in seen_segments:
+                    self.errors.append(
+                        {
+                            "composition_id": composition[self.comp_id_column_name] if self.comp_id_column_name else composition.id(),
+                            "error_type": "duplicate_segment_id",
+                            "segment_list": (segments_list),
+                            "duplicate_segment_id": segment_id,
+                        }
+                    )
+            else:
+                seen_segments.add(segment_id)
+
+    def check_discontinuity(self, composition, segments_list):
+        discontinuity_errors = defaultdict(list)
 
         for i, current_segment_id in enumerate(segments_list):
             # Pour tous les segments sauf le dernier de la liste (dont la coninuité est vérifié par celle du précédent).
@@ -63,10 +95,10 @@ def verify_compositions(
                 current_segment_id = segments_list[i]
                 next_segment_id = segments_list[i + 1]
 
-                if current_segment_id not in segments_geom_dict:
-                    errors.append(
+                if current_segment_id not in self.segments_geom_dict:
+                    self.errors.append(
                         {
-                            "composition_id": composition.id(),
+                            "composition_id": composition[self.comp_id_column_name] if self.comp_id_column_name else composition.id(),
                             "error_type": "missing_segment",
                             "segment_ids": (current_segment_id, None),
                             "missing_segment_id": current_segment_id,
@@ -74,10 +106,10 @@ def verify_compositions(
                     )
                     continue
 
-                if next_segment_id not in segments_geom_dict:
-                    errors.append(
+                if next_segment_id not in self.segments_geom_dict:
+                    self.errors.append(
                         {
-                            "composition_id": composition.id(),
+                            "composition_id": composition[self.comp_id_column_name] if self.comp_id_column_name else composition.id(),
                             "error_type": "missing_segment",
                             "segment_ids": (next_segment_id, None),
                             "missing_segment_id": next_segment_id,
@@ -86,10 +118,10 @@ def verify_compositions(
                     continue
 
                 current_geom = cast(
-                    QgsGeometry, segments_geom_dict[current_segment_id]
+                    QgsGeometry, self.segments_geom_dict[current_segment_id]
                 )
                 next_geom = cast(
-                    QgsGeometry, segments_geom_dict[next_segment_id]
+                    QgsGeometry, self.segments_geom_dict[next_segment_id]
                 )
 
                 current_points = current_geom.asPolyline()
@@ -113,9 +145,9 @@ def verify_compositions(
                         discontinuity_errors[current_segment_id].append(
                             composition.id()
                         )
-                        errors.append(
+                        self.errors.append(
                             {
-                                "composition_id": composition.id(),
+                                "composition_id": composition[self.comp_id_column_name] if self.comp_id_column_name else composition.id(),
                                 "error_type": "discontinuity",
                                 "segment_ids": (
                                     current_segment_id,
@@ -124,15 +156,20 @@ def verify_compositions(
                             }
                         )
 
-    unused_segment_ids = set(segments_geom_dict.keys()) - used_segment_ids
-    for segment_id in unused_segment_ids:
-        errors.append(
-            {
-                "composition_id": None,
-                "error_type": "unused_segment",
-                "segment_ids": (segment_id, None),
-                "unused_segment_id": segment_id,
-            }
-        )
+    def check_unused_segments(self):
+        unused_segment_ids = set(self.segments_geom_dict.keys()) - self.used_segments_ids
+        for segment_id in unused_segment_ids:
+            self.errors.append(
+                {
+                    "composition_id": None,
+                    "error_type": "unused_segment",
+                    "segment_ids": (segment_id, None),
+                    "unused_segment_id": segment_id,
+                }
+            )
 
-    return errors
+    def _create_segments_geom_dict(self):
+        return {
+            str(seg[self.seg_id_column_name]): seg.geometry()
+            for seg in self.segments_layer.getFeatures()
+        }

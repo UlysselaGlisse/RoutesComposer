@@ -37,12 +37,12 @@ class RoutesComposer(QObject):
         )
         self.seg_id_column_name, self.id_column_index = self.get_id_column_name()
 
-        self.segment_manager = LayersAssociationManager(
+        self.lam = LayersAssociationManager(
             self.compositions_layer,
             self.segments_layer,
             self.segments_column_name,
             self.seg_id_column_name)
-        self.split_manager = SplitManager(self)
+        self.split = SplitManager(self)
         self.geom = GeomCompo(
             self.segments_layer,
             self.compositions_layer,
@@ -74,17 +74,17 @@ class RoutesComposer(QObject):
         if self.segments_layer is None or self.compositions_layer is None:
             return
 
-        source_feature = self.segments_layer.getFeature(feature_id)
-        if not source_feature.isValid() and source_feature.fields().names():
+        new_feature = self.segments_layer.getFeature(feature_id)
+        if not new_feature.isValid():
             return
 
-        segment_id = int(source_feature.attributes()[self.id_column_index])
+        segment_id = int(new_feature.attributes()[self.id_column_index])
         if segment_id is None:
             return
 
-        if self.split_manager.has_duplicate_segment_id(segment_id):
+        if self.split.has_duplicate_segment_id(segment_id):
             log(f"segment id: {segment_id}, has been duplicated")
-            new_geometry = source_feature.geometry()
+            new_geometry = new_feature.geometry()
             if not new_geometry or new_geometry.isEmpty():
                 return
 
@@ -96,35 +96,33 @@ class RoutesComposer(QObject):
             )
 
             if original_feature:
-                segments_lists_ids = self.segment_manager.get_compositions_list_segments(
+                segments_lists_ids = self.lam.get_segments_list_for_segment(
                     segment_id
                 )
-                next_id = self.split_manager.get_next_id()
-                self.split_manager.update_segment_id(feature_id, next_id)
+                next_id = self.split.get_next_id()
+                self.split.update_segment_id(feature_id, next_id)
 
                 if segments_lists_ids:
-                    self.split_manager.update_compositions_segments(
+                    self.split.update_compositions_segments(
                         feature_id,
                         segment_id,
                         next_id,
                         original_feature,
-                        source_feature,
+                        new_feature,
                         segments_lists_ids,
                     )
-                    self.geometry_changed_on_segments(feature_id)
+                    self.geom.update_geometries_on_the_fly(segment_id)
 
     def features_deleted_on_segments(self, fids):
-        log(fids)
         """Nettoie les compositions des segments supprimés."""
         if self.segments_layer is None or self.compositions_layer is None:
             return
         log(f"Segments supprimées: {fids}")
 
-        self.split_manager.clean_invalid_segments()
+        self.split.clean_invalid_segments()
 
     @timer_decorator
-    def geometry_changed_on_segments(self, fid, geometry=None):
-        log(fid)
+    def geometry_changed_on_segments(self, fid, idx, *args):
         """Crée la géométrie des compositions lors du changement de la géométrie d'un segment"""
         if self.segments_layer is None or self.compositions_layer is None:
             return
@@ -137,9 +135,8 @@ class RoutesComposer(QObject):
         if segment_id is None:
             return
 
-        log(f"Updating geometries for modified segment {segment_id}")
         self.geom.update_geometries_on_the_fly(segment_id)
-        self.compositions_layer.reload()
+        self.compositions_layer.triggerRepaint()
 
     def feature_added_on_compositions(self, fid):
         # On n'exécute pas ce qui suit lors de l'enregistrement.
@@ -223,7 +220,7 @@ class RoutesComposer(QObject):
             f"Attribute '{field_name}' modified on composition: {int(source_feature[compo_id_column_name])}"
         )
 
-        if field_name == self.segments_column_name:
+        if field_name == self.segments_column_name and not self.is_splitting:
             if self.routes_composer_connected:
                 segments_str = source_feature[self.segments_column_name]
                 if not segments_str:

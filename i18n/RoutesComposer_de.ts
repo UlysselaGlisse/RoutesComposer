@@ -517,7 +517,7 @@ und eine &apos;id&apos;-Spalte.&lt;br&gt;
     </message>
     <message>
         <location filename="../layers.py" line="91"/>
-        <source>Le champ {self.id_column_name} n&apos;a pas été trouvé dans la couche segments</source>
+        <source>Le champ {self.seg_id_column_name} n&apos;a pas été trouvé dans la couche segments</source>
         <translation type="obsolete">Das Feld {self.id_column_name} wurde in der Schicht Segmente nicht gefunden</translation>
     </message>
 </context>

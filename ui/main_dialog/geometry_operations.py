@@ -6,8 +6,7 @@ from qgis.PyQt.QtWidgets import QMessageBox
 
 from ... import config
 from ...func.geom_compo import GeomCompo
-from ...func.utils import log
-from ...func.warning import verify_compositions
+from ...func.warning import ErrorsFinder
 from .errors_dialog import ErrorDialog
 
 
@@ -50,7 +49,6 @@ class GeometryOperations(QObject):
             errors_messages = geom_compo.update_compositions_geometries(
                 self.dialog.ui.progress_bar, mode="update"
             )
-            log(errors_messages)
             self.cleanup_after_operation(errors_messages)
 
     def setup_progress_bar(self, compositions_layer):
@@ -81,7 +79,7 @@ class GeometryOperations(QObject):
 
     def check_errors(self):
         if self.dialog.layer_manager.check_layers_and_columns():
-            errors = verify_compositions(
+            errors = ErrorsFinder(
                 self.dialog.layer_manager.segments_layer,
                 self.dialog.layer_manager.compositions_layer,
                 self.dialog.ui.segments_column_combo.currentText(),

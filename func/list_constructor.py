@@ -29,7 +29,7 @@ class IDsBasket(QgsMapTool):
         canvas,
         segments_layer,
         compositions_layer,
-        id_column_name,
+        seg_id_column_name,
         segments_column_name,
         options_widget=None,
     ):
@@ -38,7 +38,7 @@ class IDsBasket(QgsMapTool):
             self.canvas = canvas
         self.segments_layer = segments_layer
         self.compositions_layer = compositions_layer
-        self.id_column_name = id_column_name
+        self.seg_id_column_name = seg_id_column_name
         self.segment_column_name = segments_column_name
 
         self.selected_ids = []
@@ -152,7 +152,7 @@ class IDsBasket(QgsMapTool):
                         closest_feature = feature
 
                 if closest_feature:
-                    feature_id = int(closest_feature[self.id_column_name])
+                    feature_id = int(closest_feature[self.seg_id_column_name])
 
                     if not self.selected_ids:
                         self.selected_ids.append(feature_id)
@@ -205,7 +205,7 @@ class IDsBasket(QgsMapTool):
     def highlight_selected_segments(self):
         """Met en surbrillance (sélection de qgis) les segments sélectionnés"""
 
-        expr = f'"{self.id_column_name}" IN ({",".join(map(str, self.selected_ids))})'
+        expr = f'"{self.seg_id_column_name}" IN ({",".join(map(str, self.selected_ids))})'
 
         self.segments_layer.selectByExpression(expr)
 
@@ -271,7 +271,7 @@ class IDsBasket(QgsMapTool):
                 neighbor_feature = next(
                     self.segments_layer.getFeatures(
                         QgsFeatureRequest().setFilterExpression(
-                            f'"{self.id_column_name}" = {neighbor_id}'
+                            f'"{self.seg_id_column_name}" = {neighbor_id}'
                         )
                     )
                 )
@@ -304,7 +304,7 @@ class IDsBasket(QgsMapTool):
         connected = []
 
         request = QgsFeatureRequest().setFilterExpression(
-            f'"{self.id_column_name}" = {segment_id}'
+            f'"{self.seg_id_column_name}" = {segment_id}'
         )
         current_feature = next(self.segments_layer.getFeatures(request))
         current_geom = current_feature.geometry()
@@ -316,13 +316,13 @@ class IDsBasket(QgsMapTool):
 
         request = QgsFeatureRequest().setFilterFids(candidates)
         for feature in self.segments_layer.getFeatures(request):
-            if feature[self.id_column_name] == segment_id:
+            if feature[self.seg_id_column_name] == segment_id:
                 continue
 
             other_geom = feature.geometry()
 
             if current_geom.touches(other_geom):
-                connected.append(int(feature[self.id_column_name]))
+                connected.append(int(feature[self.seg_id_column_name]))
 
         self.connectivity_cache[segment_id] = connected
         return connected

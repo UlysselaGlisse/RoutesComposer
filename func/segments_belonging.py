@@ -41,7 +41,7 @@ class SegmentsBelonging:
 
     def update_belonging_column(self, composition_id=None):
         try:
-            segments_appartenance = (
+            segments_belonging = (
                 self.segments_manager.create_segments_belonging_dictionary()
             )
             features = None
@@ -49,17 +49,18 @@ class SegmentsBelonging:
             if composition_id:
                 segments_to_update = set()
 
-                segments = self.segments_manager.get_segments_for_composition(
+                segments_list = self.segments_manager.get_segments_list_for_composition(
                     composition_id
                 )
-                for segment in segments:
-                    segments_to_update.add(segment)
+                if segments_list:
+                    for segment in segments_list:
+                        segments_to_update.add(segment)
 
-                if segments_to_update:
-                    expr = f'"{self.seg_id_column_name}" IN ({",".join(map(str, segments_to_update))})'
-                    request = QgsFeatureRequest().setFilterExpression(expr)
+                    if segments_to_update:
+                        expr = f'"{self.seg_id_column_name}" IN ({",".join(map(str, segments_to_update))})'
+                        request = QgsFeatureRequest().setFilterExpression(expr)
 
-                    features = self.segments_layer.getFeatures(request)
+                        features = self.segments_layer.getFeatures(request)
 
             if features is None:
                 features = self.segments_layer.getFeatures()
@@ -70,7 +71,7 @@ class SegmentsBelonging:
             for segment in features:
                 appartenance_str = ",".join(
                     sorted(
-                        segments_appartenance.get(segment[self.seg_id_column_name], [])
+                        segments_belonging.get(segment[self.seg_id_column_name], [])
                     )
                 )
                 if segment.id() >= 0:

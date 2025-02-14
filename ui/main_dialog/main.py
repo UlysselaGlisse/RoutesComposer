@@ -4,7 +4,7 @@ import os
 
 from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QSettings, QTranslator
-from qgis.PyQt.QtWidgets import QDialog
+from qgis.PyQt.QtWidgets import QApplication, QDialog
 from qgis.utils import iface
 
 from ...connexions_handler import ConnexionsHandler
@@ -53,11 +53,22 @@ class RoutesComposerDialog(QDialog):
         self.ui.init_linkages()
         self.update_ui_state()
 
+    def get_theme_stylesheet(self):
+        """Méthode statique pour obtenir le style selon le thème actuel"""
+        if QApplication.instance().palette().window().color().lightness() < 128:
+            theme_file = "dark_theme.css"
+        else:
+            theme_file = "light_theme.css"
+
+        style_file = os.path.join(os.path.dirname(__file__), "..", "styles", theme_file)
+
+        if os.path.exists(style_file):
+            with open(style_file, 'r', encoding='utf-8') as f:
+                return f.read()
+        return ""
+
     def load_styles(self):
-        with open(
-            os.path.join(os.path.dirname(__file__), "..", "styles.css"), "r"
-        ) as f:
-            return f.read()
+            return self.get_theme_stylesheet()
 
     def load_settings(self):
         project = QgsProject.instance()
