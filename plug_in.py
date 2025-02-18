@@ -93,20 +93,10 @@ class RoutesComposerTool:
             auto_start, _ = project.readBoolEntry(
                 "routes_composer", "auto_start", False
             )
-            geom_on_fly, _ = project.readBoolEntry(
-                "routes_composer", "geom_on_fly", False
-            )
-            belonging, _ = project.readBoolEntry(
-                "routes_composer", "belonging", False
-            )
 
             if self.checks_layers():
                 if auto_start:
                     self.connexions_handler.connect_routes_composer()
-                if geom_on_fly:
-                    self.connexions_handler.connect_geom_on_fly()
-                if belonging:
-                    self.connexions_handler.connect_belonging()
 
             self.update_icon()
 
@@ -182,11 +172,6 @@ class RoutesComposerTool:
         if not isinstance(tool, IDsBasket):
             self.ids_basket_action.setChecked(False)
 
-    def reset_plugin_state(self):
-        if self.dialog:
-            self.dialog.reset_ui_state()
-            self.dialog.close()
-
     def unload(self):
         for action in self.actions:
             self.iface.removeToolBarIcon(action)
@@ -196,10 +181,6 @@ class RoutesComposerTool:
         del self.toolbar
         if self.connexions_handler.routes_composer_connected:
             self.connexions_handler.disconnect_routes_composer()
-        if self.connexions_handler.belonging_connected:
-            self.connexions_handler.disconnect_belonging()
-        if self.connexions_handler.geom_on_fly_connected:
-            self.connexions_handler.disconnect_geom_on_fly()
 
     def update_icon(self):
         icon_path = os.path.join(

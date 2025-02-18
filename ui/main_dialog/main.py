@@ -60,15 +60,17 @@ class RoutesComposerDialog(QDialog):
         else:
             theme_file = "light_theme.css"
 
-        style_file = os.path.join(os.path.dirname(__file__), "..", "styles", theme_file)
+        style_file = os.path.join(
+            os.path.dirname(__file__), "..", "styles", theme_file
+        )
 
         if os.path.exists(style_file):
-            with open(style_file, 'r', encoding='utf-8') as f:
+            with open(style_file, "r", encoding="utf-8") as f:
                 return f.read()
         return ""
 
     def load_styles(self):
-            return self.get_theme_stylesheet()
+        return self.get_theme_stylesheet()
 
     def load_settings(self):
         project = QgsProject.instance()
@@ -100,10 +102,14 @@ class RoutesComposerDialog(QDialog):
                     saved_segments_attr
                 )
                 if segments_attr_index >= 0:
-                    self.ui.segments_attr_combo.setCurrentIndex(segments_attr_index)
+                    self.ui.segments_attr_combo.setCurrentIndex(
+                        segments_attr_index
+                    )
             if saved_compositions_attr:
-                compositions_attr_index = self.ui.compositions_attr_combo.findText(
-                    saved_compositions_attr
+                compositions_attr_index = (
+                    self.ui.compositions_attr_combo.findText(
+                        saved_compositions_attr
+                    )
                 )
                 if compositions_attr_index >= 0:
                     self.ui.compositions_attr_combo.setCurrentIndex(
@@ -112,7 +118,9 @@ class RoutesComposerDialog(QDialog):
 
             self.ui.priority_mode_combo.setCurrentText(saved_priority_mode)
 
-            belonging, _ = project.readBoolEntry("routes_composer", "belonging", False)
+            belonging, _ = project.readBoolEntry(
+                "routes_composer", "belonging", False
+            )
             self.ui.update_belonging_segments_checkbox.setChecked(belonging)
 
     def setup_signals(self):
@@ -141,11 +149,15 @@ class RoutesComposerDialog(QDialog):
         self.ui.geom_checkbox.stateChanged.connect(
             self.event_handlers.on_geom_on_fly_check
         )
-        self.ui.check_errors_button.clicked.connect(self.geometry_ops.check_errors)
+        self.ui.check_errors_button.clicked.connect(
+            self.geometry_ops.check_errors
+        )
         self.ui.create_or_update_geom_button.clicked.connect(
             self.geometry_ops.create_geometries
         )
-        self.ui.cancel_button.clicked.connect(self.event_handlers.cancel_process)
+        self.ui.cancel_button.clicked.connect(
+            self.event_handlers.cancel_process
+        )
 
         # Advanced options
 
@@ -162,7 +174,9 @@ class RoutesComposerDialog(QDialog):
             self.advanced_options.start_attribute_linking
         )
 
-        self.ui.save_linkage_button.clicked.connect(self.event_handlers.save_linkage)
+        self.ui.save_linkage_button.clicked.connect(
+            self.event_handlers.save_linkage
+        )
 
         # Appartenance des segments
 
@@ -179,7 +193,9 @@ class RoutesComposerDialog(QDialog):
     def update_ui_state(self):
         if ConnexionsHandler.routes_composer_connected:
             self.ui.start_button.setText(self.tr("Arrêter"))
-            self.ui.status_label.setText(self.tr("Status: En cours d'exécution"))
+            self.ui.status_label.setText(
+                self.tr("Status: En cours d'exécution")
+            )
         else:
             self.ui.start_button.setText(self.tr("Démarrer"))
             self.ui.status_label.setText(self.tr("Status: Arrêté"))
@@ -189,31 +205,6 @@ class RoutesComposerDialog(QDialog):
     def closeEvent(self, a0):
         if a0 is not None:
             a0.accept()
-            RoutesComposerDialog._instance = None
-
-    def reset_ui_state(self):
-        self.ui.auto_start_checkbox.setChecked(False)
-        self.ui.geom_checkbox.setChecked(False)
-
-        self.ui.segments_combo.setCurrentIndex(-1)
-        self.ui.compositions_combo.setCurrentIndex(-1)
-        self.ui.segments_column_combo.clear()
-        self.ui.seg_id_column_combo.clear()
-        self.ui.compo_id_column_combo.clear()
-        self.ui.segments_attr_combo.clear()
-        self.ui.compositions_attr_combo.clear()
-
-        self.ui.priority_mode_combo.setCurrentIndex(0)
-
-        self.ui.progress_bar.setValue(0)
-        self.ui.progress_bar.setVisible(False)
-
-        self.ui.status_label.setText(self.tr("Status: Arrêté"))
-        self.ui.start_button.setText(self.tr("Démarrer"))
-        self.ui.start_button.setStyleSheet(self.ui.get_start_button_style())
-
-        self.ui.advanced_options_container.setVisible(False)
-        self.ui.toggle_advanced_arrow.setText("▶")
 
     def showEvent(self, a0):
         if a0 is not None:
@@ -228,7 +219,9 @@ class RoutesComposerDialog(QDialog):
             self.layer_manager.refresh_layers_combo(self.ui.segments_combo)
             self.layer_manager.refresh_layers_combo(self.ui.compositions_combo)
 
-            self.layer_manager.populate_segments_layer_combo(self.ui.segments_combo)
+            self.layer_manager.populate_segments_layer_combo(
+                self.ui.segments_combo
+            )
             self.layer_manager.populate_compositions_layer_combo(
                 self.ui.compositions_combo
             )

@@ -36,7 +36,7 @@ Go to the plugin extension menu of Qgis and search for RoutesComposer.
 # Usage
 ### Prerequisites:
 * Two input layers are required, one for segments and another for compositions.
-* The layers can be in any format (GeoPackage, PostgreSQL, shp, geojson, ...).
+* The layers can be in any format (GeoPackage, PostgreSQL, shp, geojson, ...), but best performances will be achieved with Geopackage and Sqlite.
 * They can have any name you want.
 * The only requirement is that the field containing the segment list must be of type string, and the segment layer must have a field named "id" - the one used to build your compositions.
 

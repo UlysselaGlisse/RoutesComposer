@@ -7,7 +7,7 @@ from .func.attributes import AttributeLinker
 from .func.geom_compo import GeomCompo
 from .func.segments_belonging import SegmentsBelonging
 from .func.split import SplitManager
-from .func.utils import LayersAssociationManager, log, timer_decorator
+from .func.utils import LayersAssociationManager, log
 
 
 class RoutesComposer(QObject):
@@ -68,7 +68,6 @@ class RoutesComposer(QObject):
 
         self.is_splitting = False
 
-    @timer_decorator
     def feature_added_on_segments(self, fid):
         """Traite l'ajout d'une nouvelle entité dans la couche segments."""
         # Pendant l'enregistrement: fid >= 0.'
@@ -114,7 +113,8 @@ class RoutesComposer(QObject):
                         new_feature,
                         segments_lists_ids,
                     )
-                    self.geom.update_geometries_on_the_fly(segment_id)
+                    # self.geom.update_geometries_on_the_fly(segment_id)
+                    self.compositions_layer.commitChanges()
 
     def features_deleted_on_segments(self, fids):
         """Nettoie les compositions des segments supprimés."""
@@ -124,7 +124,6 @@ class RoutesComposer(QObject):
 
         self.split.clean_invalid_segments()
 
-    @timer_decorator
     def geometry_changed_on_segments(self, fid, idx, *args):
         """Crée la géométrie des compositions lors du changement de la géométrie d'un segment"""
         if self.segments_layer is None or self.compositions_layer is None:
@@ -141,7 +140,6 @@ class RoutesComposer(QObject):
         self.geom.update_geometries_on_the_fly(segment_id)
         self.compositions_layer.triggerRepaint()
 
-    @timer_decorator
     def feature_added_on_compositions(self, fid):
         # On n'exécute pas ce qui suit lors de l'enregistrement.
         if fid >= 0:
@@ -209,7 +207,6 @@ class RoutesComposer(QObject):
 
         self.segments_layer.reload()
 
-    @timer_decorator
     def feature_changed_on_compositions(self, fid, idx, *args):
         if self.segments_layer is None or self.compositions_layer is None:
             return
@@ -336,28 +333,64 @@ class RoutesComposer(QObject):
                     )
                     self.seg_feature_deleted_connected = True
 
-                if not self.comp_feature_added_connected:
-                    self.compositions_layer.featureAdded.connect(
-                        self.feature_added_on_compositions
-                    )
-                    self.comp_feature_added_connected = True
+                # Geom on fly check :
 
-                if not self.comp_attr_value_changed_connected:
-                    self.compositions_layer.attributeValueChanged.connect(
-                        self.feature_changed_on_compositions
-                    )
-                    self.comp_attr_value_changed_connected = True
+                geom = self.project.readBoolEntry(
+                    "routes_composer", "geom_on_fly", False
+                )[0]
+                if geom:
+                    if not self.seg_geom_changed_connected:
+                        self.segments_layer.geometryChanged.connect(
+                            self.geometry_changed_on_segments
+                        )
+                        self.seg_geom_changed_connected = True
 
+                    if not self.comp_feature_added_connected:
+                        self.compositions_layer.featureAdded.connect(
+                            self.feature_added_on_compositions
+                        )
+                        self.comp_feature_added_connected = True
+
+                    if not self.comp_attr_value_changed_connected:
+                        self.compositions_layer.attributeValueChanged.connect(
+                            self.feature_changed_on_compositions
+                        )
+                        self.comp_attr_value_changed_connected = True
+
+                    log("geom_on_fly connected" if geom else "")
+                    self.geom_on_fly_connected = True
+
+                # Appartenance des segments check :
+                belonging = self.project.readBoolEntry(
+                    "routes_composer", "belonging"
+                )[0]
+                if belonging:
+                    if not self.comp_feature_added_connected:
+                        self.compositions_layer.featureAdded.connect(
+                            self.feature_added_on_compositions
+                        )
+                        self.comp_feature_added_connected = True
+
+                    if not self.comp_attr_value_changed_connected:
+                        self.compositions_layer.attributeValueChanged.connect(
+                            self.feature_changed_on_compositions
+                        )
+                        self.comp_attr_value_changed_connected = True
+
+                    if not self.comp_feature_deleted_connected:
+                        self.compositions_layer.featuresDeleted.connect(
+                            self.features_deleted_on_compositions
+                        )
+                        self.comp_feature_deleted_connected = True
+
+                    self.belonging_connected = True
+                    log("Belonging connected" if belonging else "")
                 self.routes_composer_connected = True
 
-                log("Routes Composer has started", level="INFO")
-                iface.messageBar().pushMessage(
-                    "Info",
-                    self.tr(
-                        "Le suivi par RoutesComposer a démarré",
-                    ),
-                    level=Qgis.MessageLevel.Info,
+                log(
+                    f"état comp feature deleted:{self.comp_feature_deleted_connected}"
                 )
+                log("Routes Composer has started", level="INFO")
 
                 return True
 
@@ -370,185 +403,83 @@ class RoutesComposer(QObject):
             return False
 
     def disconnect_routes_composer(self):
-        try:
-            if (
-                self.segments_layer is not None
-                and self.routes_composer_connected
-            ):
-                if self.seg_feature_added_connected:
+        if (
+            self.segments_layer is not None
+            and self.compositions_layer is not None
+        ):
+            # Déconnexion des signaux de la couche segments
+            if self.seg_feature_added_connected:
+                try:
                     self.segments_layer.featureAdded.disconnect(
                         self.feature_added_on_segments
                     )
                     self.seg_feature_added_connected = False
+                except Exception as e:
+                    log(
+                        f"Erreur lors de la déconnexion de featureAdded on segments: {str(e)}"
+                    )
 
-                if self.seg_feature_deleted_connected:
+            if self.seg_feature_deleted_connected:
+                try:
                     self.segments_layer.featuresDeleted.disconnect(
                         self.features_deleted_on_segments
                     )
                     self.seg_feature_deleted_connected = False
-
-                if (
-                    self.compositions_layer is not None
-                    and self.comp_feature_added_connected
-                ):
-                    self.compositions_layer.featureAdded.disconnect(
-                        self.feature_added_on_compositions
-                    )
-                    self.comp_feature_added_connected = False
-
-                if (
-                    self.compositions_layer is not None
-                    and self.comp_attr_value_changed_connected
-                ):
-                    self.compositions_layer.attributeValueChanged.disconnect(
-                        self.feature_changed_on_compositions
-                    )
-                    self.comp_attr_value_changed_connected = False
-
-                self.routes_composer_connected = False
-
-                log("Script has been stopped.", level="INFO")
-                iface.messageBar().pushMessage(
-                    "Info",
-                    self.tr(
-                        "Le suivi par RoutesComposer est arrêté",
-                    ),
-                    level=Qgis.MessageLevel.Info,
-                )
-            else:
-                log("Segments layer is None or is_connect is false.")
-        except Exception as e:
-            iface.messageBar().pushMessage(
-                self.tr("Erreur"),
-                str(e),
-                level=Qgis.MessageLevel.Critical,
-            )
-
-    def connect_geom(self):
-        """Démarre la création en continue des géométries de compositions."""
-        try:
-            if not self.project:
-                return
-            geom_on_fly, _ = self.project.readBoolEntry(
-                "routes_composer", "geom_on_fly", False
-            )
-            if geom_on_fly:
-                if (
-                    self.segments_layer is not None
-                    and not self.seg_geom_changed_connected
-                ):
-                    self.segments_layer.geometryChanged.connect(
-                        self.geometry_changed_on_segments
+                except Exception as e:
+                    log(
+                        f"Erreur lors de la déconnexion de featuresDeleted on segments: {str(e)}"
                     )
 
-                    self.seg_geom_changed_connected = True
-                    self.geom_on_fly_connected = True
-                    log("GeomOnFly has started")
-        except TypeError:
-            log(
-                "La fonction geometry_changed n'a pas pu être connectée.",
-                level="WARNING",
-            )
-
-    def disconnect_geom(self):
-        try:
-            if self.segments_layer is None:
-                return
-
-            else:
-                if self.seg_geom_changed_connected:
+            if self.seg_geom_changed_connected:
+                try:
                     self.segments_layer.geometryChanged.disconnect(
                         self.geometry_changed_on_segments
                     )
-
                     self.seg_geom_changed_connected = False
-                    self.geom_on_fly_connected = False
-
-                    log("GeomOnFly has been stoped")
-
-        except TypeError:
-            log(
-                "La fonction geometry_changed n'était pas connectée.",
-                level="WARNING",
-            )
-
-    def connect_belonging(self):
-        try:
-            if (
-                self.segments_layer is not None
-                and self.compositions_layer is not None
-            ):
-                if not self.comp_feature_added_connected:
-                    self.compositions_layer.featureAdded.connect(
-                        self.feature_added_on_compositions
+                except Exception as e:
+                    log(
+                        f"Erreur lors de la déconnexion de geometryChanged on segments: {str(e)}"
                     )
-                    self.comp_feature_added_connected = True
 
-                if not self.comp_attr_value_changed_connected:
-                    self.compositions_layer.attributeValueChanged.connect(
-                        self.feature_changed_on_compositions
-                    )
-                    self.comp_attr_value_changed_connected = True
-
-                if not self.comp_feature_deleted_connected:
-                    self.compositions_layer.featuresDeleted.connect(
-                        self.features_deleted_on_compositions
-                    )
-                    self.comp_feature_deleted_connected = True
-
-                self.belonging_connected = True
-
-                log("Belonging has been connected")
-
-        except Exception as e:
-            iface.messageBar().pushMessage(
-                self.tr("Erreur"),
-                str(e),
-                level=Qgis.MessageLevel.Critical,
-            )
-            return False
-
-    def disconnect_belonging(self):
-        try:
-            if (
-                self.segments_layer is not None
-                and self.compositions_layer is not None
-            ):
-                if (
-                    self.comp_feature_added_connected
-                    and not self.routes_composer_connected
-                ):
+            # Déconnexion des signaux de la couche compositions
+            if self.comp_feature_added_connected:
+                try:
                     self.compositions_layer.featureAdded.disconnect(
                         self.feature_added_on_compositions
                     )
                     self.comp_feature_added_connected = False
+                except Exception as e:
+                    log(
+                        f"Erreur lors de la déconnexion de featureAdded on compositions: {str(e)}"
+                    )
 
-                if (
-                    self.comp_attr_value_changed_connected
-                    and not self.routes_composer_connected
-                ):
+            if self.comp_attr_value_changed_connected:
+                try:
                     self.compositions_layer.attributeValueChanged.disconnect(
                         self.feature_changed_on_compositions
                     )
                     self.comp_attr_value_changed_connected = False
+                except Exception as e:
+                    log(
+                        f"Erreur lors de la déconnexion de attributeValueChanged on compositions: {str(e)}"
+                    )
 
-                if self.comp_feature_deleted_connected:
-                    self.compositions_layer.featuresDeleted.disconnect(
+            if self.comp_feature_deleted_connected:
+                try:
+                    self.compositions_layer.featureDeleted.disconnect(
                         self.features_deleted_on_compositions
                     )
                     self.comp_feature_deleted_connected = False
+                except Exception as e:
+                    log(
+                        f"Erreur lors de la déconnexion de featureDeleted on compositions: {str(e)}"
+                    )
 
-                self.belonging_connected = False
+            self.routes_composer_connected = False
+            self.belonging_connected = False
+            self.geom_on_fly_connected = False
 
-                log("Belonging has been disconnected")
-
-        except Exception as e:
-            iface.messageBar().pushMessage(
-                self.tr("Erreur"),
-                str(e),
-                level=Qgis.MessageLevel.Critical,
-            )
-            return False
+            log("Script has been stopped.", level="INFO")
 
     def get_segments_layer(self):
         if not self.project:
@@ -652,11 +583,14 @@ class RoutesComposer(QObject):
                     remove_layer_id == self.compositions_layer_id
                     or remove_layer_id == self.segments_layer_id
                 ):
-                    log("layer followed removed")
-                    from .ui.main_dialog.main import RoutesComposerDialog
+                    try:
+                        log("layer followed removed")
+                        from .ui.main_dialog.main import RoutesComposerDialog
 
-                    dialog = RoutesComposerDialog.get_instance()
-                    dialog.event_handlers.stop_running_routes_composer()
+                        dialog = RoutesComposerDialog.get_instance()
+                        dialog.event_handlers.stop_running_routes_composer()
 
-                    if dialog.ui.geom_checkbox.isChecked():
-                        dialog.ui.geom_checkbox.setChecked(False)
+                        if dialog.ui.geom_checkbox.isChecked():
+                            dialog.ui.geom_checkbox.setChecked(False)
+                    except Exception as e:
+                        log(f"Error removing layer: {e}")

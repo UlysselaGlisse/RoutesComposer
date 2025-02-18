@@ -79,9 +79,15 @@ class SplitManager:
                     self.process_single_segment_composition(fid, old_id, new_id)
 
             if updates:
+                self.rc.compositions_layer.startEditing()
+                self.rc.compositions_layer.beginEditCommand(
+                    "Update compositions"
+                )
                 self.rc.compositions_layer.dataProvider().changeAttributeValues(
                     updates
                 )
+                self.rc.compositions_layer.endEditCommand()
+                self.rc.compositions_layer.commitChanges()
             self.rc.compositions_layer.reload()
 
         except Exception as e:

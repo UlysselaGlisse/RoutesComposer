@@ -28,8 +28,8 @@ class SegmentsBelonging:
         project = QgsProject.instance()
         if not project:
             return
-        segments_layer = project.mapLayersByName("seg")[0]
-        compositions_layer = project.mapLayersByName("comp")[0]
+        segments_layer = project.mapLayersByName("gseg")[0]
+        compositions_layer = project.mapLayersByName("gcom")[0]
         segments_column_name = "segments"
         seg_id_column_name = "id"
         compo_id_column_name = "id"
@@ -63,9 +63,6 @@ class SegmentsBelonging:
 
     @timer_decorator
     def update_belonging_column(self, composition_id=None):
-        if self.segments_layer is None:
-            print("problème avec les couches")
-        print(self.segments_layer.name())
         try:
             segments_belonging = (
                 self.segments_manager.create_segments_belonging_dictionary()
@@ -97,9 +94,6 @@ class SegmentsBelonging:
             attr_idx = self.segments_layer.fields().indexOf(
                 self.belonging_column
             )
-            self.segments_layer.startEditing()
-            self.segments_layer.beginEditCommand("edit")
-
             for segment in features:
                 appartenance_str = ",".join(
                     sorted(
@@ -120,7 +114,7 @@ class SegmentsBelonging:
                 self.segments_layer.dataProvider().changeAttributeValues(
                     updates
                 )
-                self.segments_layer.commitChanges()
+                # self.segments_layer.commitChanges()
 
             return True
 

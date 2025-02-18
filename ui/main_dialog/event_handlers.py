@@ -7,6 +7,7 @@ from qgis.utils import iface
 
 from ... import config
 from ...connexions_handler import ConnexionsHandler
+from ...func.utils import log
 
 
 class EventHandlers(QObject):
@@ -47,12 +48,6 @@ class EventHandlers(QObject):
     def stop_running_routes_composer(self):
         self.connexions_handler.disconnect_routes_composer()
 
-        if self.dialog.ui.geom_checkbox.isChecked():
-            self.dialog.ui.geom_checkbox.setChecked(False)
-
-        if self.dialog.ui.update_belonging_segments_checkbox.isChecked():
-            self.dialog.ui.update_belonging_segments_checkbox.setChecked(False)
-
         if self.dialog.tool:
             self.dialog.tool.update_icon()
 
@@ -61,34 +56,26 @@ class EventHandlers(QObject):
     def on_geom_on_fly_check(self, state):
         project = QgsProject.instance()
         if project:
-            project.writeEntry("routes_composer", "geom_on_fly", bool(state))
-            project.setDirty(True)
             geom_on_fly = bool(state)
+            project.writeEntry("routes_composer", "geom_on_fly", geom_on_fly)
+            project.setDirty(True)
+            if ConnexionsHandler.routes_composer_connected:
+                self.connexions_handler.disconnect_routes_composer()
+                self.connexions_handler.connect_routes_composer()
 
-            if (
-                geom_on_fly
-                and self.dialog.layer_manager.check_layers_and_columns()
-            ):
-                self.dialog.layer_manager.save_selected_layers_and_columns()
-                self.connexions_handler.connect_geom_on_fly()
-
-            elif not geom_on_fly:
-                self.connexions_handler.disconnect_geom_on_fly()
+            log(f"geom_on_fly: {geom_on_fly}")
 
     def on_belonging_check(self, state):
         project = QgsProject.instance()
         if project:
-            project.writeEntry("routes_composer", "belonging", bool(state))
-            project.setDirty(True)
             belonging = bool(state)
+            project.writeEntry("routes_composer", "belonging", belonging)
+            project.setDirty(True)
+            if ConnexionsHandler.routes_composer_connected:
+                self.connexions_handler.disconnect_routes_composer()
+                self.connexions_handler.connect_routes_composer()
 
-            if (
-                belonging
-                and self.dialog.layer_manager.check_layers_and_columns()
-            ):
-                self.connexions_handler.connect_belonging()
-            elif not belonging:
-                self.connexions_handler.disconnect_belonging()
+            log(f"belonging: {belonging}")
 
     def save_linkage(self):
         compositions_attr = self.dialog.ui.compositions_attr_combo.currentText()
