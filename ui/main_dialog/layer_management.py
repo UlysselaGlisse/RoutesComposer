@@ -109,12 +109,12 @@ class LayerManager(QObject):
     def populate_segments_column_combo(self, compositions_layer):
         self.dialog.ui.segments_column_combo.clear()
 
-        if compositions_layer:
+        if compositions_layer and self.project:
             field_names = [field.name() for field in compositions_layer.fields()]
             self.dialog.ui.segments_column_combo.addItems(field_names)
 
-            segments_column_name = self.settings.value(
-                "routes_composer/segments_column_name", ""
+            segments_column_name, _ = self.project.readEntry(
+                "routes_composer", "segments_column_name", ""
             )
             segments_column_idx = self.dialog.ui.segments_column_combo.findText(
                 segments_column_name
@@ -228,7 +228,9 @@ class LayerManager(QObject):
         self.project.writeEntry("routes_composer", "seg_id_column_name", id_column)
 
         segments_column = self.dialog.ui.segments_column_combo.currentText()
-        self.settings.setValue("routes_composer/segments_column_name", segments_column)
+        self.project.writeEntry(
+            "routes_composer", "segments_column_name", segments_column
+        )
 
         compo_id_column = self.dialog.ui.compo_id_column_combo.currentText()
         self.settings.setValue("routes_composer/compo_id_column_name", compo_id_column)

@@ -122,8 +122,8 @@ class RoutesComposerTool:
         if compositions_layer is None:
             return
 
-        segments_column_name = settings.value(
-            "routes_composer/segments_column_name", "segments"
+        segments_column_name, _ = self.project.readEntry(
+            "routes_composer", "segments_column_name", "segments"
         )
         if segments_column_name not in compositions_layer.fields().names():
             return

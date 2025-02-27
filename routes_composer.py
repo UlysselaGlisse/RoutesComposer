@@ -532,24 +532,25 @@ class RoutesComposer(QObject):
         return self.compositions_layer
 
     def get_segments_column_name(self):
-        self.segments_column_name = self.settings.value(
-            "routes_composer/segments_column_name", "segments"
-        )
-        if self.compositions_layer is not None:
-            self.segments_column_index = int(
-                self.compositions_layer.fields().indexOf(self.segments_column_name)
+        if self.project:
+            self.segments_column_name, _ = self.project.readEntry(
+                "routes_composer", "segments_column_name", "segments"
             )
-
-            if self.segments_column_index == -1:
-                raise Exception(
-                    self.tr(
-                        "Le champ '{segments_column_name}' n'existe pas dans la couche compositions".format(
-                            segments_column_name=self.segments_column_name
-                        ),
-                    )
+            if self.compositions_layer is not None:
+                self.segments_column_index = int(
+                    self.compositions_layer.fields().indexOf(self.segments_column_name)
                 )
 
-        return self.segments_column_name, self.segments_column_index
+                if self.segments_column_index == -1:
+                    raise Exception(
+                        self.tr(
+                            "Le champ '{segments_column_name}' n'existe pas dans la couche compositions".format(
+                                segments_column_name=self.segments_column_name
+                            ),
+                        )
+                    )
+
+            return self.segments_column_name, self.segments_column_index
 
     def get_id_column_name(self):
         if self.project:
