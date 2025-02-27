@@ -508,8 +508,8 @@ class RoutesComposer(QObject):
         settings = QSettings()
         if not self.project:
             return
-        self.compositions_layer_id = settings.value(
-            "routes_composer/compositions_layer_id", ""
+        self.compositions_layer_id, _ = self.project.readEntry(
+            "routes_composer", "compositions_layer_id", ""
         )
         if not self.compositions_layer_id:
             return

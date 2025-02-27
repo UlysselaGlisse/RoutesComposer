@@ -100,8 +100,8 @@ class LayerManager(QObject):
 
     def populate_compositions_layer_combo(self, combo):
         if self.project:
-            saved_compositions_layer_id = self.settings.value(
-                "routes_composer/compositions_layer_id", ""
+            saved_compositions_layer_id, _ = self.project.readEntry(
+                "routes_composer", "compositions_layer_id", ""
             )
             log(saved_compositions_layer_id)
             compositions_index = combo.findData(saved_compositions_layer_id)
@@ -257,7 +257,9 @@ class LayerManager(QObject):
         self.project.writeEntry("routes_composer", "segments_layer_id", segments_id)
 
         compositions_id = self.dialog.ui.compositions_combo.currentData()
-        self.settings.setValue("routes_composer/compositions_layer_id", compositions_id)
+        self.project.writeEntry(
+            "routes_composer", "compositions_layer_id", compositions_id
+        )
 
         id_column = self.dialog.ui.seg_id_column_combo.currentText()
         self.settings.setValue("routes_composer/seg_id_column_name", id_column)

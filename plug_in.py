@@ -92,8 +92,8 @@ class RoutesComposerTool:
             saved_segments_layer_id, _ = self.project.readEntry(
                 "routes_composer", "segments_layer_id", ""
             )
-            saved_compositions_layer_id = settings.value(
-                "routes_composer/compositions_layer_id", ""
+            saved_compositions_layer_id, _ = self.project.readEntry(
+                "routes_composer", "compositions_layer_id", ""
             )
             if not self.project.mapLayer(
                 saved_segments_layer_id
@@ -113,8 +113,8 @@ class RoutesComposerTool:
         if segments_layer is None:
             return
 
-        compositions_layer_id = settings.value(
-            "routes_composer/compositions_layer_id", ""
+        compositions_layer_id, _ = self.project.readEntry(
+            "routes_composer", "compositions_layer_id", ""
         )
         compositions_layer = cast(
             QgsVectorLayer, self.project.mapLayer(compositions_layer_id)
