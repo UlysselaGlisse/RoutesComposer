@@ -163,8 +163,11 @@ class RoutesComposer(QObject):
         if not source_feature.isValid():
             return
 
-        compo_id_column_name = (
-            self.settings.value("routes_composer/compo_id_column_name", "id") or "id"
+        if not self.project:
+            return
+        compo_id_column_name, _ = (
+            self.project.readEntry("routes_composer", "compo_id_column_name", "id")
+            or "id"
         )
 
         log(
@@ -226,8 +229,11 @@ class RoutesComposer(QObject):
         if not source_feature.isValid():
             return
 
-        compo_id_column_name = (
-            self.settings.value("routes_composer/compo_id_column_name", "id") or "id"
+        if not self.project:
+            return
+        compo_id_column_name, _ = (
+            self.project.readEntry("routes_composer", "compo_id_column_name", "id")
+            or "id"
         )
 
         field_name = self.compositions_layer.fields()[idx].name()
@@ -290,15 +296,20 @@ class RoutesComposer(QObject):
             return
         log(f"Features removed from compositions: {fids}")
 
+        if not self.project:
+            return
+        compo_id_column_name, _ = (
+            self.project.readEntry("routes_composer", "compo_id_column_name", "id")
+            or "id"
+        )
+
         if self.belonging_connected:
             self.belong = SegmentsBelonging(
                 self.segments_layer,
                 self.compositions_layer,
                 self.seg_id_column_name,
                 self.segments_column_name,
-                compo_id_column_name=self.settings.value(
-                    "routes_composer/compo_id_column_name", "id"
-                ),
+                compo_id_column_name,
             )
             if self.belong.update_belonging_column():
                 log("Belonging column on segments layer updated.")
