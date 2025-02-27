@@ -552,21 +552,22 @@ class RoutesComposer(QObject):
         return self.segments_column_name, self.segments_column_index
 
     def get_id_column_name(self):
-        self.seg_id_column_name = self.settings.value(
-            "routes_composer/seg_id_column_name", "id"
-        )
-        if self.segments_layer is not None:
-            self.id_column_index = self.segments_layer.fields().indexOf(
-                self.seg_id_column_name
+        if self.project:
+            self.seg_id_column_name, _ = self.project.readEntry(
+                "routes_composer", "seg_id_column_name", "id"
             )
-        if self.id_column_index == -1:
-            raise Exception(
-                self.tr(
-                    f"Le champ {self.seg_id_column_name} n'a pas été trouvé dans la couche segments",
+            if self.segments_layer is not None:
+                self.id_column_index = self.segments_layer.fields().indexOf(
+                    self.seg_id_column_name
                 )
-            )
+            if self.id_column_index == -1:
+                raise Exception(
+                    self.tr(
+                        f"Le champ {self.seg_id_column_name} n'a pas été trouvé dans la couche segments",
+                    )
+                )
 
-        return self.seg_id_column_name, self.id_column_index
+            return self.seg_id_column_name, self.id_column_index
 
     def on_layer_removed(self, layer_ids):
         if self.routes_composer_connected:

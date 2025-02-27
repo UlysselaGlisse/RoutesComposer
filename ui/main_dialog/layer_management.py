@@ -41,43 +41,6 @@ class LayerManager(QObject):
                             Qt.ItemDataRole.ToolTipRole,
                         )
 
-    # def populate_layer_combo(self, combo, type_name):
-    #     """
-    #     Popule le combo avec les couches de type QgsVectorLayer.
-    #     :param combo: QComboBox à remplir.
-    #     :param type_name: Nom du type de couche ('segments' ou 'compositions').
-    #     """
-    #     if self.project:
-    #         saved_layer_id, _ = self.project.readEntry(
-    #             "routes_composer", f"{type_name}_layer_id", ""
-    #         )
-    #         combo.clear()
-
-    #         # Ajouter les couches de la carte
-    #         for layer in self.project.mapLayers().values():
-    #             if isinstance(layer, QgsVectorLayer):
-    #                 combo.addItem(layer.name(), layer.id())
-    #                 data_provider = layer.dataProvider()
-    #                 if data_provider is not None:
-    #                     full_path = data_provider.dataSourceUri()
-    #                     combo.setItemData(
-    #                         combo.count() - 1,
-    #                         full_path,
-    #                         Qt.ItemDataRole.ToolTipRole,
-    #                     )
-
-    #         # Sélectionner la couche enregistrée ou selon le nom
-    #         if saved_layer_id:
-    #             index = combo.findData(saved_layer_id)
-    #             if index >= 0:
-    #                 combo.setCurrentIndex(index)
-    #             else:
-    #                 regex_pattern = r"^" + type_name + r"s?[_]|[_]?" + type_name + r"s?$"
-    #                 for i in range(combo.count()):
-    #                     if re.search(regex_pattern, combo.itemText(i), re.IGNORECASE):
-    #                         combo.setCurrentIndex(i)
-    #                         break
-
     def populate_segments_layer_combo(self, combo):
         if self.project:
             saved_segments_layer_id, _ = self.project.readEntry(
@@ -122,12 +85,12 @@ class LayerManager(QObject):
     def populate_seg_id_column_combo(self, segments_layer):
         self.dialog.ui.seg_id_column_combo.clear()
 
-        if segments_layer:
+        if segments_layer and self.project:
             field_names = [field.name() for field in segments_layer.fields()]
             self.dialog.ui.seg_id_column_combo.addItems(field_names)
 
-            seg_id_column_name = self.settings.value(
-                "routes_composer/seg_id_column_name", ""
+            seg_id_column_name, _ = self.project.readEntry(
+                "routes_composer", "seg_id_column_name", ""
             )
             seg_id_column_idx = self.dialog.ui.seg_id_column_combo.findText(
                 seg_id_column_name
@@ -262,7 +225,7 @@ class LayerManager(QObject):
         )
 
         id_column = self.dialog.ui.seg_id_column_combo.currentText()
-        self.settings.setValue("routes_composer/seg_id_column_name", id_column)
+        self.project.writeEntry("routes_composer", "seg_id_column_name", id_column)
 
         segments_column = self.dialog.ui.segments_column_combo.currentText()
         self.settings.setValue("routes_composer/segments_column_name", segments_column)
