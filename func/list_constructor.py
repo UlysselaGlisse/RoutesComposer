@@ -83,6 +83,15 @@ class IDsBasket(QgsMapTool):
                 ids_text = ",".join(map(str, self.selected_ids))
                 feature.setAttribute(self.segment_column_name, ids_text)
 
+            # if (
+            #     settings.value("routes_composer/departure_checkbox")
+            #     and self.select_composition
+            # ):
+            #     feature.setAttribute(
+            #         settings.value("routes_composer/departure_field_name"),
+            #         self.start_name,
+            #     )
+
         dialog = QgsAttributeDialog(
             self.compositions_layer, feature, True, iface.mainWindow(), True
         )
@@ -93,7 +102,6 @@ class IDsBasket(QgsMapTool):
 
             if new_feature:
                 self.compositions_layer.addFeature(new_feature)
-                self.compositions_layer.commitChanges()
 
         self.selected_ids.clear()
         self.segments_layer.removeSelection()
@@ -160,7 +168,9 @@ class IDsBasket(QgsMapTool):
                         # Chercher le chemin entre le dernier point sélectionné et le nouveau
                         last_id = self.selected_ids[-1]
                         if last_id != feature_id:
-                            path = self.find_connected_segments(last_id, feature_id)
+                            path = self.find_connected_segments(
+                                last_id, feature_id
+                            )
                             for segment_id in path:
                                 if segment_id not in self.selected_ids:
                                     self.selected_ids.append(segment_id)
@@ -196,6 +206,14 @@ class IDsBasket(QgsMapTool):
 
         if closest_composition:
             segments_str = closest_composition[self.segment_column_name]
+            # departure_field_name = settings.value(
+            #     "routes_composer/departure_field_name", ""
+            # )
+            # self.start_name = (
+            #     closest_composition[departure_field_name]
+            #     if departure_field_name in closest_composition.fields().names()
+            #     else None
+            # )
             if segments_str:
                 segment_ids = [int(id_) for id_ in segments_str.split(",")]
                 self.selected_ids = segment_ids
@@ -362,7 +380,9 @@ class IDsBasket(QgsMapTool):
         #     return
 
         settings = QSettings()
-        show_label = settings.value("routes_composer/ids_basket_label_hide", "True")
+        show_label = settings.value(
+            "routes_composer/ids_basket_label_hide", "True"
+        )
         if not show_label:
             return
 

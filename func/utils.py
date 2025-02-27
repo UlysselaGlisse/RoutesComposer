@@ -8,40 +8,21 @@ from functools import wraps
 
 from qgis.PyQt.QtCore import QSettings
 
-from .. import config
-
 
 def timer_decorator(func):
     """Indique le temps que prend une fonction à s'exécuter."""
+    settings = QSettings()
+    if settings.value("routes_composer/log", False, type=bool) is True:
 
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        start = time.time()
-        result = func(*args, **kwargs)
-        end = time.time()
-        print(f"{func.__name__} a pris {(end - start) * 1000:.2f} ms")
-        return result
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            start = time.time()
+            result = func(*args, **kwargs)
+            end = time.time()
+            print(f"{func.__name__} a pris {(end - start) * 1000:.2f} ms")
+            return result
 
-    return wrapper
-
-
-def get_features_list(layer, request=None, return_as="list"):
-    """Retourne une liste ou un set d'entités."""
-    features = []
-    if request:
-        iterator = layer.getFeatures(request)
-    else:
-        iterator = layer.getFeatures()
-
-    feature = next(iterator, None)
-    while feature:
-        features.append(feature)
-        feature = next(iterator, None)
-
-    if return_as == "set":
-        return set(features)
-
-    return features
+        return wrapper
 
 
 def print_geometry_info(geometry, label):
@@ -75,7 +56,8 @@ def get_comp_id_column_name():
 
 def log(message: str, level: str = "INFO"):
     """Fonction pour gérer l'affichage des logs"""
-    if config.logging_enabled is True:
+    settings = QSettings()
+    if settings.value("routes_composer/log", False, type=bool) is True:
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[
             :-3
         ]

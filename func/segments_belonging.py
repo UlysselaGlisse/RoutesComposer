@@ -40,63 +40,63 @@ class SegmentsBelonging:
             return
 
     def update_belonging_column(self, composition_id=None):
-        self.segments_layer.startEditing()
+        segments_belonging = (
+            self.segments_manager.create_segments_belonging_dictionary()
+        )
+        features = None
 
-        try:
-            segments_belonging = (
-                self.segments_manager.create_segments_belonging_dictionary()
-            )
-            features = None
+        if composition_id:
+            segments_to_update = set()
 
-            if composition_id:
-                segments_to_update = set()
-
-                segments_list = (
-                    self.segments_manager.get_segments_list_for_composition(
-                        composition_id
-                    )
+            segments_list = (
+                self.segments_manager.get_segments_list_for_composition(
+                    composition_id
                 )
-                if segments_list:
-                    for segment in segments_list:
-                        segments_to_update.add(segment)
-
-                    if segments_to_update:
-                        expr = f'"{self.seg_id_column_name}" IN ({",".join(map(str, segments_to_update))})'
-                        request = QgsFeatureRequest().setFilterExpression(expr)
-
-                        features = self.segments_layer.getFeatures(request)
-
-            if features is None:
-                features = self.segments_layer.getFeatures()
-
-            updates = {}
-            attr_idx = self.segments_layer.fields().indexOf(
-                self.belonging_column
             )
+            if segments_list:
+                for segment in segments_list:
+                    segments_to_update.add(segment)
 
-            for segment in features:
-                appartenance_str = ",".join(
-                    sorted(
-                        segments_belonging.get(
-                            segment[self.seg_id_column_name], []
-                        )
-                    )
+                if segments_to_update:
+                    expr = f'"{self.seg_id_column_name}" IN ({",".join(map(str, segments_to_update))})'
+                    request = QgsFeatureRequest().setFilterExpression(expr)
+
+                    features = self.segments_layer.getFeatures(request)
+
+        if features is None:
+            features = self.segments_layer.getFeatures()
+
+        attr_idx = self.segments_layer.fields().indexOf(self.belonging_column)
+        updates = {}
+        for segment in features:
+            appartenance_str = ",".join(
+                sorted(
+                    segments_belonging.get(segment[self.seg_id_column_name], [])
                 )
-                if segment.id() >= 0:
-                    updates[segment.id()] = {attr_idx: appartenance_str}
-                else:
+            )
+            if segment.id() >= 0:
+                updates[segment.id()] = {attr_idx: appartenance_str}
+            else:
+                if self.segments_layer.isEditable():
+                    self.segments_layer.startEditing()
+                try:
                     self.segments_layer.changeAttributeValue(
                         segment.id(), attr_idx, appartenance_str
                     )
 
-            if updates:
-                self.segments_layer.dataProvider().changeAttributeValues(
-                    updates
+                except Exception as e:
+                    raise Exception(f"Error updating segment belonging: {e}")
+
+        if updates:
+            try:
+                success = (
+                    self.segments_layer.dataProvider().changeAttributeValues(
+                        updates
+                    )
                 )
-
-            return True
-
-        except Exception as e:
-            self.segments_layer.rollBack()
-            raise e
-            return False
+                if success:
+                    return True
+                else:
+                    return False
+            except Exception as e:
+                raise Exception(f"Error updating segments belonging: {e}")
