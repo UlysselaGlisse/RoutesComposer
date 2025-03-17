@@ -80,12 +80,8 @@ class SplitManager:
 
             if updates:
                 self.rc.compositions_layer.startEditing()
-                self.rc.compositions_layer.beginEditCommand(
-                    "Update compositions"
-                )
-                self.rc.compositions_layer.dataProvider().changeAttributeValues(
-                    updates
-                )
+                self.rc.compositions_layer.beginEditCommand("Update compositions")
+                self.rc.compositions_layer.dataProvider().changeAttributeValues(updates)
                 self.rc.compositions_layer.endEditCommand()
                 self.rc.compositions_layer.commitChanges()
             self.rc.compositions_layer.reload()
@@ -126,9 +122,7 @@ class SplitManager:
 
         return True
 
-    def process_single_segment_composition(
-        self, fid: int, old_id: int, new_id: int
-    ):
+    def process_single_segment_composition(self, fid: int, old_id: int, new_id: int):
         """Gère le cas d'une composition d'un seul segment."""
 
         dialog = SingleSegmentDialog(old_id=old_id, new_id=new_id)
@@ -145,9 +139,7 @@ class SplitManager:
 
             if composition:
                 try:
-                    new_segments_str = ",".join(
-                        map(str, dialog.current_segments)
-                    )
+                    new_segments_str = ",".join(map(str, dialog.current_segments))
                     self.rc.compositions_layer.startEditing()
                     self.rc.compositions_layer.changeAttributeValue(
                         composition.id(),
@@ -187,9 +179,7 @@ class SplitManager:
             segments_list = self.rc.lam.convert_segments_list(
                 composition[self.rc.segments_column_name]
             )
-            valid_segments = [
-                seg for seg in segments_list if seg in valid_segments_ids
-            ]
+            valid_segments = [seg for seg in segments_list if seg in valid_segments_ids]
 
             if len(valid_segments) != len(segments_list):
                 new_segments_str = ",".join(map(str, valid_segments))
@@ -201,6 +191,7 @@ class SplitManager:
                     self.rc.segments_column_index,
                     new_segments_str,
                 )
+                self.rc.compositions_layer.commitChanges()
 
     @timer_decorator
     def has_duplicate_segment_id(self, segment_id: int) -> bool:
@@ -221,7 +212,5 @@ class SplitManager:
         self.rc.segments_layer.triggerRepaint()
 
     def get_next_id(self) -> int:
-        next_id = int(
-            self.rc.segments_layer.maximumValue(self.rc.id_column_index)
-        )
+        next_id = int(self.rc.segments_layer.maximumValue(self.rc.id_column_index))
         return next_id + 1
