@@ -1,16 +1,15 @@
 """Functions to show compositions errors."""
 
-from collections import defaultdict
-from dataclasses import dataclass
-from enum import Enum
-from functools import wraps
 import time
-from typing import cast, Dict, List, Set, Tuple
-from qgis.PyQt.QtCore import QSettings
+from collections import defaultdict
+from functools import wraps
+from typing import cast
+
 from qgis.core import (
     QgsGeometry,
     QgsProject,
 )
+
 
 def timer_decorator(func):
     """Indique le temps que prend une fonction à s'exécuter."""
@@ -25,23 +24,26 @@ def timer_decorator(func):
 
     return wrapper
 
-def get_comp_id_column_name():
-    settings = QSettings()
-    comp_id_column_name = (
-        settings.value("routes_composer/compo_id_column_name", "")
-    )
-    if comp_id_column_name:
-        return comp_id_column_name
 
+def get_comp_id_column_name():
+    project = QgsProject.instance()
+    if not project:
+        return ""
+
+    compo_id_column_name, _ = (
+        project.readEntry("routes_composer", "compo_id_column_name", "id") or "id"
+    )
+
+    if compo_id_column_name:
+        return compo_id_column_name
     else:
         return ""
+
 
 class ErrorsFinder:
     def __init__(self):
         self.segments_layer = QgsProject.instance().mapLayersByName("segments")[0]
-        self.compositions_layer = QgsProject.instance().mapLayersByName("compositions")[
-            0
-        ]
+        self.compositions_layer = QgsProject.instance().mapLayersByName("compositions")[0]
 
         self.segments_column_name = "segments"
         self.seg_id_column_name = "id"
@@ -81,7 +83,9 @@ class ErrorsFinder:
         ):
             self.errors.append(
                 {
-                    "composition_id": composition[self.comp_id_column_name] if self.comp_id_column_name else composition.id(),
+                    "composition_id": composition[self.comp_id_column_name]
+                    if self.comp_id_column_name
+                    else composition.id(),
                     "error_type": "empty_segments_list",
                 }
             )
@@ -94,21 +98,25 @@ class ErrorsFinder:
             if not segment_id.isdigit():
                 self.errors.append(
                     {
-                        "composition_id": composition[self.comp_id_column_name] if self.comp_id_column_name else composition.id(),
+                        "composition_id": composition[self.comp_id_column_name]
+                        if self.comp_id_column_name
+                        else composition.id(),
                         "error_type": "invalid_segment_id",
                         "segment_list": (segments_list),
                         "invalid_segment_id": segment_id,
                     }
                 )
             elif segment_id in seen_segments:
-                    self.errors.append(
-                        {
-                            "composition_id": composition[self.comp_id_column_name] if self.comp_id_column_name else composition.id(),
-                            "error_type": "duplicate_segment_id",
-                            "segment_list": (segments_list),
-                            "duplicate_segment_id": segment_id,
-                        }
-                    )
+                self.errors.append(
+                    {
+                        "composition_id": composition[self.comp_id_column_name]
+                        if self.comp_id_column_name
+                        else composition.id(),
+                        "error_type": "duplicate_segment_id",
+                        "segment_list": (segments_list),
+                        "duplicate_segment_id": segment_id,
+                    }
+                )
             else:
                 seen_segments.add(segment_id)
 
@@ -118,14 +126,15 @@ class ErrorsFinder:
         for i, current_segment_id in enumerate(segments_list):
             # Pour tous les segments sauf le dernier de la liste (dont la coninuité est vérifié par celle du précédent).
             if i < len(segments_list) - 1:
-
                 current_segment_id = segments_list[i]
                 next_segment_id = segments_list[i + 1]
 
                 if current_segment_id not in self.segments_geom_dict:
                     self.errors.append(
                         {
-                            "composition_id": composition[self.comp_id_column_name] if self.comp_id_column_name else composition.id(),
+                            "composition_id": composition[self.comp_id_column_name]
+                            if self.comp_id_column_name
+                            else composition.id(),
                             "error_type": "missing_segment",
                             "segment_ids": (current_segment_id, None),
                             "missing_segment_id": current_segment_id,
@@ -136,7 +145,9 @@ class ErrorsFinder:
                 if next_segment_id not in self.segments_geom_dict:
                     self.errors.append(
                         {
-                            "composition_id": composition[self.comp_id_column_name] if self.comp_id_column_name else composition.id(),
+                            "composition_id": composition[self.comp_id_column_name]
+                            if self.comp_id_column_name
+                            else composition.id(),
                             "error_type": "missing_segment",
                             "segment_ids": (next_segment_id, None),
                             "missing_segment_id": next_segment_id,
@@ -147,9 +158,7 @@ class ErrorsFinder:
                 current_geom = cast(
                     QgsGeometry, self.segments_geom_dict[current_segment_id]
                 )
-                next_geom = cast(
-                    QgsGeometry, self.segments_geom_dict[next_segment_id]
-                )
+                next_geom = cast(QgsGeometry, self.segments_geom_dict[next_segment_id])
 
                 current_points = current_geom.asPolyline()
                 next_points = next_geom.asPolyline()
@@ -169,12 +178,12 @@ class ErrorsFinder:
                     ):
                         pass
                     else:
-                        discontinuity_errors[current_segment_id].append(
-                            composition.id()
-                        )
+                        discontinuity_errors[current_segment_id].append(composition.id())
                         self.errors.append(
                             {
-                                "composition_id": composition[self.comp_id_column_name] if self.comp_id_column_name else composition.id(),
+                                "composition_id": composition[self.comp_id_column_name]
+                                if self.comp_id_column_name
+                                else composition.id(),
                                 "error_type": "discontinuity",
                                 "segment_ids": (
                                     current_segment_id,
@@ -200,5 +209,6 @@ class ErrorsFinder:
             str(seg[self.seg_id_column_name]): seg.geometry()
             for seg in self.segments_layer.getFeatures()
         }
+
 
 e = ErrorsFinder()

@@ -28,9 +28,6 @@ class SplitManager:
         segment_lists_ids: list,
     ) -> None:
         """Met à jour les compositions après division d'un segment."""
-
-        self.rc.compositions_layer.startEditing()
-
         original_geom = original_feature.geometry()
         new_geom = new_feature.geometry()
 
@@ -41,7 +38,7 @@ class SplitManager:
             for composition_id, segments_list in segment_lists_ids:
                 if len(segments_list) > 1:
                     old_index = segments_list.index(int(old_id))
-                    # On utilise la géométrie de la nouvelle entité pour déterminer
+                    # On n'utilise la géométrie de la nouvelle entité pour déterminer
                     # le sens que pour le dernier segment de la liste.
                     last_segment = old_index == len(segments_list) - 1
                     segment_geom = new_geom if last_segment else original_geom
@@ -70,11 +67,20 @@ class SplitManager:
                             self.rc.segments_column_index: new_segments_list
                         }
                     else:
-                        self.rc.compositions_layer.changeAttributeValue(
-                            composition_id,
-                            self.rc.segments_column_index,
-                            new_segments_list,
-                        )
+                        if not self.rc.compositions_layer.isEditable():
+                            self.rc.compositions_layer.startEditing()
+                        try:
+                            self.rc.compositions_layer.changeAttributeValue(
+                                composition_id,
+                                self.rc.segments_column_index,
+                                new_segments_list,
+                            )
+
+                        except Exception as e:
+                            raise Exception(
+                                f"Erreur lors de la mise-à-jour automatique de la liste des segments {e}."
+                            )
+
                 else:
                     self.process_single_segment_composition(fid, old_id, new_id)
 
@@ -93,6 +99,7 @@ class SplitManager:
         finally:
             self.rc.is_splitting = False
 
+    @timer_decorator
     def check_segment_orientation(
         self,
         segment_geom: QgsGeometry,
@@ -141,21 +148,18 @@ class SplitManager:
                 try:
                     new_segments_str = ",".join(map(str, dialog.current_segments))
                     self.rc.compositions_layer.startEditing()
+                try:
                     self.rc.compositions_layer.changeAttributeValue(
                         composition.id(),
                         self.rc.segments_column_index,
                         new_segments_str,
                     )
-                    log(
-                        f"Composition {composition.id()} (data provider) has been updated with segments: '{new_segments_str}'"
-                    )
 
                 except Exception as e:
-                    iface.messageBar().pushMessage(
-                        "Erreur",
-                        f"Erreur lors de la mise à jour de la composition: {str(e)}",
-                        level=Qgis.MessageLevel.Critical,
-                    )
+                    log(f"Error updating composition: {e}")
+                finally:
+                    self.rc.compositions_layer.triggerRepaint()
+
             else:
                 iface.messageBar().pushMessage(
                     "Attention",
@@ -166,6 +170,7 @@ class SplitManager:
         else:
             return None
 
+    @timer_decorator
     def clean_invalid_segments(self) -> None:
         """Supprime les références aux segments qui n'existent plus dans la table segments."""
         valid_segments_ids = {
@@ -174,7 +179,6 @@ class SplitManager:
             if f.id() is not None
         }
 
-        self.rc.compositions_layer.startEditing()
         for composition in self.rc.compositions_layer.getFeatures():
             segments_list = self.rc.lam.convert_segments_list(
                 composition[self.rc.segments_column_name]
@@ -203,13 +207,17 @@ class SplitManager:
         segments = list(self.rc.segments_layer.getFeatures(request))
         return len(segments) > 1
 
+    @timer_decorator
     def update_segment_id(self, fid: int, next_id: int) -> None:
         """Met à jour l'id des segments divisés."""
-        self.rc.segments_layer.startEditing()
-        self.rc.segments_layer.changeAttributeValue(
-            fid, self.rc.id_column_index, int(next_id)
-        )
-        self.rc.segments_layer.triggerRepaint()
+        try:
+            self.rc.segments_layer.changeAttributeValue(
+                fid, self.rc.id_column_index, int(next_id)
+            )
+        except Exception as e:
+            log(f"Error updating segment {fid}: {e}")
+        finally:
+            self.rc.segments_layer.triggerRepaint()
 
     def get_next_id(self) -> int:
         next_id = int(self.rc.segments_layer.maximumValue(self.rc.id_column_index))

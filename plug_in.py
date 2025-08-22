@@ -6,11 +6,9 @@ from qgis.PyQt.QtCore import QCoreApplication, QSettings, QTimer, QTranslator
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
-from .connexions_handler import ConnexionsHandler
+from .ctrl.connexions_handler import ConnexionsHandler
 from .func.list_constructor import IDsBasket
-from .func.utils import log
 from .ui.main_dialog.main import RoutesComposerDialog
-from .ui.main_dialog.options import PluginOptions
 
 
 class RoutesComposerTool:
@@ -21,13 +19,12 @@ class RoutesComposerTool:
         self.menu = "Routes Composer Tool"
         self.toolbar = self.iface.addToolBar("Routes Composer")
         self.toolbar.setObjectName("RoutesComposerToolbar")
-        self.project_loaded = False
         self.connexions_handler = ConnexionsHandler()
-        self.iface = iface
-        project = QgsProject.instance()
-        if project:
-            project.readProject.connect(self.on_project_load)
-            project.layerRemoved.connect(self.update_icon)
+
+        self.project = QgsProject.instance()
+        if self.project:
+            self.project.readProject.connect(self.on_project_load)
+            self.project.layerRemoved.connect(self.update_icon)
 
         locale = QSettings().value("locale/userLocale")[0:2]
         locale_path = os.path.join(
@@ -43,16 +40,10 @@ class RoutesComposerTool:
         self.iface.mapCanvas().mapToolSet.connect(self.deactivate_ids_basket)
 
     def initGui(self):
-        icon_path = os.path.join(
-            os.path.dirname(__file__), "ui", "icons", "icon.png"
-        )
+        icon_path = os.path.join(os.path.dirname(__file__), "ui", "icons", "icon.png")
         show_action = QAction(
             QIcon(icon_path),
-            (
-                QCoreApplication.translate(
-                    "RoutesManagerTool", "Ouvrir Routes Composer"
-                )
-            ),
+            (QCoreApplication.translate("RoutesManagerTool", "Ouvrir Routes Composer")),
             self.iface.mainWindow(),
         )
         show_action.triggered.connect(self.show_dialog)
@@ -74,23 +65,18 @@ class RoutesComposerTool:
         self.ids_basket_action.triggered.connect(self.toggle_ids_basket)
         self.toolbar.addAction(self.ids_basket_action)
         self.actions.append(self.ids_basket_action)
-        options = PluginOptions(self.iface)
-        options.load_options()
 
     def on_project_load(self):
-        project = QgsProject.instance()
-        if project:
-            auto_start, _ = project.readBoolEntry(
+        if self.project:
+            auto_start, _ = self.project.readBoolEntry(
                 "routes_composer", "auto_start", False
             )
-            log(f"auto_start value {auto_start}")
             if auto_start:
                 QTimer.singleShot(1000, self.auto_start_script)
 
     def auto_start_script(self):
-        project = QgsProject.instance()
-        if project:
-            auto_start, _ = project.readBoolEntry(
+        if self.project:
+            auto_start, _ = self.project.readBoolEntry(
                 "routes_composer", "auto_start", False
             )
 
@@ -101,52 +87,49 @@ class RoutesComposerTool:
             self.update_icon()
 
     def checks_layers(self):
-        project = QgsProject.instance()
-        if project:
-            settings = QSettings()
-            saved_segments_layer_id = settings.value(
-                "routes_composer/segments_layer_id", ""
+        settings = QSettings()
+        if self.project:
+            saved_segments_layer_id, _ = self.project.readEntry(
+                "routes_composer", "segments_layer_id", ""
             )
-            saved_compositions_layer_id = settings.value(
-                "routes_composer/compositions_layer_id", ""
+            saved_compositions_layer_id, _ = self.project.readEntry(
+                "routes_composer", "compositions_layer_id", ""
             )
-            if not project.mapLayer(
+            if not self.project.mapLayer(
                 saved_segments_layer_id
-            ) or not project.mapLayer(saved_compositions_layer_id):
+            ) or not self.project.mapLayer(saved_compositions_layer_id):
                 return False
 
             return True
 
     def activate_ids_basket(self):
-        project = QgsProject.instance()
-        if not project:
+        if not self.project:
             return
         settings = QSettings()
-        segments_layer_id = settings.value(
-            "routes_composer/segments_layer_id", ""
+        segments_layer_id, _ = self.project.readEntry(
+            "routes_composer", "segments_layer_id", ""
         )
-        segments_layer = cast(
-            QgsVectorLayer, project.mapLayer(segments_layer_id)
-        )
+        segments_layer = cast(QgsVectorLayer, self.project.mapLayer(segments_layer_id))
         if segments_layer is None:
             return
-        compositions_layer_id = settings.value(
-            "routes_composer/compositions_layer_id", ""
+
+        compositions_layer_id, _ = self.project.readEntry(
+            "routes_composer", "compositions_layer_id", ""
         )
         compositions_layer = cast(
-            QgsVectorLayer, project.mapLayer(compositions_layer_id)
+            QgsVectorLayer, self.project.mapLayer(compositions_layer_id)
         )
         if compositions_layer is None:
             return
 
-        segments_column_name = settings.value(
-            "routes_composer/segments_column_name", "segments"
+        segments_column_name, _ = self.project.readEntry(
+            "routes_composer", "segments_column_name", "segments"
         )
         if segments_column_name not in compositions_layer.fields().names():
             return
 
-        seg_id_column_name = settings.value(
-            "routes_composer/seg_id_column_name", "id"
+        seg_id_column_name, _ = self.project.readEntry(
+            "routes_composer", "seg_id_column_name", "id"
         )
         if seg_id_column_name not in segments_layer.fields().names():
             return
@@ -180,7 +163,7 @@ class RoutesComposerTool:
             self.dialog.close()
         del self.toolbar
         if self.connexions_handler.routes_composer_connected:
-            self.connexions_handler.disconnect_routes_composer()
+            self.connexions_handler.delete_routes_composer()
 
     def update_icon(self):
         icon_path = os.path.join(

@@ -15,7 +15,7 @@ from qgis.core import (
 )
 
 from .. import config
-from .utils import LayersAssociationManager, log, timer_decorator
+from .utils import LayersAssociationManager, log
 
 
 class GeomCompo:
@@ -38,65 +38,61 @@ class GeomCompo:
             self.seg_id_column_name,
         )
 
-    @timer_decorator
     def update_geometries_on_the_fly(self, segment_id):
-        try:
-            affected_compositions = self.lam.get_compositions_for_segment(
-                segment_id, get_feature="yes"
+        affected_compositions = self.lam.get_compositions_for_segment(
+            segment_id, get_feature="yes"
+        )
+        if not affected_compositions:
+            return
+
+        needed_segments = {
+            seg_id
+            for composition in affected_compositions
+            for seg_id in self.lam.convert_segments_list(
+                composition[self.segments_column_name]
             )
-            if not affected_compositions:
-                return
+        }
 
-            needed_segments = {
-                seg_id
-                for composition in affected_compositions
-                for seg_id in self.lam.convert_segments_list(
-                    composition[self.segments_column_name]
-                )
-            }
+        segments_points = {}
+        expr = f"{self.seg_id_column_name} IN ({','.join(map(str, needed_segments))})"
+        segments = self.segments_layer.getFeatures(expr)
+        segments_points = {
+            segment[self.seg_id_column_name]: segment.geometry().asPolyline()
+            for segment in segments
+            if segment.geometry() and not segment.geometry().isEmpty()
+        }
 
-            segments_points = {}
-            expr = f"{self.seg_id_column_name} IN ({','.join(map(str, needed_segments))})"
-            segments = self.segments_layer.getFeatures(expr)
-            segments_points = {
-                segment[
-                    self.seg_id_column_name
-                ]: segment.geometry().asPolyline()
-                for segment in segments
-                if segment.geometry() and not segment.geometry().isEmpty()
-            }
+        updates = {}
+        for composition in affected_compositions:
+            segments_list = self.lam.convert_segments_list(
+                composition[self.segments_column_name]
+            )
 
-            updates = {}
-            if not self.compositions_layer.isEditable():
-                self.compositions_layer.startEditing()
-
-            for composition in affected_compositions:
-                segments_list = self.lam.convert_segments_list(
-                    composition[self.segments_column_name]
-                )
-
-                new_geometry = self.create_merged_geometry(
-                    segments_list, segments_points
-                )
-                if new_geometry:
-                    if composition.id() >= 0:
-                        updates[composition.id()] = new_geometry[0]
-                    else:
-                        success = self.compositions_layer.changeGeometry(
+            new_geometry = self.create_merged_geometry(
+                segments_list, segments_points
+            )
+            if new_geometry:
+                if composition.id() >= 0:
+                    updates[composition.id()] = new_geometry[0]
+                else:
+                    if not self.compositions_layer.isEditable():
+                        self.compositions_layer.startEditing()
+                    try:
+                        self.compositions_layer.changeGeometry(
                             composition.id(), new_geometry[0]
                         )
-                        if not success:
-                            self.compositions_layer.rollBack()
+                    except Exception as e:
+                        log(f"Error occurred while updating geometry: {e}")
 
-            if updates:
+        if updates:
+            try:
                 self.compositions_layer.dataProvider().changeGeometryValues(
                     updates
                 )
-        except Exception as e:
-            log(e)
-            if self.compositions_layer.isEditable():
-                self.compositions_layer.rollBack()
-            return
+            except Exception as e:
+                raise Exception(
+                    f"Error occurred while updating geometries: {e}"
+                )
 
     def update_compositions_geometries(self, progress_bar, mode="update"):
         provider, new_layer = None, None
@@ -239,9 +235,9 @@ class GeomCompo:
                 result_points.extend(current_points)
 
         if result_points:
-            line_string = QgsLineString([
-                QgsPoint(p.x(), p.y()) for p in result_points
-            ])
+            line_string = QgsLineString(
+                [QgsPoint(p.x(), p.y()) for p in result_points]
+            )
             return QgsGeometry(line_string), not_connected_segments
         log(
             "Aucun point trouvé après le traitement des segments.",

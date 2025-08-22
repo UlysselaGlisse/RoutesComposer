@@ -6,7 +6,7 @@ from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.utils import iface
 
 from ... import config
-from ...connexions_handler import ConnexionsHandler
+from ...ctrl.connexions_handler import ConnexionsHandler
 from ...func.utils import log
 
 
@@ -21,9 +21,9 @@ class EventHandlers(QObject):
             if not ConnexionsHandler.routes_composer_connected:
                 if not self.dialog.layer_manager.check_layers_and_columns():
                     return
-                self.dialog.layer_manager.save_selected_layers_and_columns()
 
-                self.connexions_handler.connect_routes_composer()
+                if self.dialog.layer_manager.save_selected_layers_and_columns():
+                    self.connexions_handler.reconnect_routes_composer()
 
                 self.dialog.update_ui_state()
                 if self.dialog.tool:
@@ -46,7 +46,7 @@ class EventHandlers(QObject):
             project.setDirty(True)
 
     def stop_running_routes_composer(self):
-        self.connexions_handler.disconnect_routes_composer()
+        self.connexions_handler.delete_routes_composer()
 
         if self.dialog.tool:
             self.dialog.tool.update_icon()
@@ -60,8 +60,8 @@ class EventHandlers(QObject):
             project.writeEntry("routes_composer", "geom_on_fly", geom_on_fly)
             project.setDirty(True)
             if ConnexionsHandler.routes_composer_connected:
-                self.connexions_handler.disconnect_routes_composer()
-                self.connexions_handler.connect_routes_composer()
+                self.connexions_handler.delete_routes_composer()
+                self.connexions_handler.reconnect_routes_composer()
 
             log(f"geom_on_fly: {geom_on_fly}")
 
@@ -72,8 +72,8 @@ class EventHandlers(QObject):
             project.writeEntry("routes_composer", "belonging", belonging)
             project.setDirty(True)
             if ConnexionsHandler.routes_composer_connected:
-                self.connexions_handler.disconnect_routes_composer()
-                self.connexions_handler.connect_routes_composer()
+                self.connexions_handler.delete_routes_composer()
+                self.connexions_handler.reconnect_routes_composer()
 
             log(f"belonging: {belonging}")
 
