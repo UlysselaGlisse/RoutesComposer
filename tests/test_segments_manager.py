@@ -1,8 +1,7 @@
 import time
 from functools import wraps
-from typing_extensions import cast
 
-from qgis.core import QgsFeatureRequest, QgsProject, QgsVectorLayer
+from qgis.core import QgsProject
 
 # exécuter le fichier dans la console python.
 # dans la console, par exemple:  manager.get_seg_for_comp(1)
@@ -20,6 +19,7 @@ def timer_decorator(func):
         return result
 
     return wrapper
+
 
 def get_features_list(layer, request=None, return_as="list"):
     """Retourne une liste ou un set d'entités."""
@@ -43,15 +43,12 @@ def get_features_list(layer, request=None, return_as="list"):
 class LayersAssociationManager:
     def __init__(self):
         self.segments_layer = QgsProject.instance().mapLayersByName("segments")[0]
-        self.compositions_layer = QgsProject.instance().mapLayersByName("compositions")[
-            0
-        ]
+        self.compositions_layer = QgsProject.instance().mapLayersByName("compositions")[0]
 
         self.segments_column_name = "segments"
         self.seg_id_column_name = "id"
         self.compo_id_column_name = "id"
         self.segments_list = {}
-
 
     @timer_decorator
     def create_segments_list_and_values_dictionary(self, fields=None):
@@ -75,10 +72,12 @@ class LayersAssociationManager:
                             ...
                         }
                     }
-            """
+        """
         for composition in self.compositions_layer.getFeatures():
             compo_id = composition[self.compo_id_column_name]
-            segments_list = self.convert_segments_list(composition[self.segments_column_name])
+            segments_list = self.convert_segments_list(
+                composition[self.segments_column_name]
+            )
 
             if fields:
                 composition_data = {"segments": segments_list}
@@ -102,7 +101,9 @@ class LayersAssociationManager:
 
         for composition in self.compositions_layer.getFeatures():
             comp_id = composition[self.compo_id_column_name]
-            segments_list = self.convert_segments_list(composition[self.segments_column_name])
+            segments_list = self.convert_segments_list(
+                composition[self.segments_column_name]
+            )
 
             for seg_id in segments_list:
                 if seg_id not in self.segment_belonging:
@@ -160,9 +161,7 @@ class LayersAssociationManager:
                 if segment_id not in compositions_by_segment:
                     compositions_by_segment[segment_id] = []
 
-                composition_info = {
-                    field: composition_data[field] for field in fields
-                }
+                composition_info = {field: composition_data[field] for field in fields}
                 composition_info["id"] = composition_id
                 compositions_by_segment[segment_id].append(composition_info)
 
@@ -214,7 +213,9 @@ class LayersAssociationManager:
             f"{self.segments_column_name} = '{segment_id}'"
         )
         for composition in self.compositions_layer.getFeatures(request):
-            segments_list = self.convert_segments_list(composition[self.segments_column_name])
+            segments_list = self.convert_segments_list(
+                composition[self.segments_column_name]
+            )
             if int(segment_id) in segments_list:
                 segments_lists_ids.append((composition.id(), segments_list))
 
@@ -235,7 +236,6 @@ class LayersAssociationManager:
             segments_list_str = composition[self.segments_column_name]
 
             return self.convert_segments_list(segments_list_str)
-
 
     def convert_segments_list(self, segments_list_str):
         """
@@ -258,5 +258,6 @@ class LayersAssociationManager:
             for id_str in segments_list_str.split(",")
             if id_str.strip().isdigit()
         ]
+
 
 a = LayersAssociationManager()
