@@ -110,7 +110,6 @@ class RoutesComposer(QObject):
                         new_feature,
                         segments_lists_ids,
                     )
-                    # self.geom.update_geometries_on_the_fly(segment_id)
                     self.compositions_layer.commitChanges()
 
     def features_deleted_on_segments(self, fids):
@@ -134,7 +133,9 @@ class RoutesComposer(QObject):
         if segment_id is None:
             return
 
-        self.geom.update_geometries_on_the_fly(segment_id)
+        if self.geom_on_fly_connected:
+            self.geom.update_geometries_on_the_fly(segment_id)
+
         self.compositions_layer.triggerRepaint()
 
     def feature_added_on_compositions(self, fid):
@@ -167,7 +168,10 @@ class RoutesComposer(QObject):
                 return
 
             segment_id = int(segments_list[0])
-            self.geom.update_geometries_on_the_fly(segment_id)
+
+            if self.geom_on_fly_connected:
+                self.geom.update_geometries_on_the_fly(segment_id)
+
             self.compositions_layer.reload()
 
         if self.belonging_connected:
@@ -226,7 +230,9 @@ class RoutesComposer(QObject):
                     return
 
                 segment_id = int(segments_list[0])
-                self.geom.update_geometries_on_the_fly(segment_id)
+                if self.geom_on_fly_connected:
+                    self.geom.update_geometries_on_the_fly(segment_id)
+
                 self.compositions_layer.reload()
 
                 log(

@@ -39,6 +39,7 @@ class GeomCompo:
         )
 
     def update_geometries_on_the_fly(self, segment_id):
+        log("e")
         affected_compositions = self.lam.get_compositions_for_segment(
             segment_id, get_feature="yes"
         )
@@ -68,9 +69,7 @@ class GeomCompo:
                 composition[self.segments_column_name]
             )
 
-            new_geometry = self.create_merged_geometry(
-                segments_list, segments_points
-            )
+            new_geometry = self.create_merged_geometry(segments_list, segments_points)
             if new_geometry:
                 if composition.id() >= 0:
                     updates[composition.id()] = new_geometry[0]
@@ -86,13 +85,9 @@ class GeomCompo:
 
         if updates:
             try:
-                self.compositions_layer.dataProvider().changeGeometryValues(
-                    updates
-                )
+                self.compositions_layer.dataProvider().changeGeometryValues(updates)
             except Exception as e:
-                raise Exception(
-                    f"Error occurred while updating geometries: {e}"
-                )
+                raise Exception(f"Error occurred while updating geometries: {e}")
 
     def update_compositions_geometries(self, progress_bar, mode="update"):
         provider, new_layer = None, None
@@ -133,9 +128,7 @@ class GeomCompo:
                         self.handle_geometry_update(composition, new_geometry),
                     )
                 not_connected_segments.update(
-                    self.update_not_connected_segments(
-                        composition.id(), non_connected
-                    ),
+                    self.update_not_connected_segments(composition.id(), non_connected),
                 )
 
             processed_count += 1
@@ -163,9 +156,7 @@ class GeomCompo:
         point2: QgsPoint,
         tolerance=1e-8,
     ) -> bool:
-        return math.isclose(
-            point1.x(), point2.x(), abs_tol=tolerance
-        ) and math.isclose(
+        return math.isclose(point1.x(), point2.x(), abs_tol=tolerance) and math.isclose(
             point1.y(),
             point2.y(),
             abs_tol=tolerance,
@@ -235,9 +226,7 @@ class GeomCompo:
                 result_points.extend(current_points)
 
         if result_points:
-            line_string = QgsLineString(
-                [QgsPoint(p.x(), p.y()) for p in result_points]
-            )
+            line_string = QgsLineString([QgsPoint(p.x(), p.y()) for p in result_points])
             return QgsGeometry(line_string), not_connected_segments
         log(
             "Aucun point trouvé après le traitement des segments.",
@@ -339,14 +328,9 @@ class GeomCompo:
     def update_not_connected_segments(self, composition_id, non_connected):
         if not non_connected:
             return {}
-        return {
-            tuple(segment_ids): [composition_id]
-            for segment_ids in non_connected
-        }
+        return {tuple(segment_ids): [composition_id] for segment_ids in non_connected}
 
-    def _generate_error_messages(
-        self, failed_compositions, not_connected_segments
-    ):
+    def _generate_error_messages(self, failed_compositions, not_connected_segments):
         errors_messages = []
 
         if failed_compositions:
