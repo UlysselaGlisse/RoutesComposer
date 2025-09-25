@@ -460,8 +460,8 @@ class RoutesComposer(QObject):
         if not self.project:
             return
 
-        self.segments_layer_id = self.settings.value(
-            "routes_composer/segments_layer_id", ""
+        self.segments_layer_id, _ = self.project.readEntry(
+            "routes_composer", "segments_layer_id", ""
         )
         if not self.segments_layer_id:
             return
@@ -489,8 +489,8 @@ class RoutesComposer(QObject):
     def get_compositions_layer(self):
         if not self.project:
             return
-        self.compositions_layer_id = self.settings.value(
-            "routes_composer/compositions_layer_id", ""
+        self.compositions_layer_id, _ = self.project.readEntry(
+            "routes_composer", "compositions_layer_id", ""
         )
         if not self.compositions_layer_id:
             return
@@ -513,8 +513,8 @@ class RoutesComposer(QObject):
         return self.compositions_layer
 
     def get_segments_column_name(self):
-        self.segments_column_name = self.settings.value(
-            "routes_composer/segments_column_name", "segments"
+        self.segments_column_name, _ = self.project.readEntry(
+            "routes_composer", "segments_column_name", "segments"
         )
         if self.compositions_layer is not None:
             self.segments_column_index = int(
@@ -533,9 +533,10 @@ class RoutesComposer(QObject):
         return self.segments_column_name, self.segments_column_index
 
     def get_id_column_name(self):
-        self.seg_id_column_name = self.settings.value(
-            "routes_composer/seg_id_column_name", "id"
+        self.seg_id_column_name, _ = self.project.readEntry(
+            "routes_composer", "seg_id_column_name", "id"
         )
+
         if self.segments_layer is not None:
             self.id_column_index = self.segments_layer.fields().indexOf(
                 self.seg_id_column_name
