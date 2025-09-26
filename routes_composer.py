@@ -22,9 +22,11 @@ class RoutesComposer(QObject):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.project = QgsProject.instance()
-        if not self.project:
-            return
+        project = QgsProject.instance()
+        if not project:
+            raise RuntimeError("QgsProject instance not available")
+
+        self.project = project
 
         self.project.layersWillBeRemoved.connect(self.on_layer_removed)
 

@@ -63,9 +63,7 @@ class PluginOptions(QDialog):
         dev_group = QGroupBox(self.tr("Développement"))
         dev_layout = QVBoxLayout()
 
-        self.log_checkbox = QCheckBox(
-            self.tr("Activer les logs dans la console python")
-        )
+        self.log_checkbox = QCheckBox(self.tr("Activer les logs dans la console python"))
         self.log_checkbox.setChecked(False)
         self.log_checkbox.stateChanged.connect(self.save_options)
 
@@ -80,6 +78,7 @@ class PluginOptions(QDialog):
         settings = QSettings()
 
         show_label = self.show_label_checkbox.isChecked()
+
         settings.setValue("routes_composer/ids_basket_label_hide", show_label)
 
         log_checkbox = self.log_checkbox.isChecked()
