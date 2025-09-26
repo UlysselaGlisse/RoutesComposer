@@ -87,7 +87,6 @@ class RoutesComposerTool:
             self.update_icon()
 
     def checks_layers(self):
-        settings = QSettings()
         if self.project:
             saved_segments_layer_id, _ = self.project.readEntry(
                 "routes_composer", "segments_layer_id", ""
@@ -105,7 +104,6 @@ class RoutesComposerTool:
     def activate_ids_basket(self):
         if not self.project:
             return
-        settings = QSettings()
         segments_layer_id, _ = self.project.readEntry(
             "routes_composer", "segments_layer_id", ""
         )
