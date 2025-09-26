@@ -152,8 +152,8 @@ class RoutesComposer(QObject):
         if not source_feature.isValid():
             return
 
-        compo_id_column_name = (
-            self.settings.value("routes_composer/compo_id_column_name", "id") or "id"
+        compo_id_column_name, _ = self.project.readEntry(
+            "routes_composer", "compo_id_column_name", ""
         )
 
         log(
@@ -215,8 +215,8 @@ class RoutesComposer(QObject):
         if not source_feature.isValid():
             return
 
-        compo_id_column_name = (
-            self.settings.value("routes_composer/compo_id_column_name", "id") or "id"
+        compo_id_column_name, _ = self.project.readEntry(
+            "routes_composer", "compo_id_column_name", ""
         )
 
         field_name = self.compositions_layer.fields()[idx].name()
@@ -285,8 +285,8 @@ class RoutesComposer(QObject):
                 self.compositions_layer,
                 self.seg_id_column_name,
                 self.segments_column_name,
-                compo_id_column_name=self.settings.value(
-                    "routes_composer/compo_id_column_name", "id"
+                compo_id_column_name=self.project.readEntry(
+                    "routes_composer", "compo_id_column_name", "id"
                 ),
             )
             if self.belong.update_belonging_column():
