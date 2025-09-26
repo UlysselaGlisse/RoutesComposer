@@ -7,7 +7,6 @@ from qgis.core import QgsVectorLayer, QgsWkbTypes
 from qgis.PyQt.QtCore import (
     QCoreApplication,
     QObject,
-    QSettings,
     Qt,
     QVariant,
 )
@@ -23,7 +22,6 @@ class LayerManager(QObject):
         super().__init__(dialog)
         self.dialog = dialog
         self.project = self.dialog.project
-        self.settings = QSettings()
 
     def refresh_layers_combo(self, combo):
         if self.project:
