@@ -1,13 +1,8 @@
-from qgis.PyQt.QtCore import QSettings
-
 from ..routes_composer import RoutesComposer
 
 
 class ConnexionsHandler:
     routes_composer_connected = False
-
-    def __init__(self):
-        self.settings = QSettings()
 
     def connect_routes_composer(self):
         routes_composer = RoutesComposer.get_instance()
