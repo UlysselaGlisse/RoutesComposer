@@ -155,7 +155,8 @@ class LayersAssociationManager:
         self.segment_belonging = {}
 
         for composition in self.compositions_layer.getFeatures():
-            comp_id = int(composition[self.compo_id_column_name])
+            comp_id = composition[self.compo_id_column_name]
+
             segments_list = self.convert_segments_list(
                 composition[self.segments_column_name]
             )

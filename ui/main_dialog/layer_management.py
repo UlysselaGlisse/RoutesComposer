@@ -231,6 +231,7 @@ class LayerManager(QObject):
         )
 
         compo_id_column = self.dialog.ui.compo_id_column_combo.currentText()
+        log(f"name of compo_id_column: {compo_id_column}")
         self.project.writeEntry(
             "routes_composer", "compo_id_column_name", compo_id_column
         )
