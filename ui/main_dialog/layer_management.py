@@ -394,6 +394,7 @@ class LayerManager(QObject):
                 )
 
         else:
+            self.project.writeEntry("routes_composer", "geom_on_fly", False)
             self.dialog.ui.geom_checkbox.setVisible(False)
             self.dialog.ui.create_or_update_geom_button.setText(
                 self.tr("Créer les géométries")
