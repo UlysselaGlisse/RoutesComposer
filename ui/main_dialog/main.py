@@ -205,6 +205,7 @@ class RoutesComposerDialog(QDialog):
             self.ui.segments_attr_combo.blockSignals(True)
             self.ui.compositions_attr_combo.blockSignals(True)
 
+            # Essentiel pour recharger les combos.
             self.layer_manager.refresh_layers_combo(self.ui.segments_combo)
             self.layer_manager.refresh_layers_combo(self.ui.compositions_combo)
 

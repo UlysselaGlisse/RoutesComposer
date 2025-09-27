@@ -12,9 +12,7 @@ from qgis.PyQt.QtCore import (
 )
 from qgis.PyQt.QtWidgets import QMessageBox
 
-from ...ctrl.connexions_handler import ConnexionsHandler
 from ...func.utils import log
-from ...routes_composer import RoutesComposer
 
 
 class LayerManager(QObject):
@@ -161,11 +159,11 @@ class LayerManager(QObject):
     def on_segments_layer_selected(self):
         segments_id = self.dialog.ui.segments_combo.currentData()
 
-        if ConnexionsHandler.routes_composer_connected:
-            routes_composer = RoutesComposer.get_instance()
-            if routes_composer.segments_layer is not None:
-                if routes_composer.segments_layer.id() != segments_id:
-                    self.dialog.event_handlers.stop_running_routes_composer()
+        # if ConnexionsHandler.routes_composer_connected:
+        #     routes_composer = RoutesComposer.get_instance()
+        #     if routes_composer.segments_layer is not None:
+        #         if routes_composer.segments_layer.id() != segments_id:
+        #             self.dialog.event_handlers.stop_running_routes_composer()
 
         self.segments_layer = cast(QgsVectorLayer, self.project.mapLayer(segments_id))
         if self.segments_layer is not None:
@@ -178,11 +176,11 @@ class LayerManager(QObject):
     def on_compositions_layer_selected(self):
         compositions_id = self.dialog.ui.compositions_combo.currentData()
 
-        if ConnexionsHandler.routes_composer_connected:
-            routes_composer = RoutesComposer.get_instance()
-            if routes_composer.compositions_layer is not None:
-                if routes_composer.compositions_layer.id() != compositions_id:
-                    self.dialog.event_handlers.stop_running_routes_composer()
+        # if ConnexionsHandler.routes_composer_connected:
+        #     routes_composer = RoutesComposer.get_instance()
+        #     if routes_composer.compositions_layer is not None:
+        #         if routes_composer.compositions_layer.id() != compositions_id:
+        #             self.dialog.event_handlers.stop_running_routes_composer()
 
         self.compositions_layer = cast(
             QgsVectorLayer, self.project.mapLayer(compositions_id)

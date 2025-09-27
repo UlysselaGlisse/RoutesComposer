@@ -156,10 +156,6 @@ class RoutesComposer(QObject):
             "routes_composer", "compo_id_column_name", ""
         )
 
-        log(
-            f"New compositions feature added with id: {int(source_feature[compo_id_column_name])}"
-        )
-
         if self.routes_composer_connected:
             segments_str = source_feature[self.segments_column_name]
             if not segments_str:
@@ -279,15 +275,17 @@ class RoutesComposer(QObject):
             return
         log(f"Features removed from compositions: {fids}")
 
+        compo_id_column_name, _ = self.project.readEntry(
+            "routes_composer", "compo_id_column_name", "id"
+        )
+
         if self.belonging_connected:
             self.belong = SegmentsBelonging(
                 self.segments_layer,
                 self.compositions_layer,
                 self.seg_id_column_name,
                 self.segments_column_name,
-                compo_id_column_name=self.project.readEntry(
-                    "routes_composer", "compo_id_column_name", "id"
-                ),
+                compo_id_column_name=compo_id_column_name,
             )
             if self.belong.update_belonging_column():
                 log("Belonging column on segments layer updated.")
