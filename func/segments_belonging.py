@@ -30,9 +30,9 @@ class SegmentsBelonging:
         )
 
     def create_belonging_column(self):
+        """Create the belonging column if it doesn't exist."""
         fields = self.segments_layer.fields()
         if self.belonging_column not in fields.names():
-            # Création du champ s'il n'existe pas
             field = QgsField(self.belonging_column, QVariant.String)
             self.segments_layer.dataProvider().addAttributes([field])
             self.segments_layer.updateFields()
@@ -40,18 +40,14 @@ class SegmentsBelonging:
             return
 
     def update_belonging_column(self, composition_id=None):
-        segments_belonging = (
-            self.segments_manager.create_segments_belonging_dictionary()
-        )
+        segments_belonging = self.segments_manager.create_segments_belonging_dictionary()
         features = None
 
         if composition_id:
             segments_to_update = set()
 
-            segments_list = (
-                self.segments_manager.get_segments_list_for_composition(
-                    composition_id
-                )
+            segments_list = self.segments_manager.get_segments_list_for_composition(
+                composition_id
             )
             if segments_list:
                 for segment in segments_list:
@@ -70,9 +66,7 @@ class SegmentsBelonging:
         updates = {}
         for segment in features:
             appartenance_str = ",".join(
-                sorted(
-                    segments_belonging.get(segment[self.seg_id_column_name], [])
-                )
+                sorted(segments_belonging.get(segment[self.seg_id_column_name], []))
             )
             if segment.id() >= 0:
                 updates[segment.id()] = {attr_idx: appartenance_str}
@@ -89,10 +83,8 @@ class SegmentsBelonging:
 
         if updates:
             try:
-                success = (
-                    self.segments_layer.dataProvider().changeAttributeValues(
-                        updates
-                    )
+                success = self.segments_layer.dataProvider().changeAttributeValues(
+                    updates
                 )
                 if success:
                     return True
