@@ -129,7 +129,17 @@ class LayersAssociationManager:
                     }
         """
         for composition in self.compositions_layer.getFeatures():
-            compo_id = int(composition[self.compo_id_column_name])
+            comp_id_value = composition[self.compo_id_column_name]
+            try:
+                # Si c'est un QVariant, récupérer la valeur native
+                if hasattr(comp_id_value, "value"):
+                    comp_id_value = comp_id_value.value()
+
+                comp_id = int(comp_id_value)
+
+            except (ValueError, TypeError, AttributeError):
+                continue
+
             segments_list = self.convert_segments_list(
                 composition[self.segments_column_name]
             )
@@ -139,9 +149,9 @@ class LayersAssociationManager:
                 for field in fields:
                     composition_data[field] = composition[field]
 
-                self.segments_list[compo_id] = composition_data
+                self.segments_list[comp_id] = composition_data
             else:
-                self.segments_list[compo_id] = segments_list
+                self.segments_list[comp_id] = segments_list
 
         return self.segments_list
 
@@ -156,10 +166,15 @@ class LayersAssociationManager:
 
         for composition in self.compositions_layer.getFeatures():
             comp_id_value = composition[self.compo_id_column_name]
-            if comp_id_value is None or comp_id_value == "":
-                continue
+            try:
+                # Si c'est un QVariant, récupérer la valeur native
+                if hasattr(comp_id_value, "value"):
+                    comp_id_value = comp_id_value.value()
 
-            comp_id = int(comp_id_value)
+                comp_id = int(comp_id_value)
+
+            except (ValueError, TypeError, AttributeError):
+                continue
 
             segments_list = self.convert_segments_list(
                 composition[self.segments_column_name]

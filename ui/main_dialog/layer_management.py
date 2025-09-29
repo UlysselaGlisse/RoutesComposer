@@ -62,7 +62,6 @@ class LayerManager(QObject):
             saved_compositions_layer_id, _ = self.project.readEntry(
                 "routes_composer", "compositions_layer_id", ""
             )
-            log(saved_compositions_layer_id)
             compositions_index = combo.findData(saved_compositions_layer_id)
 
             if compositions_index >= 0:
