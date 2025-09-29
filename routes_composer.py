@@ -121,6 +121,7 @@ class RoutesComposer(QObject):
         log(f"Segments supprimées: {fids}")
 
         self.split.clean_invalid_segments()
+        self.compositions_layer.commitChanges()
 
     def geometry_changed_on_segments(self, fid, idx, *args):
         """Crée la géométrie des compositions lors du changement de la géométrie d'un segment"""
