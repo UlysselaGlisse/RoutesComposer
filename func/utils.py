@@ -24,6 +24,8 @@ def timer_decorator(func):
             return result
 
         return wrapper
+    else:
+        return func
 
 
 def print_geometry_info(geometry, label):
