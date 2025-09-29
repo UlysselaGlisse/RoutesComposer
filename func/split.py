@@ -10,14 +10,13 @@ from qgis.PyQt.QtWidgets import QDialog
 from qgis.utils import iface
 
 from ..ui.single_segment_dialog import SingleSegmentDialog
-from .utils import log, timer_decorator
+from .utils import log
 
 
 class SplitManager:
     def __init__(self, routes_composer):
         self.rc = routes_composer
 
-    @timer_decorator
     def update_compositions_segments(
         self,
         fid: int,
@@ -190,7 +189,6 @@ class SplitManager:
                     new_segments_str,
                 )
 
-    @timer_decorator
     def has_duplicate_segment_id(self, segment_id: int) -> bool:
         """Vérifie si un id de segments existe plusieurs fois. Si oui, il s'agit d'un segment divisé."""
         expression = f"{self.rc.seg_id_column_name} = '{segment_id}'"

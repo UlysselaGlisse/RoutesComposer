@@ -79,7 +79,8 @@ class RoutesComposer(QObject):
 
         if self.split is None:
             log("SplitManager n'est pas initialisé", level="WARNING")
-            return
+        else:
+            log("SplitManager is working")
 
         new_feature = self.segments_layer.getFeature(fid)
         if not new_feature.isValid():
