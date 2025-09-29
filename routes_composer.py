@@ -180,10 +180,25 @@ class RoutesComposer(QObject):
                 self.segments_column_name,
                 compo_id_column_name=compo_id_column_name,
             )
-            if self.belong.update_belonging_column(
-                int(source_feature[compo_id_column_name])
-            ):
-                log("Belonging column on segments layer updated.")
+            comp_id = source_feature[compo_id_column_name]
+
+            # Extraction de la valeur si c'est un QVariant
+            if hasattr(comp_id, "value"):
+                comp_id = comp_id.value()
+
+            # Vérification que l'ID est valide avant de procéder
+            if comp_id is not None:
+                try:
+                    # Conversion en entier et mise à jour
+                    comp_id_int = int(comp_id)
+                    if self.belong.update_belonging_column(comp_id_int):
+                        log("Belonging column on segments layer updated.")
+                    else:
+                        log("Failed to update belonging column on segments layer.")
+                except (ValueError, TypeError) as e:
+                    log(f"Invalid component ID: {comp_id}. Error: {e}")
+            else:
+                log("Component ID is None, skipping belonging column update.")
 
         saved_linkages = (
             self.settings.value("routes_composer/attribute_linkages", []) or []
@@ -245,10 +260,25 @@ class RoutesComposer(QObject):
                     self.segments_column_name,
                     compo_id_column_name=compo_id_column_name,
                 )
-                if self.belong.update_belonging_column(
-                    int(source_feature[compo_id_column_name])
-                ):
-                    log("Belonging column on segments layer updated.")
+                comp_id = source_feature[compo_id_column_name]
+
+                # Extraction de la valeur si c'est un QVariant
+                if hasattr(comp_id, "value"):
+                    comp_id = comp_id.value()
+
+                # Vérification que l'ID est valide avant de procéder
+                if comp_id is not None:
+                    try:
+                        # Conversion en entier et mise à jour
+                        comp_id_int = int(comp_id)
+                        if self.belong.update_belonging_column(comp_id_int):
+                            log("Belonging column on segments layer updated.")
+                        else:
+                            log("Failed to update belonging column on segments layer.")
+                    except (ValueError, TypeError) as e:
+                        log(f"Invalid component ID: {comp_id}. Error: {e}")
+                else:
+                    log("Component ID is None, skipping belonging column update.")
 
         settings = QSettings()
         saved_linkages = settings.value("routes_composer/attribute_linkages", []) or []
