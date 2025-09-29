@@ -447,7 +447,7 @@ class RoutesComposer(QObject):
 
             if self.comp_feature_deleted_connected:
                 try:
-                    self.compositions_layer.featureDeleted.disconnect(
+                    self.compositions_layer.featuresDeleted.disconnect(
                         self.features_deleted_on_compositions
                     )
                     self.comp_feature_deleted_connected = False
