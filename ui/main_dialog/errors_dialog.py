@@ -21,6 +21,7 @@ from qgis.utils import iface
 
 from ...func.warning import ErrorsFinder
 
+
 class ErrorDialog(QDialog):
     def __init__(self, dialog, errors, parent=None):
         super().__init__(parent)
@@ -164,7 +165,16 @@ class ErrorDialog(QDialog):
             ).format(
                 composition_id=composition_id,
                 duplicate_segment_id=duplicate_segment_id,
-                segment_list=segment_list
+                segment_list=segment_list,
+            )
+        elif error_type == "useless_segment":
+            segment_id1, segment_id2 = error.get("segment_ids", (None, None))
+            return self.tr(
+                "Composition : {composition_id}. Segments en aller-retour : {segment_id1} et {segment_id2}."
+            ).format(
+                composition_id=composition_id,
+                segment_id1=segment_id1,
+                segment_id2=segment_id2,
             )
 
         return self.tr("Erreur inconnue. Détails: {details}").format(details=str(error))
@@ -200,14 +210,18 @@ class ErrorDialog(QDialog):
                 duplicate_segment_id = match.group(1)
                 self.zoom_to_segment(duplicate_segment_id)
 
+        elif error_type == "useless_segment":
+            match = re.search(r"segment : (\d+)", detail_text)
+            if match:
+                segment_id = match.group(1)
+                self.zoom_to_segment(segment_id)
+
     def zoom_to_segment(self, segment_id):
         expr = f"\"{self.seg_id_column_name}\" = '{segment_id}'"
         self.segments_layer.selectByExpression(expr)
         feature = next(
             self.segments_layer.getFeatures(
-                QgsFeatureRequest().setFilterExpression(
-                    expr
-                )
+                QgsFeatureRequest().setFilterExpression(expr)
             ),
             None,
         )
@@ -233,7 +247,5 @@ class ErrorDialog(QDialog):
             QMessageBox.warning(
                 self,
                 self.tr("Erreur"),
-                self.tr("Segment {segment_id} non trouvé.").format(
-                    segment_id=segment_id
-                ),
+                self.tr("Segment {segment_id} non trouvé.").format(segment_id=segment_id),
             )
