@@ -168,9 +168,7 @@ class IDsBasket(QgsMapTool):
                         # Chercher le chemin entre le dernier point sélectionné et le nouveau
                         last_id = self.selected_ids[-1]
                         if last_id != feature_id:
-                            path = self.find_connected_segments(
-                                last_id, feature_id
-                            )
+                            path = self.find_connected_segments(last_id, feature_id)
                             for segment_id in path:
                                 if segment_id not in self.selected_ids:
                                     self.selected_ids.append(segment_id)
@@ -295,10 +293,7 @@ class IDsBasket(QgsMapTool):
                 )
                 segment_length = neighbor_feature.geometry().length()
                 new_distance = current_distance + segment_length
-                if (
-                    neighbor_id not in distances
-                    or new_distance < distances[neighbor_id]
-                ):
+                if neighbor_id not in distances or new_distance < distances[neighbor_id]:
                     distances[neighbor_id] = new_distance
                     unvisited[neighbor_id] = new_distance
                     previous[neighbor_id] = current_id
@@ -370,7 +365,7 @@ class IDsBasket(QgsMapTool):
         self.label.adjustSize()
 
     def canvasMoveEvent(self, e):
-        if not e:
+        if not e or not self.label.isVisible or not self.label:
             return
         mousePos = e.pos()
 
@@ -380,9 +375,7 @@ class IDsBasket(QgsMapTool):
         #     return
 
         settings = QSettings()
-        show_label = settings.value(
-            "routes_composer/ids_basket_label_hide", "True"
-        )
+        show_label = settings.value("routes_composer/ids_basket_label_hide", "True")
         if not show_label:
             return
 
@@ -394,8 +387,12 @@ class IDsBasket(QgsMapTool):
         self.label.show()
 
     def deactivate(self):
-        self.label.hide()
-        self.label.deleteLater()
+        try:
+            self.label.hide()
+            self.label.deleteLater()
+        except Exception:
+            pass
+
         self.selected_ids = []
         self.removed_ids = []
         self.segments_layer.removeSelection()
