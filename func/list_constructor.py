@@ -113,10 +113,11 @@ class IDsBasket(QgsMapTool):
         if e.button() == Qt.RightButton:  # type: ignore
             if self.selected_ids:
                 modifiers = QgsApplication.keyboardModifiers()
-                if modifiers == Qt.ShiftModifier:
+                if modifiers == Qt.ShiftModifier:  # type: ignore
                     ids_text = ",".join(map(str, self.selected_ids))
                     clipboard = QApplication.clipboard()
-                    clipboard.setText(ids_text)
+                    if clipboard is not None:
+                        clipboard.setText(ids_text)
 
                     self.selected_ids.clear()
                     self.segments_layer.removeSelection()
@@ -341,6 +342,16 @@ class IDsBasket(QgsMapTool):
         return connected
 
     def update_label(self):
+        try:
+            if (
+                not self.label
+                or not hasattr(self.label, "isVisible")
+                or not self.label.isVisible
+            ):
+                return
+        except RuntimeError:
+            return
+
         if self.selected_ids:
             self.label.setText(", ".join(map(str, self.selected_ids)))
             self.label.setStyleSheet(
@@ -365,36 +376,53 @@ class IDsBasket(QgsMapTool):
         self.label.adjustSize()
 
     def canvasMoveEvent(self, e):
-        if not e or not self.label.isVisible or not self.label:
+        if not e:
             return
-        mousePos = e.pos()
 
-        # # TODO : ne marche pas
-        # if not mousePos:
-        #     self.label.hide()
-        #     return
+        try:
+            if (
+                not self.label
+                or not hasattr(self.label, "isVisible")
+                or not self.label.isVisible
+            ):
+                return
+        except RuntimeError:
+            return
+
+        mousePos = e.pos()
 
         settings = QSettings()
         show_label = settings.value("routes_composer/ids_basket_label_hide", "True")
-        if not show_label:
+        if show_label == "False":
             return
 
         labelPos = mousePos + QPoint(20, 0)
-        if labelPos.x() + self.label.width() > self.canvas.width():  # type: ignore
-            labelPos.setX(mousePos.x() - self.label.width() - 5)
 
-        self.label.move(labelPos)
-        self.label.show()
+        try:
+            if labelPos.x() + self.label.width() > self.canvas.width():  # type: ignore
+                labelPos.setX(mousePos.x() - self.label.width() - 5)
+
+            self.label.move(labelPos)
+            self.label.show()
+        except RuntimeError:
+            return
 
     def deactivate(self):
         try:
-            self.label.hide()
-            self.label.deleteLater()
-        except Exception:
+            if hasattr(self, "label") and self.label:
+                self.label.hide()
+                self.label.deleteLater()
+                self.label = None
+        except (RuntimeError, AttributeError):
             pass
 
         self.selected_ids = []
         self.removed_ids = []
-        self.segments_layer.removeSelection()
-        self.canvas.unsetMapTool(self)
+
+        try:
+            self.segments_layer.removeSelection()
+        except:
+            pass
+
+        self.canvas.unsetMapTool(self)  # type: ignore
         super().deactivate()

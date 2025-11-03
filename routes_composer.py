@@ -117,6 +117,7 @@ class RoutesComposer(QObject):
                         new_feature,
                         segments_lists_ids,
                     )
+                    self.geom.update_geometries_on_the_fly(segment_id)
                     self.compositions_layer.commitChanges()
 
     def features_deleted_on_segments(self, fids):
