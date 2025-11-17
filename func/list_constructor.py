@@ -1,6 +1,5 @@
 """Create ui and features to list_constructor by cliking on canvas."""
 
-from PyQt5.QtCore import QSettings
 from qgis.core import (
     QgsApplication,
     QgsCoordinateTransform,
@@ -17,9 +16,9 @@ from qgis.gui import (
     QgsAttributeEditorContext,
     QgsMapTool,
 )
-from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor
-from qgis.PyQt.QtWidgets import QApplication, QLabel
+from qgis.PyQt.QtWidgets import QApplication
 from qgis.utils import iface
 
 
@@ -46,17 +45,6 @@ class IDsBasket(QgsMapTool):
         self.canvas = canvas
 
         self.setCursor(QCursor(Qt.PointingHandCursor))  # type: ignore
-        self.label = QLabel(self.canvas)
-        self.label.setText("")
-        self.label.setStyleSheet(
-            """
-            background-color: rgba(0, 0, 0, 0);
-            padding: 0;
-            border-radius: 0;
-            color: white;
-        """
-        )
-        self.label.hide()
 
         project = QgsProject.instance()
         if not project:
@@ -105,7 +93,6 @@ class IDsBasket(QgsMapTool):
 
         self.selected_ids.clear()
         self.segments_layer.removeSelection()
-        self.update_label()
 
     def canvasReleaseEvent(self, e):
         if not e:
@@ -121,7 +108,6 @@ class IDsBasket(QgsMapTool):
 
                     self.selected_ids.clear()
                     self.segments_layer.removeSelection()
-                    self.update_label()
                     return
                 else:
                     self.open_attribute_form()
@@ -176,7 +162,6 @@ class IDsBasket(QgsMapTool):
                             if feature_id not in self.selected_ids:
                                 self.selected_ids.append(feature_id)
 
-                    self.update_label()
                     self.highlight_selected_segments()
 
     def select_composition_segments(self, point):
@@ -217,7 +202,6 @@ class IDsBasket(QgsMapTool):
                 segment_ids = [int(id_) for id_ in segments_str.split(",")]
                 self.selected_ids = segment_ids
                 self.highlight_selected_segments()
-                self.update_label()
 
     def highlight_selected_segments(self):
         """Met en surbrillance (sélection de qgis) les segments sélectionnés"""
@@ -243,7 +227,6 @@ class IDsBasket(QgsMapTool):
         self.selected_ids.clear()
         self.removed_ids.clear()
         self.segments_layer.removeSelection()
-        self.update_label()
 
     def remove_last_segment(self):
         if self.selected_ids:
@@ -251,14 +234,12 @@ class IDsBasket(QgsMapTool):
             self.removed_ids.append(last_id)
             self.segments_layer.removeSelection()
             self.highlight_selected_segments()
-            self.update_label()
 
     def restore_last_removed_segment(self):
         if self.removed_ids:
             last_removed_id = self.removed_ids.pop()
             self.selected_ids.append(last_removed_id)
             self.highlight_selected_segments()
-            self.update_label()
 
     def find_connected_segments(self, start_id, end_id):
         start_id = int(start_id)
@@ -341,81 +322,7 @@ class IDsBasket(QgsMapTool):
         self.connectivity_cache[segment_id] = connected
         return connected
 
-    def update_label(self):
-        try:
-            if (
-                not self.label
-                or not hasattr(self.label, "isVisible")
-                or not self.label.isVisible
-            ):
-                return
-        except RuntimeError:
-            return
-
-        if self.selected_ids:
-            self.label.setText(", ".join(map(str, self.selected_ids)))
-            self.label.setStyleSheet(
-                """
-                background-color: rgba(255, 255, 255, 0.9);
-                padding: 5px;
-                border-radius: 3px;
-                color: black;
-            """
-            )
-        else:
-            self.label.setText("")
-            self.label.setStyleSheet(
-                """
-                background-color: rgba(0, 0, 0, 0);
-                padding: 0;
-                border-radius: 0;
-                color: white;
-            """
-            )
-
-        self.label.adjustSize()
-
-    def canvasMoveEvent(self, e):
-        if not e:
-            return
-
-        try:
-            if (
-                not self.label
-                or not hasattr(self.label, "isVisible")
-                or not self.label.isVisible
-            ):
-                return
-        except RuntimeError:
-            return
-
-        mousePos = e.pos()
-
-        settings = QSettings()
-        show_label = settings.value("routes_composer/ids_basket_label_hide", "True")
-        if show_label == "False":
-            return
-
-        labelPos = mousePos + QPoint(20, 0)
-
-        try:
-            if labelPos.x() + self.label.width() > self.canvas.width():  # type: ignore
-                labelPos.setX(mousePos.x() - self.label.width() - 5)
-
-            self.label.move(labelPos)
-            self.label.show()
-        except RuntimeError:
-            return
-
     def deactivate(self):
-        try:
-            if hasattr(self, "label") and self.label:
-                self.label.hide()
-                self.label.deleteLater()
-                self.label = None
-        except (RuntimeError, AttributeError):
-            pass
-
         self.selected_ids = []
         self.removed_ids = []
 
