@@ -166,7 +166,7 @@ class SplitManager:
     def clean_invalid_segments(self) -> None:
         """Supprime les références aux segments qui n'existent plus dans la table segments."""
         valid_segments_ids = {
-            f[self.rc.seg_id_column_name]
+            int(f[self.rc.seg_id_column_name])
             for f in self.rc.segments_layer.getFeatures()
             if f.id() is not None
         }
