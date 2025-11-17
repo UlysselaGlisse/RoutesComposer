@@ -171,7 +171,7 @@ class SplitManager:
             if f.id() is not None
         }
 
-        if valid_segments_ids is None or valid_segments_ids == []:
+        if not valid_segments_ids:
             return
 
         self.rc.compositions_layer.startEditing()
