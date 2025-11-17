@@ -172,6 +172,7 @@ class SplitManager:
         }
 
         if not valid_segments_ids:
+            log("No valid segments found, return...")
             return
 
         self.rc.compositions_layer.startEditing()
