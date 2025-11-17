@@ -171,6 +171,9 @@ class SplitManager:
             if f.id() is not None
         }
 
+        if valid_segments_ids is None or valid_segments_ids == []:
+            return
+
         self.rc.compositions_layer.startEditing()
         for composition in self.rc.compositions_layer.getFeatures():
             segments_list = self.rc.lam.convert_segments_list(
