@@ -3,8 +3,12 @@ from functools import wraps
 
 from qgis.core import QgsProject
 
-# exécuter le fichier dans la console python.
-# dans la console, par exemple:  manager.get_seg_for_comp(1)
+"""
+1. Ouvrir le fichier dans la console python.
+2. Changer le nom des couches (segments, compositions) charger dans qgis ou changer les noms à l'initialisation de LayersAssociationManager
+3. Exécuter le fichier.
+4. Dans la console, taper a.une_des_fonctions_à_tester()
+"""
 
 
 def timer_decorator(func):
@@ -49,6 +53,34 @@ class LayersAssociationManager:
         self.seg_id_column_name = "id"
         self.compo_id_column_name = "id"
         self.segments_list = {}
+
+    @timer_decorator
+    def get_features(self):
+        valid_segments_ids = {
+            int(f[self.seg_id_column_name])
+            for f in self.segments_layer.getFeatures()
+            if f.id() is not None
+        }
+        if not valid_segments_ids:
+            # Tentative de récupération avec une approche alternative
+            try:
+                alternative_ids = {
+                    int(f[self.seg_id_column_name])
+                    for f in self.segments_layer.dataProvider().getFeatures()
+                    if f.id() is not None and f[self.seg_id_column_name] is not None
+                }
+                if alternative_ids:
+                    print(f"Alternative method found {len(alternative_ids)} segments")
+                    valid_segments_ids = alternative_ids
+                else:
+                    print(
+                        "Alternative method also failed - aborting to prevent data loss"
+                    )
+                    return
+            except Exception as e:
+                print(f"Alternative method failed: {e} - aborting")
+                return
+        print(len(valid_segments_ids))
 
     @timer_decorator
     def create_segments_list_and_values_dictionary(self, fields=None):

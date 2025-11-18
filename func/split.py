@@ -165,6 +165,10 @@ class SplitManager:
 
     def clean_invalid_segments(self) -> None:
         """Supprime les références aux segments qui n'existent plus dans la table segments."""
+        if not self.rc.segments_layer.isValid():
+            log("Segments layer unvalid - Aborting")
+            return
+
         valid_segments_ids = {
             int(f[self.rc.seg_id_column_name])
             for f in self.rc.segments_layer.getFeatures()
@@ -172,8 +176,21 @@ class SplitManager:
         }
 
         if not valid_segments_ids:
-            log("No valid segments found, return...")
-            return
+            try:
+                alternative_ids = {
+                    int(f[self.rc.seg_id_column_name])
+                    for f in self.rc.segments_layer.dataProvider().getFeatures()
+                    if f.id() is not None
+                }
+                if alternative_ids:
+                    log(f"Alternative method found {len(alternative_ids)} segments")
+                    valid_segments_ids = alternative_ids
+                else:
+                    log("Alternative method also failed - aborting to prevent data loss")
+                    return
+            except Exception as e:
+                log(f"Alternative method failed: {e} - aborting")
+                return
 
         self.rc.compositions_layer.startEditing()
         for composition in self.rc.compositions_layer.getFeatures():
