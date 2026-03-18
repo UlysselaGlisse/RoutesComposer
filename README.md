@@ -60,3 +60,12 @@ Go to the plugin extension menu of Qgis and search for RoutesComposer.
 
 # Trial
 If you simply want to try this plugin, you will find an example GeoPackage in the etc/ folder. Open it and give it a try.
+
+# Contribute
+## MacOS
+1. Create a symbolic link of the repository into:
+```
+~/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins
+```
+2. Restart QGIS.
+3. Go to **Plugins > Manage and Install Plugins** and enable **RoutesComposer**.
