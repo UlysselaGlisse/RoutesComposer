@@ -11,7 +11,11 @@ from . import utils
 
 class ErrorsFinder:
     def __init__(
-        self, segments_layer, compositions_layer, segments_column_name, seg_id_column_name
+        self,
+        segments_layer,
+        compositions_layer,
+        segments_column_name,
+        seg_id_column_name,
     ):
         self.segments_layer = segments_layer
         self.compositions_layer = compositions_layer
@@ -33,7 +37,9 @@ class ErrorsFinder:
         for composition in self.compositions_layer.getFeatures():
             segments_list_str = composition[self.segments_column_name]
             if self.check_empty_list(composition, segments_list_str):
-                segments_list = [seg.strip() for seg in str(segments_list_str).split(",")]
+                segments_list = [
+                    seg.strip() for seg in str(segments_list_str).split(",")
+                ]
 
                 self.check_duplicate_and_invalid_seg_id(composition, segments_list)
                 self.check_discontinuity(composition, segments_list)
@@ -193,13 +199,21 @@ class ErrorsFinder:
                                     # Déterminer le point de connexion entre précédent et courant
                                     prev_current_connection_point = None
                                     if distance_prev_end_current_first < 0.001:
-                                        prev_current_connection_point = current_points[0]
+                                        prev_current_connection_point = current_points[
+                                            0
+                                        ]
                                     elif distance_prev_end_current_end < 0.001:
-                                        prev_current_connection_point = current_points[-1]
+                                        prev_current_connection_point = current_points[
+                                            -1
+                                        ]
                                     elif distance_prev_first_current_first < 0.001:
-                                        prev_current_connection_point = current_points[0]
+                                        prev_current_connection_point = current_points[
+                                            0
+                                        ]
                                     elif distance_prev_first_current_end < 0.001:
-                                        prev_current_connection_point = current_points[-1]
+                                        prev_current_connection_point = current_points[
+                                            -1
+                                        ]
 
                                     # Si les deux points de connexion sont identiques (aller-retour)
                                     if (
@@ -239,7 +253,9 @@ class ErrorsFinder:
                         )
 
     def check_unused_segments(self):
-        unused_segment_ids = set(self.segments_geom_dict.keys()) - self.used_segments_ids
+        unused_segment_ids = (
+            set(self.segments_geom_dict.keys()) - self.used_segments_ids
+        )
         for segment_id in unused_segment_ids:
             self.errors.append(
                 {
@@ -254,4 +270,5 @@ class ErrorsFinder:
         return {
             str(seg[self.seg_id_column_name]): seg.geometry()
             for seg in self.segments_layer.getFeatures()
+            if not seg.geometry().isNull() and not seg.geometry().isEmpty()
         }
