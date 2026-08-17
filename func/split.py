@@ -10,7 +10,7 @@ from qgis.PyQt.QtWidgets import QDialog
 from qgis.utils import iface
 
 from ..ui.single_segment_dialog import SingleSegmentDialog
-from .utils import log
+from .utils import log, safe_int_from_qvariant
 
 
 class SplitManager:
@@ -170,7 +170,7 @@ class SplitManager:
             return
 
         valid_segments_ids = {
-            int(f[self.rc.seg_id_column_name])
+            safe_int_from_qvariant(f[self.rc.seg_id_column_name])
             for f in self.rc.segments_layer.getFeatures()
             if f.id() is not None
         }
@@ -178,7 +178,7 @@ class SplitManager:
         if not valid_segments_ids:
             try:
                 alternative_ids = {
-                    int(f[self.rc.seg_id_column_name])
+                    safe_int_from_qvariant(f[self.rc.seg_id_column_name])
                     for f in self.rc.segments_layer.dataProvider().getFeatures()
                     if f.id() is not None
                 }
@@ -186,7 +186,9 @@ class SplitManager:
                     log(f"Alternative method found {len(alternative_ids)} segments")
                     valid_segments_ids = alternative_ids
                 else:
-                    log("Alternative method also failed - aborting to prevent data loss")
+                    log(
+                        "Alternative method also failed - aborting to prevent data loss"
+                    )
                     return
             except Exception as e:
                 log(f"Alternative method failed: {e} - aborting")

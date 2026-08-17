@@ -21,6 +21,8 @@ from qgis.PyQt.QtGui import QCursor
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.utils import iface
 
+from .utils import safe_int_from_qvariant
+
 
 class IDsBasket(QgsMapTool):
     def __init__(
@@ -147,7 +149,9 @@ class IDsBasket(QgsMapTool):
                         closest_feature = feature
 
                 if closest_feature:
-                    feature_id = int(closest_feature[self.seg_id_column_name])
+                    feature_id = safe_int_from_qvariant(
+                        closest_feature[self.seg_id_column_name]
+                    )
 
                     if not self.selected_ids:
                         self.selected_ids.append(feature_id)
@@ -206,7 +210,9 @@ class IDsBasket(QgsMapTool):
     def highlight_selected_segments(self):
         """Met en surbrillance (sélection de qgis) les segments sélectionnés"""
 
-        expr = f'"{self.seg_id_column_name}" IN ({",".join(map(str, self.selected_ids))})'
+        expr = (
+            f'"{self.seg_id_column_name}" IN ({",".join(map(str, self.selected_ids))})'
+        )
 
         self.segments_layer.selectByExpression(expr)
 
@@ -275,7 +281,10 @@ class IDsBasket(QgsMapTool):
                 )
                 segment_length = neighbor_feature.geometry().length()
                 new_distance = current_distance + segment_length
-                if neighbor_id not in distances or new_distance < distances[neighbor_id]:
+                if (
+                    neighbor_id not in distances
+                    or new_distance < distances[neighbor_id]
+                ):
                     distances[neighbor_id] = new_distance
                     unvisited[neighbor_id] = new_distance
                     previous[neighbor_id] = current_id
@@ -317,7 +326,9 @@ class IDsBasket(QgsMapTool):
             other_geom = feature.geometry()
 
             if current_geom.touches(other_geom):
-                connected.append(int(feature[self.seg_id_column_name]))
+                connected.append(
+                    safe_int_from_qvariant(feature[self.seg_id_column_name])
+                )
 
         self.connectivity_cache[segment_id] = connected
         return connected

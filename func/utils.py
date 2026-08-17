@@ -133,11 +133,7 @@ class LayersAssociationManager:
         for composition in self.compositions_layer.getFeatures():
             comp_id_value = composition[self.compo_id_column_name]
             try:
-                # Si c'est un QVariant, récupérer la valeur native
-                if hasattr(comp_id_value, "value"):
-                    comp_id_value = comp_id_value.value()
-
-                comp_id = int(comp_id_value)
+                comp_id = safe_int_from_qvariant(composition[self.compo_id_column_name])
 
             except (ValueError, TypeError, AttributeError):
                 continue
@@ -169,11 +165,7 @@ class LayersAssociationManager:
         for composition in self.compositions_layer.getFeatures():
             comp_id_value = composition[self.compo_id_column_name]
             try:
-                # Si c'est un QVariant, récupérer la valeur native
-                if hasattr(comp_id_value, "value"):
-                    comp_id_value = comp_id_value.value()
-
-                comp_id = int(comp_id_value)
+                comp_id = safe_int_from_qvariant(composition[self.compo_id_column_name])
 
             except (ValueError, TypeError, AttributeError):
                 continue
@@ -266,7 +258,7 @@ class LayersAssociationManager:
             if get_feature == "yes":
                 compositions_list.append(composition)
             else:
-                comp_id = int(composition[self.compo_id_column_name])
+                comp_id = safe_int_from_qvariant(composition[self.compo_id_column_name])
                 compositions_list.append(comp_id)
 
         return compositions_list
@@ -335,3 +327,37 @@ class LayersAssociationManager:
             for id_str in segments_list_str.split(",")
             if id_str.strip().isdigit()
         ]
+
+
+def safe_int_from_qvariant(value):
+    """Convertit une valeur (potentiellement QVariant) en int."""
+    # Gestion des None
+    if value is None:
+        return 0
+
+    # Si c'est un QVariant, récupérer la valeur native (max 3 tentatives)
+    for _ in range(3):
+        if hasattr(value, "value") and callable(getattr(value, "value", None)):
+            try:
+                new_value = value.value()
+                # Si value() retourne None ou le même objet, arrêter
+                if new_value is None or new_value is value:
+                    break
+                value = new_value
+            except:
+                break
+        else:
+            break
+
+    # Si c'est toujours un QVariant, tenter conversion via string
+    if type(value).__name__ == "QVariant":
+        try:
+            return int(str(value))
+        except:
+            return 0
+
+    # Conversion finale
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return 0

@@ -8,7 +8,7 @@ from .func.attributes import AttributeLinker
 from .func.geom_compo import GeomCompo
 from .func.segments_belonging import SegmentsBelonging
 from .func.split import SplitManager
-from .func.utils import LayersAssociationManager, log
+from .func.utils import LayersAssociationManager, log, safe_int_from_qvariant
 
 
 class RoutesComposer(QObject):
@@ -86,7 +86,9 @@ class RoutesComposer(QObject):
         if not new_feature.isValid():
             return
 
-        segment_id = int(new_feature.attributes()[self.id_column_index])
+        segment_id = safe_int_from_qvariant(
+            new_feature.attributes()[self.id_column_index]
+        )
         if segment_id is None:
             return
 
@@ -172,7 +174,7 @@ class RoutesComposer(QObject):
             if not segments_list:
                 return
 
-            segment_id = int(segments_list[0])
+            segment_id = safe_int_from_qvariant(segments_list[0])
 
             if self.geom_on_fly_connected:
                 self.geom.update_geometries_on_the_fly(segment_id)
@@ -219,7 +221,7 @@ class RoutesComposer(QObject):
                 saved_linkages,
             )
             if attribute_linker.update_segments_attr_values(
-                int(source_feature[compo_id_column_name])
+                safe_int_from_qvariant(source_feature[compo_id_column_name])
             ):
                 log("Attributes updated in segments layer")
 
@@ -249,7 +251,7 @@ class RoutesComposer(QObject):
                 if not segments_list:
                     return
 
-                segment_id = int(segments_list[0])
+                segment_id = safe_int_from_qvariant(segments_list[0])
                 if self.geom_on_fly_connected:
                     self.geom.update_geometries_on_the_fly(segment_id)
 
@@ -301,7 +303,7 @@ class RoutesComposer(QObject):
                         saved_linkages if len(saved_linkages) > 1 else [linkage],
                     )
                     if attribute_linker.update_segments_attr_values(
-                        int(source_feature[compo_id_column_name])
+                        safe_int_from_qvariant(source_feature[compo_id_column_name])
                     ):
                         log("Attributes updated in segments layer")
 
@@ -386,7 +388,9 @@ class RoutesComposer(QObject):
                     self.geom_on_fly_connected = True
 
                 # Appartenance des segments check :
-                belonging = self.project.readBoolEntry("routes_composer", "belonging")[0]
+                belonging = self.project.readBoolEntry("routes_composer", "belonging")[
+                    0
+                ]
                 if belonging:
                     if not self.comp_feature_added_connected:
                         self.compositions_layer.featureAdded.connect(
